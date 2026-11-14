@@ -1,7 +1,7 @@
 import Explain from './Explain'
 import { EXPLAIN } from './explanations'
 import { fmtUtc, fmtWait, nextChange } from './events'
-import { fmtDuration, VERDICT_TEXT, verdicts, type Metrics } from './metrics'
+import { bestDarkHours, fmtDuration, VERDICT_TEXT, verdicts, type Metrics } from './metrics'
 import type { Site } from './types'
 
 interface Row { site: Site; m: Metrics }
@@ -26,7 +26,7 @@ export default function Compare({ rows, explainAll, landing }: { rows: Row[]; ex
   const verdict = verdicts(rows.map(r => ({ id: r.site.id, m: r.m })))
   const bestSun = Math.max(...rows.map(r => r.m.sunPct))
   const bestEarth = Math.max(...rows.map(r => r.m.earthPct))
-  const bestDark = Math.min(...rows.map(r => r.m.longestDarkHours))
+  const bestDark = bestDarkHours(rows.map(r => r.m))
 
   return (
     <div className="compare">
@@ -51,7 +51,7 @@ export default function Compare({ rows, explainAll, landing }: { rows: Row[]; ex
                 <div className={m.earthPct === bestEarth ? 'best' : ''}>
                   <dt>Earth visible</dt><dd className="earth">{m.earthPct.toFixed(1)}%</dd>
                 </div>
-                <div className={m.longestDarkHours === bestDark ? 'best' : ''}>
+                <div className={!m.darkCut && m.longestDarkHours === bestDark ? 'best' : ''}>
                   <dt>Longest darkness</dt>
                   <dd>{m.darkCut ? '≥ ' : ''}{fmtDuration(m.longestDarkHours)}</dd>
                 </div>

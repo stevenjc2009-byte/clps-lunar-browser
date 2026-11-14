@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { fmtDuration, siteMetrics, spanFor, verdicts, type Metrics } from './metrics'
+import { bestDarkHours, fmtDuration, siteMetrics, spanFor, verdicts, type Metrics } from './metrics'
 import type { Site, SkyData } from './types'
 
 const START = '2026-11-15T00:00:00Z'
@@ -25,9 +25,9 @@ function makeSite(sun: number[], earth: number[] = sun.map(() => 1)): Site {
   }
 }
 
-function m(sunPct: number, earthPct: number, longestDarkHours = 0): Metrics {
+function m(sunPct: number, earthPct: number, longestDarkHours = 0, darkCut = false): Metrics {
   return {
-    sunPct, earthPct, longestDarkHours, darkCut: false,
+    sunPct, earthPct, longestDarkHours, darkCut,
     sunMin: 0, sunMax: 0, earthMin: 0, earthMax: 0,
   }
 }
@@ -202,6 +202,27 @@ describe('verdicts', () => {
   it('identical sites all share "both"', () => {
     const v = verdicts([{ id: 'a', m: m(50, 50, 5) }, { id: 'b', m: m(50, 50, 5) }])
     expect(v).toEqual({ a: 'both', b: 'both' })
+  })
+})
+
+describe('bestDarkHours', () => {
+  it('ignores a cut-off "≥" night, which may really be longer', () => {
+    // Live case, 30 days from 24 Dec 2026: Shackleton "≥ 17 h" must not beat a full 13.1-day night.
+    expect(bestDarkHours([m(50, 50, 17, true), m(50, 50, 314), m(50, 50, 334)])).toBe(314)
+  })
+  it('picks the shortest full night', () => {
+    expect(bestDarkHours([m(50, 50, 40), m(50, 50, 30)])).toBe(30)
+  })
+  it('has no best when every night is cut off', () => {
+    expect(bestDarkHours([m(50, 50, 40, true), m(50, 50, 30, true)])).toBeNull()
+  })
+})
+
+describe('energy tie-break with a cut-off night', () => {
+  it('does not award energy to a tied site only because its night was cut off', () => {
+    const v = verdicts([{ id: 'a', m: m(50, 10, 5, true) }, { id: 'b', m: m(50, 20, 100) }])
+    expect(v.b === 'energy' || v.b === 'both').toBe(true)
+    expect(v.a).not.toBe('energy')
   })
 })
 

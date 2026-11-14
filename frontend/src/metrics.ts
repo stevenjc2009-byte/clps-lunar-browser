@@ -56,6 +56,13 @@ export function siteMetrics(site: Site, span: Span, stepHours: number): Metrics 
   }
 }
 
+// Shortest full night among the sites. A cut-off ("≥") night may really be longer,
+// so it can never be the best; null when every night is cut off.
+export function bestDarkHours(ms: Metrics[]): number | null {
+  const full = ms.filter(m => !m.darkCut).map(m => m.longestDarkHours)
+  return full.length ? Math.min(...full) : null
+}
+
 export type Verdict = 'energy' | 'comms' | 'both' | 'balanced'
 
 export const VERDICT_TEXT: Record<Verdict, string> = {
@@ -65,7 +72,7 @@ export const VERDICT_TEXT: Record<Verdict, string> = {
   balanced: 'Balanced',
 }
 
-// Energy: most Sun (ties -> shorter darkness). Comms: most Earth (ties share it).
+// Energy: most Sun (ties -> shorter full night; a cut-off night never wins the tie). Comms: most Earth (ties share it).
 // Balanced: of the sites with no other label, the best worst-case of Sun % and Earth %.
 // Compared on the 0.1 %-rounded values the page shows, so an on-screen tie is a tie.
 export function verdicts(rows: { id: string; m: Metrics }[]): Record<string, Verdict | null> {
@@ -74,8 +81,8 @@ export function verdicts(rows: { id: string; m: Metrics }[]): Record<string, Ver
 
   const maxSun = Math.max(...rows.map(r => r.m.sunPct))
   const sunTop = rows.filter(r => r.m.sunPct === maxSun)
-  const minDark = Math.min(...sunTop.map(r => r.m.longestDarkHours))
-  const energy = new Set(sunTop.filter(r => r.m.longestDarkHours === minDark).map(r => r.id))
+  const minDark = bestDarkHours(sunTop.map(r => r.m))
+  const energy = new Set(sunTop.filter(r => minDark === null || (!r.m.darkCut && r.m.longestDarkHours === minDark)).map(r => r.id))
 
   const maxEarth = Math.max(...rows.map(r => r.m.earthPct))
   const comms = new Set(rows.filter(r => r.m.earthPct === maxEarth).map(r => r.id))
