@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "CLPS Lunar Mission Browser"
+abstract: >-
+  A static web tool that compares Moon south-pole landing sites by how long the
+  Sun is visible, how long Earth (with a Deep Space Network dish in view) is
+  visible, and the longest night. Built for the NASA Space Apps Challenge 2026,
+  Lunar Landing Site Navigator. Not an official NASA product.
+type: software
+authors:
+  - name: "The Big Four"
+repository-code: "https://github.com/stevenjc2009-byte/clps-lunar-browser"
+url: "https://stevenjc2009-byte.github.io/clps-lunar-browser/"
+license: MIT
+keywords:
+  - Moon
+  - lunar south pole
+  - landing site
+  - illumination
+  - Skyfield
+  - NASA Space Apps Challenge
