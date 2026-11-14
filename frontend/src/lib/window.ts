@@ -23,6 +23,13 @@ export function landingRangeH(data: SkyData, lenH: number): { minH: number; maxH
   return { minH, maxH }
 }
 
+// The date the picker starts on: the first whole UTC day inside the landing range.
+export function defaultLandingDay(data: SkyData): string {
+  const ms = dataStartMs(data) + landingRangeH(data, 0).minH * HOUR_MS
+  const day = new Date(ms).toISOString().slice(0, 10)
+  return Date.parse(`${day}T00:00:00Z`) < ms ? new Date(ms + 86_400_000 - (ms % 86_400_000)).toISOString().slice(0, 10) : day
+}
+
 export interface Window { startH: number; lenH: number }
 
 // Why the window is not where the date picker asked (null = exactly as asked).

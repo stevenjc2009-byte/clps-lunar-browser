@@ -3,7 +3,7 @@ import { dipDeg, makeMask, maskAt, maskOverDisc, type HorizonsFile } from './hor
 
 // Skyline with one sharp peak at az 90 (2 deg high), 0 elsewhere, 1 deg steps.
 function horizons(): HorizonsFile {
-  const h0 = Array.from({ length: 360 }, (_, i) => (i === 90 ? 2 : 0))
+  const h0 = Array.from({ length: 360 }, (_, i): number => (i === 90 ? 2 : 0))
   const h2 = h0.map(v => v - 0.1)
   const h5 = h0.map(v => v - 0.4)
   h0[359] = 1 // something near the wrap point

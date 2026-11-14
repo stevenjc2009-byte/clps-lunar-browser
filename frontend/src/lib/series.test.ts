@@ -2,10 +2,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { buildTimeline, engineData } from './engine'
 import { nextChange } from './events'
-import { fmtDuration, fmtWait, listAnd } from './format'
+import { fmtDuration, fmtUtcHour, fmtWait, listAnd } from './format'
 import { sunPctByDay } from './landingSeries'
-import { LEGACY, makeSite, makeSky, squareWave } from './testFixtures'
-import { landingRangeH, spanOf, windowFor } from './window'
+import { LEGACY, makeSite, makeSky } from './testFixtures'
+import { defaultLandingDay, landingRangeH, spanOf, windowFor } from './window'
 import { windowMetrics } from './windowMetrics'
 
 beforeEach(() => { vi.spyOn(console, 'warn').mockImplementation(() => {}) })
@@ -68,6 +68,12 @@ describe('windowFor (audit B3: never clamps silently)', () => {
     expect(windowFor(v2, '2026-11-16', 1).clamped).toBe('before_range')
     expect(windowFor(v2, '2026-11-20', 1)).toMatchObject({ startH: 96, clamped: 'after_range' })
   })
+  it('default landing day: data start, or the first whole day of the v2 landing range', () => {
+    expect(defaultLandingDay(sky)).toBe('2026-11-15')
+    const at = (iso: string) => makeSky([makeSite('a', Array(240).fill(1))], {}, { landing_min_utc: iso })
+    expect(defaultLandingDay(at('2026-11-17T00:00:00Z'))).toBe('2026-11-17')
+    expect(defaultLandingDay(at('2026-11-17T06:00:00Z'))).toBe('2026-11-18')
+  })
   it('spanOf covers the window in whole samples', () => {
     expect(spanOf(sky, { startH: 72, lenH: 48 })).toEqual({ start: 72, end: 121 })
   })
@@ -85,6 +91,10 @@ describe('format', () => {
   it('fmtWait: whole hours under two days, days above', () => {
     expect(fmtWait(27.6)).toBe('28 h')
     expect(fmtWait(48)).toBe('2.0 days')
+  })
+  it('fmtUtcHour: nearest hour, said as "about" (audit B5)', () => {
+    expect(fmtUtcHour(Date.parse('2027-06-23T14:29:00Z'))).toBe('23 Jun 2027, about 14:00 UTC')
+    expect(fmtUtcHour(Date.parse('2027-06-23T23:31:00Z'))).toBe('24 Jun 2027, about 00:00 UTC')
   })
   it('listAnd joins names', () => {
     expect(listAnd(['a'])).toBe('a')

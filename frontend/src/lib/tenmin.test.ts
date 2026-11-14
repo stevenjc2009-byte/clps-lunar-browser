@@ -35,7 +35,7 @@ function measure(f: Fixture, body: 'sun' | 'earth', round: (x: number) => number
     const e = angDiff(az[k], truthAz[k])
     if (k >= 6 && k <= n - 7) azInner = Math.max(azInner, e); else azEnds = Math.max(azEnds, e)
   }
-  const tTruth = crossings(truthAlt, n), tInterp = crossings(alt, n)
+  const tTruth = crossings(truthAlt, n), tInterp = crossings(Array.from(alt), n)
   // local rate of the truth at each crossing, deg/h
   const rate = tTruth.map(t => { const k = Math.round(t * 6); return Math.abs(truthAlt[Math.min(k + 1, n - 1)] - truthAlt[Math.max(k - 1, 0)]) * 3 })
   return { altErr, azInner, azEnds, tTruth, tInterp, rate }

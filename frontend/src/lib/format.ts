@@ -20,6 +20,15 @@ export function fmtUtc(ms: number) {
   }) + ' UTC'
 }
 
+// To the nearest hour, said as "about": rise/set times near the pole move by hours with a
+// fraction of a degree of horizon, so minutes would be false precision (audit B5).
+export function fmtUtcHour(ms: number) {
+  const h = Math.round(ms / 3_600_000) * 3_600_000
+  const d = new Date(h)
+  const day = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
+  return `${day}, about ${String(d.getUTCHours()).padStart(2, '0')}:00 UTC`
+}
+
 export function isoDay(ms: number) { return new Date(ms).toISOString().slice(0, 10) }
 
 // "a", "a and b", "a, b and c"

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 // Before/after check against the pre-engine app (audit baseline, tests/fixtures/baseline.json
 // on branch audit, copied to __fixtures__/baseline-v1.json). Runs only while
 // public/sky.json is the same v1 file the baseline was made from.
@@ -15,7 +16,14 @@ import { engineData, siteTimeline } from './engine'
 import { DEFAULT_PARAMS } from './params'
 import { LEGACY } from './testFixtures'
 import { windowFor } from './window'
-import { windowMetrics } from './windowMetrics'
+import { verdict, type VerdictInput } from './verdict'
+import { windowMetrics, type WindowMetrics } from './windowMetrics'
+import type { Site } from '../types'
+
+const toInput = (s: Site, m: WindowMetrics): VerdictInput => ({
+  id: s.id, name: s.name, sunPct: m.sunPct, commsPct: m.linkPct,
+  dark: { hours: m.longestDark.hours, status: m.longestDark.status }, terrain: m.terrain,
+})
 
 const sky = JSON.parse(readFileSync(new URL('../../public/sky.json', import.meta.url), 'utf8')) as SkyData
 const sameData = sky.meta.start_utc === baseline.sky_json_meta.start_utc && sky.meta.samples === baseline.sky_json_meta.samples
@@ -45,6 +53,14 @@ describe.skipIf(!sameData)('engine vs pre-engine baseline (sky.json v1)', () => 
       }
     })
   }
+  // Old test "default 1-year view: Sun too close, IM-1 comms". The rules changed (night score
+  // in Balanced, absolute floor), so only the two calls the old app also made are pinned.
+  it('1-year view from the data start, legacy params: Sun too close to call, IM-1 best for Earth time', () => {
+    const w = windowFor(sky, sky.meta.start_utc.slice(0, 10), 365)
+    const v = verdict(sky.sites.map(s => toInput(s, windowMetrics(siteTimeline(d, s, LEGACY), w.startH, w.lenH))), 'earth')
+    expect(v.outcomes.energy.state).toBe('comparable')
+    expect(v.outcomes.comms.winner).toBe('im1')
+  })
   it('prints default-params numbers for the decisions file (always passes)', () => {
     const rows: string[] = []
     for (const key of Object.keys(baseline.configs)) {
@@ -55,6 +71,10 @@ describe.skipIf(!sameData)('engine vs pre-engine baseline (sky.json v1)', () => 
           const m = windowMetrics(siteTimeline(d, site, p), w.startH, w.lenH)
           rows.push(`${key} ${site.id} ${label}: sun ${m.sunPct} earth ${m.earthPct} link ${m.linkPct} dark ${m.longestDark.hours.toFixed(2)} h ${m.longestDark.status}${m.longestDark.startedBefore ? ' (started before landing)' : ''} inside ${m.longestDark.insideHours.toFixed(2)} nights ${m.darkCount}`)
         }
+      }
+      for (const [label, p] of [['legacy', LEGACY], ['default', DEFAULT_PARAMS]] as const) {
+        const v = verdict(sky.sites.map(s => toInput(s, windowMetrics(siteTimeline(d, s, p), w.startH, w.lenH))), 'earth')
+        rows.push(`${key} verdict ${label}: ${Object.values(v.outcomes).map(o => `${o.rule}=${o.state}${o.winner ? ':' + o.winner : ''}`).join(' ')}`)
       }
     }
     if (process.env.ENGINE_BASELINE_PRINT) writeFileSync(process.env.ENGINE_BASELINE_PRINT, rows.join('\n'))
