@@ -16,10 +16,73 @@ body { margin: 0; background: radial-gradient(ellipse at top, #0d1630 0%, var(--
 
 .app { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; }
 
+header { display: flex; gap: 16px; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
 header h1 { margin: 0; font-size: 1.9rem; letter-spacing: 0.01em; }
-.tagline { margin: 4px 0 20px; color: var(--muted); }
+.tagline { margin: 4px 0 0; color: var(--muted); max-width: 640px; }
+.explain-all {
+  flex: none; background: #13213f; color: var(--text); border: 1px solid var(--earth);
+  border-radius: 999px; padding: 9px 16px; font: inherit; font-weight: 600; cursor: pointer;
+}
+.explain-all.on { background: var(--earth); color: #04101f; }
 
-.site-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; }
+.panel h2 { margin: 0; font-size: 1.15rem; }
+.section-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--muted); }
+.field input[type=date] {
+  background: #070b16; color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font: inherit; font-size: 0.95rem; color-scheme: dark;
+}
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button { background: #070b16; color: var(--text); border: 0; padding: 8px 14px; font: inherit; font-size: 0.92rem; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button.active { background: #1a2a4f; box-shadow: inset 0 -2px 0 var(--earth); }
+.period { margin: 0 0 6px; color: var(--muted); font-size: 0.9rem; }
+
+.site-picks { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick {
+  display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--border); border-radius: 999px;
+  padding: 6px 12px; font-size: 0.88rem; cursor: pointer; user-select: none;
+}
+.pick.on { border-color: #3a4b72; background: #111c35; }
+.pick input { accent-color: var(--earth); margin: 0; }
+
+.compare-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 10px; font-size: 0.85rem; color: var(--muted); }
+.compare-legend b { color: var(--text); font-weight: 600; }
+.compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.compare-card { background: #070b16; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.compare-card h3 { margin: 0 0 6px; font-size: 0.98rem; }
+.verdict { display: inline-block; margin: 0 0 10px; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+.verdict.energy { background: rgba(255, 182, 39, 0.16); color: var(--sun); }
+.verdict.comms { background: rgba(77, 163, 255, 0.16); color: var(--earth); }
+.verdict.both { background: linear-gradient(90deg, rgba(255,182,39,.2), rgba(77,163,255,.2)); color: var(--text); }
+.verdict.balanced { background: rgba(126, 224, 160, 0.14); color: #7ee0a0; }
+.verdict.none { background: #141b2d; color: var(--muted); font-weight: 500; }
+.compare-card dl { margin: 0; display: grid; gap: 6px; }
+.compare-card dl > div { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 4px 8px; border-radius: 6px; }
+.compare-card dl > div.best { background: #12203d; }
+.compare-card dl > div.best dt::after { content: ' ★'; color: #e8dcc0; }
+.compare-card dt { color: var(--muted); font-size: 0.85rem; }
+.compare-card dd { margin: 0; font-size: 1.25rem; font-weight: 700; }
+.compare-card dd.sun { color: var(--sun); }
+.compare-card dd.earth { color: var(--earth); }
+
+.explain-btn {
+  display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: 4px; padding: 0;
+  border-radius: 50%; border: 1px solid #3a4b72; background: #111c35; color: var(--text);
+  font: inherit; font-size: 0.72rem; font-weight: 700; line-height: 1; cursor: pointer; vertical-align: 1px;
+}
+.explain-btn[aria-expanded=true] { background: var(--earth); color: #04101f; border-color: var(--earth); }
+.explain-note {
+  display: block; margin: 6px 0 2px; padding: 8px 10px; border-left: 3px solid var(--earth);
+  background: #0a1830; color: #cfdaf0; border-radius: 0 6px 6px 0; font-size: 0.85rem; font-weight: 400; line-height: 1.45;
+}
+.compare-legend > span { flex: 1 1 200px; }
+.note p { margin: 0; font-size: 0.9rem; color: #cfdaf0; }
+
+.site-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
 .site-tabs button {
   background: var(--panel); color: var(--text); border: 1px solid var(--border);
   border-radius: 999px; padding: 8px 16px; font: inherit; font-size: 0.92rem; cursor: pointer;
@@ -27,21 +90,9 @@ header h1 { margin: 0; font-size: 1.9rem; letter-spacing: 0.01em; }
 .site-tabs button:hover { border-color: #3a4b72; }
 .site-tabs button.active { background: #1a2a4f; border-color: var(--earth); }
 
-.site-head h2 { margin: 0; font-size: 1.3rem; }
-.coords { margin: 4px 0 16px; color: var(--muted); font-size: 0.9rem; }
+.coords { margin: 0 0 8px; color: var(--muted); font-size: 0.88rem; }
 
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 16px; }
-.stat {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px 18px; display: flex; flex-direction: column; gap: 2px;
-}
-.stat .value { font-size: 2.2rem; font-weight: 700; line-height: 1.1; }
-.stat.sun .value { color: var(--sun); }
-.stat.earth .value { color: var(--earth); }
-.stat .label { font-weight: 600; }
-.stat .sub { color: var(--muted); font-size: 0.82rem; }
 
-.chart-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
 .sky-chart { width: 100%; height: 460px; }
 .caption { margin: 8px 4px 0; color: var(--muted); font-size: 0.82rem; }
 
@@ -52,5 +103,5 @@ footer { margin-top: 20px; color: var(--muted); font-size: 0.78rem; }
 @media (max-width: 600px) {
   header h1 { font-size: 1.45rem; }
   .sky-chart { height: 360px; }
-  .stat .value { font-size: 1.8rem; }
+  header { flex-direction: column; }
 }

@@ -1,6 +1,7 @@
 export interface SiteStats {
   sun_visible_pct: number
   earth_visible_pct: number
+  longest_dark_hours: number
   sun_alt_max: number
   sun_alt_min: number
   earth_alt_max: number

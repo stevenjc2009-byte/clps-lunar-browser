@@ -18,8 +18,8 @@ HERE = Path(__file__).resolve().parent
 DATA_DIR = HERE / "data"
 OUT_FILE = HERE.parent / "frontend" / "public" / "sky.json"
 
-START = (2027, 1, 1)   # UTC
-DAYS = 365
+START = (2026, 11, 15)   # UTC; submission day
+DAYS = 731               # two years, so any 1-year window inside it can be picked
 STEP_HOURS = 1
 
 
@@ -45,6 +45,25 @@ def compute_site(site, eph, pc, frame, t):
 
 def percent(mask):
     return round(100.0 * float(np.mean(mask)), 1)
+
+
+def round_keep_sign(a, nd):
+    """Round to nd decimals, but never turn a positive value into 0.
+
+    The page counts "above horizon" as alt > 0, so 0.004 must not become 0.00.
+    """
+    r = np.round(a, nd)
+    r[(a > 0) & (r <= 0)] = 10.0 ** -nd
+    return r
+
+
+def longest_run(mask):
+    """Length of the longest run of consecutive True samples."""
+    best = run = 0
+    for v in mask:
+        run = run + 1 if v else 0
+        best = max(best, run)
+    return best
 
 
 def main():
@@ -75,6 +94,7 @@ def main():
         stats = {
             "sun_visible_pct": percent(sun_alt > 0),
             "earth_visible_pct": percent(earth_alt > 0),
+            "longest_dark_hours": longest_run(sun_alt <= 0) * STEP_HOURS,
             "sun_alt_max": round(float(sun_alt.max()), 2),
             "sun_alt_min": round(float(sun_alt.min()), 2),
             "earth_alt_max": round(float(earth_alt.max()), 2),
@@ -83,13 +103,14 @@ def main():
         result["sites"].append({
             **site,
             "stats": stats,
-            "sun_alt": np.round(sun_alt, 2).tolist(),
+            "sun_alt": round_keep_sign(sun_alt, 2).tolist(),
             "sun_az": np.round(sun_az, 1).tolist(),
-            "earth_alt": np.round(earth_alt, 2).tolist(),
+            "earth_alt": round_keep_sign(earth_alt, 2).tolist(),
             "earth_az": np.round(earth_az, 1).tolist(),
         })
         print(f"{site['id']:12s} sun {stats['sun_visible_pct']:5.1f}%  "
               f"earth {stats['earth_visible_pct']:5.1f}%  "
+              f"dark {stats['longest_dark_hours'] / 24:5.1f} d  "
               f"sun alt [{stats['sun_alt_min']}, {stats['sun_alt_max']}]  "
               f"earth alt [{stats['earth_alt_min']}, {stats['earth_alt_max']}]")
 

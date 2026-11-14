@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import Plotly from 'plotly.js-dist-min'
+import type { Span } from './metrics'
 import type { Site } from './types'
 
 const SUN = '#ffb627'
@@ -10,12 +11,16 @@ const EARTH = '#4da3ff'
 const wrap = (az: number[]) => az.map(a => (a > 180 ? a - 360 : a))
 
 // Sky graph: azimuth (deg from lunar north, clockwise) vs elevation above a flat horizon.
-export default function SkyChart({ site }: { site: Site }) {
+// Shows only the samples inside `span` (the window picked on the page).
+export default function SkyChart({ site, span }: { site: Site; span: Span }) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    const cut = (a: number[]) => a.slice(span.start, span.end)
+    const sunAlt = cut(site.sun_alt), earthAlt = cut(site.earth_alt)
+    // Fixed to the whole data range so the axes don't jump when the dates change.
     const lo = Math.min(site.stats.sun_alt_min, site.stats.earth_alt_min) - 1
     const hi = Math.max(site.stats.sun_alt_max, site.stats.earth_alt_max) + 1
 
@@ -24,8 +29,8 @@ export default function SkyChart({ site }: { site: Site }) {
         type: 'scattergl',
         mode: 'markers',
         name: 'Sun',
-        x: wrap(site.sun_az),
-        y: site.sun_alt,
+        x: wrap(cut(site.sun_az)),
+        y: sunAlt,
         marker: { color: SUN, size: 3, opacity: 0.5 },
         hovertemplate: 'Sun<br>az %{x:.1f}°<br>el %{y:.2f}°<extra></extra>',
       },
@@ -33,8 +38,8 @@ export default function SkyChart({ site }: { site: Site }) {
         type: 'scattergl',
         mode: 'markers',
         name: 'Earth',
-        x: wrap(site.earth_az),
-        y: site.earth_alt,
+        x: wrap(cut(site.earth_az)),
+        y: earthAlt,
         marker: { color: EARTH, size: 3, opacity: 0.5 },
         hovertemplate: 'Earth<br>az %{x:.1f}°<br>el %{y:.2f}°<extra></extra>',
       },
@@ -75,7 +80,7 @@ export default function SkyChart({ site }: { site: Site }) {
     }
 
     Plotly.react(el, data, layout, { responsive: true, displaylogo: false })
-  }, [site])
+  }, [site, span.start, span.end])
 
   useEffect(() => {
     const el = ref.current
