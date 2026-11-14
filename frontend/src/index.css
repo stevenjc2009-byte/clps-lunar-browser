@@ -155,3 +155,15 @@ footer a:hover { text-decoration: underline; }
 .custom-go:disabled { opacity: 0.6; cursor: wait; }
 .custom-status { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 0.88rem; }
 :focus-visible { outline: 2px solid var(--earth); outline-offset: 2px; }
+
+/* engine migration: chips, sub-lines, label reasons */
+.verdict.night { background: rgba(199, 155, 255, 0.14); color: #c79bff; }
+.compare-card h3 .chip { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; font-size: 0.7rem; font-weight: 600; vertical-align: middle; }
+.compare-card h3 .chip.terrain { background: rgba(126, 224, 160, 0.12); color: #7ee0a0; }
+.compare-card h3 .chip.flat { background: rgba(255, 182, 39, 0.08); color: #e8dcc0; border: 1px dashed rgba(255, 182, 39, 0.45); }
+.compare-card .sub { color: var(--muted); font-size: 0.78rem; font-weight: 500; }
+.compare-card .sub.block { display: block; }
+.clamp-note { color: #e8dcc0; }
+.why { margin: 12px 0 0; font-size: 0.86rem; color: #cfdaf0; }
+.why summary { cursor: pointer; color: var(--muted); }
+.why ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; line-height: 1.45; }

@@ -1,36 +1,33 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { sunPctByDay } from './landing'
-import { isoDay } from './metrics'
+import type { Timeline } from './lib/engine'
+import { isoDay } from './lib/format'
+import { sunPctByDay } from './lib/landingSeries'
 import { loadPlotly, plotlyLoaded } from './plotly'
-import type { Site } from './types'
 
 const LINE = ['#ffb627', '#7ee0a0', '#c79bff', '#ff7a7a']
-const DAY_MS = 86_400_000
+const HOUR_MS = 3_600_000
 
 interface Props {
-  sites: Site[]
+  lines: { name: string; tl: Timeline }[]
   days: number          // look-ahead length
-  stepHours: number
+  firstH: number        // first and last landing day (UTC midnight), hours from the first sample
+  lastH: number
   t0Ms: number          // time of the first sample
   landingDay: string    // ISO date currently picked
   onPick: (isoDate: string) => void
 }
 
-// Sun % for every possible landing date, one line per compared site.
-// Clicking the chart picks that landing date.
-export default function LandingChart({ sites, days, stepHours, t0Ms, landingDay, onPick }: Props) {
+// Sun % for every possible landing date, one line per compared site, from the same engine
+// timelines as the cards. Clicking the chart picks that landing date.
+export default function LandingChart({ lines, days, firstH, lastH, t0Ms, landingDay, onPick }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const pickRef = useRef(onPick)
   useEffect(() => { pickRef.current = onPick }, [onPick])
 
-  const series = useMemo(() => {
-    const perDay = Math.round(24 / stepHours)
-    const len = Math.round((days * 24) / stepHours)
-    return sites.map(s => {
-      const y = sunPctByDay(s.sun_alt, len, perDay)
-      return { site: s, x: y.map((_, d) => isoDay(t0Ms + d * DAY_MS)), y }
-    })
-  }, [sites, days, stepHours, t0Ms])
+  const series = useMemo(() => lines.map(l => {
+    const d = sunPctByDay(l.tl, days * 24, firstH, lastH)
+    return { name: l.name, x: d.startsH.map(h => isoDay(t0Ms + h * HOUR_MS)), y: d.sunPct }
+  }), [lines, days, firstH, lastH, t0Ms])
 
   useEffect(() => {
     const el = ref.current
@@ -38,11 +35,11 @@ export default function LandingChart({ sites, days, stepHours, t0Ms, landingDay,
     const data: Partial<Plotly.Data>[] = series.map((s, i) => ({
       type: 'scatter',
       mode: 'lines',
-      name: s.site.name,
+      name: s.name,
       x: s.x,
       y: s.y,
       line: { color: LINE[i % LINE.length], width: 2 },
-      hovertemplate: `${s.site.name}: %{y:.1f}%<extra></extra>`,
+      hovertemplate: `${s.name}: %{y:.1f}%<extra></extra>`,
     }))
     const layout: Partial<Plotly.Layout> = {
       paper_bgcolor: 'rgba(0,0,0,0)',

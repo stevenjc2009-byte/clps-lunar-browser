@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import type { Span } from './metrics'
+import type { Span } from './lib/window'
 import { loadPlotly, plotlyLoaded } from './plotly'
 import type { Site } from './types'
 
