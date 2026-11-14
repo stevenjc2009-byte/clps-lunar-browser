@@ -105,7 +105,7 @@ pres.addSection({ title: 'Solution' })
     ['Sun visible', '% of hours the Sun is up', SUN],
     ['Earth visible', '% of hours Earth is up', EARTH],
     ['Longest darkness', 'the night to survive on batteries', TEXT],
-    ['Verdict', 'energy, communication or balanced', GREEN],
+    ['Verdict', 'energy, communication, balanced, or too close to call', GREEN],
   ]
   items.forEach(([h, d, col], i) => {
     const x = 0.5 + i * 2.3
@@ -163,7 +163,7 @@ pres.addSection({ title: 'Method' })
   const stats = [
     ['0.0000083°', 'largest difference from NASA JPL Horizons (78 checks)', SUN],
     ['0.01°', 'custom-location maths vs the full calculation', EARTH],
-    ['54', 'automated tests; 38 run before every deploy', GREEN],
+    ['68', 'automated tests; 52 run before every deploy', GREEN],
   ]
   stats.forEach(([n, d, col], i) => {
     const x = 0.5 + i * 3.1

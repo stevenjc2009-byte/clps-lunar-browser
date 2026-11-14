@@ -57,6 +57,10 @@ const at = async ms => { const wait = t0 + ms - Date.now(); if (wait > 0) await 
 const scrollTo = (sel, block = 'start') =>
   page.evaluate(([s, b]) => document.querySelector(s).scrollIntoView({ behavior: 'smooth', block: b }), [sel, block])
 async function moveTo(sel, steps = 25) {
+  // Wait for any smooth scroll to finish, or the box is measured mid-scroll and the pointer misses.
+  for (let last = -1, y = await page.evaluate(() => scrollY); y !== last; ) {
+    last = y; await page.waitForTimeout(80); y = await page.evaluate(() => scrollY)
+  }
   const box = await page.locator(sel).first().boundingBox()
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps })
 }
