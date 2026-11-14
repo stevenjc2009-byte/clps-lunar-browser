@@ -75,6 +75,7 @@ export function drawHeatmap(canvas: HTMLCanvasElement, g: HeatGrid, l: Layout, o
   const rowsH = l.rows * ROW_H
   ctx.font = '11px Inter, system-ui, sans-serif'
   ctx.textBaseline = 'top'
+  let labelEnd = -Infinity // right edge of the last label drawn, so labels never overlap
   g.days.isos.forEach((iso, i) => {
     if (!iso.endsWith('-01') && i !== 0) return
     const x = Math.round(cellX(l, i)) + 0.5
@@ -82,9 +83,11 @@ export function drawHeatmap(canvas: HTMLCanvasElement, g: HeatGrid, l: Layout, o
     ctx.beginPath(); ctx.moveTo(x, rowsH); ctx.lineTo(x, rowsH + 5); ctx.stroke()
     const m = Number(iso.slice(5, 7)) - 1
     const label = m === 0 || i === 0 ? `${MONTHS[m]} ${iso.slice(0, 4)}` : MONTHS[m]
-    if (x + ctx.measureText(label).width + 2 > l.width) return
+    const w = ctx.measureText(label).width
+    if (x + w + 2 > l.width || x + 2 < labelEnd + 6) return
     ctx.fillStyle = '#8d9ab3'
     ctx.fillText(label, x + 2, rowsH + 6)
+    labelEnd = x + 2 + w
   })
 
   if (o.landingIdx >= 0) {

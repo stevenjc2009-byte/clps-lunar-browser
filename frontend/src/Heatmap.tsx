@@ -63,9 +63,13 @@ function Recommendation({ g, r, look, onPickDate }: { g: HeatGrid; r: number; lo
   const name = metricName(g.metric, row.commsKind)
   const margin = g.metric === 'dark' ? '1 day' : `${marginFor(g.metric)} points`
   const picks = bestDays(row, g.metric)
+  const allCensored = g.metric === 'dark' && row.censored.every(c => c === 1)
   return (
     <div className="hm-reco" role="note">
-      {row.flatRow || !picks.length
+      {allCensored
+        ? <p>At <b>{row.site.name}</b>, for every landing date the longest night runs past the edge of our data, so it
+            can only be called "at least" that long and the dates cannot be ranked.</p>
+        : row.flatRow || !picks.length
         ? <p>At <b>{row.site.name}</b>, every landing date here gives {name} within {margin} of the same value over
             the next {lookLabel(look)}, so for this measure the date makes little difference.</p>
         : <>
@@ -201,14 +205,15 @@ export default function Heatmap({ ed, sites, params, landingDay, onPickDate, sit
       <p className="how-read">Landing days {fmtDay(g.days.isos[0])} to {fmtDay(g.days.isos[nDays - 1])}.
         {' '}<b>Click a day, or use the arrow keys and Enter, to use that landing date.</b>
         <Explain term="Landing heatmap" all={explainAll}>{HEAT_EXPLAIN.heatmap}</Explain>
-        {look === 365 && <Explain term="1-year look-ahead" all={explainAll}>{HEAT_EXPLAIN.oneYear}</Explain>}</p>
+</p>
+      {look === 365 && <p className="hm-note">{HEAT_EXPLAIN.oneYear}</p>}
 
       <div className="hm-body">
         <ul className="hm-labels" aria-hidden="true">
           {g.rows.map((row, r) => (
             <li key={row.site.id} style={{ height: ROW_H }} className={cur?.r === r ? 'on' : ''}
               title={row.terrain ? row.site.name : `${row.site.name}. ${FLAT_WARNING}`}>
-              {row.site.name}{!row.terrain && <span className="hm-prov" aria-hidden="true">*</span>}
+              <span className="hm-name">{row.site.name}</span>{!row.terrain && <span className="hm-prov" aria-hidden="true">*</span>}
             </li>
           ))}
         </ul>

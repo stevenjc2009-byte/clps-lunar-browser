@@ -2,16 +2,18 @@
 
 .hm-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
-.heatmap { display: grid; gap: 10px; }
+.heatmap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.heatmap .seg, .cd .seg { flex-wrap: wrap; }
 .hm-controls { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; }
 .hm-body { display: flex; align-items: flex-start; gap: 8px; }
-.hm-labels { flex: none; margin: 0; padding: 0; list-style: none; max-width: 38%; }
+.hm-labels { flex: none; margin: 0; padding: 0; list-style: none; max-width: 38%; min-width: 0; }
 .hm-labels li {
   display: flex; align-items: center; gap: 2px; padding-right: 4px; font-size: 0.8rem; color: #cfdaf0;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1;
+  white-space: nowrap; line-height: 1;
 }
+.hm-name { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .hm-labels li.on { color: var(--text); font-weight: 700; }
-.hm-prov { color: var(--sun); font-weight: 700; }
+.hm-prov { flex: none; color: var(--sun); font-weight: 700; }
 .hm-scroll {
   flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; border-radius: 6px; outline: none;
   padding-bottom: 2px;
@@ -53,7 +55,7 @@
 .hm-flat { color: var(--muted); font-size: 0.82rem; }
 
 /* Compare dates */
-.cd { display: grid; gap: 10px; }
+.cd { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 .cd-pick { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; }
 .cd-pick input[type=date] {
   background: #070b16; color: var(--text); border: 1px solid var(--border); border-radius: 8px;
@@ -72,7 +74,7 @@
 .cd-scroll { overflow-x: auto; }
 
 /* Presets */
-.preset { display: grid; gap: 4px; font-size: 0.85rem; color: var(--muted); }
+.preset { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; font-size: 0.85rem; color: var(--muted); }
 .preset select {
   background: #070b16; color: var(--text); border: 1px solid var(--border); border-radius: 8px;
   padding: 7px 10px; font: inherit; font-size: 0.95rem; color-scheme: dark; max-width: 100%;

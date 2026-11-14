@@ -28,5 +28,5 @@ export function darkLine(a: Run, b: Run): DeltaLine {
 }
 
 export const DELTA_TEXT: Record<DeltaVerdict, string> = {
-  better: 'date B better', worse: 'date B worse', same: 'about the same', unknown: 'cannot say (night runs past our data)',
+  better: 'date B better', worse: 'date B worse', same: 'about the same', unknown: 'cannot say: the night runs past our data',
 }

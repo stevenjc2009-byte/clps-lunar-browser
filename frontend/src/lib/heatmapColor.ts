@@ -36,7 +36,8 @@ export interface Tick { t: number; label: string }
 export function legendTicks(metric: HeatMetric, domain: [number, number]): Tick[] {
   if (metric !== 'dark') return [0, 25, 50, 75, 100].map(v => ({ t: scaleT(v, metric, domain), label: `${v}%` }))
   const maxDays = domain[1] / 24
-  const step = maxDays <= 8 ? 1 : maxDays <= 20 ? 2 : maxDays <= 40 ? 5 : 10
+  // At most about 6 labels, so they never overlap on the bar.
+  const step = [1, 2, 5, 10, 20, 50, 100, 200, 500].find(st => maxDays / st <= 6) ?? 1000
   const out: Tick[] = []
   const tick = (d: number) => ({ t: scaleT(d * 24, metric, domain), label: `${Math.round(d)} d` })
   for (let d = 0; d <= maxDays + 1e-9; d += step) out.push(tick(d))

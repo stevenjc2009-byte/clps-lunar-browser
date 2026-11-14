@@ -113,6 +113,8 @@ describe.skipIf(!have)('heatmap on sky.json v2', () => {
     heatmapGrid(d, real.sites, DEFAULT_PARAMS, 'dark', 365)
     const warm = performance.now() - t2
     console.log(`heatmap: ${g.rows.length} sites x ${g.days.isos.length} days, cold ${cold.toFixed(0)} ms, warm (1 yr dark) ${warm.toFixed(0)} ms`)
+    const censored = [30, 365].map(n => heatmapGrid(d, real.sites, DEFAULT_PARAMS, 'dark', n).rows.reduce((k, r) => k + r.censored.reduce((a, c) => a + c, 0), 0))
+    console.log(`heatmap: censored darkness cells with default params: 30 d ${censored[0]}, 1 yr ${censored[1]}`)
     expect(g.rows).toHaveLength(real.sites.length)
     expect(g.days.isos[0]).toBe(real.meta.landing_min_utc!.slice(0, 10))
     for (let r = 0; r < g.rows.length; r++) {

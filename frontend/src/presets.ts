@@ -17,12 +17,12 @@ const p = (over: Partial<Params>): Params => ({ ...DEFAULT_PARAMS, ...over })
 export const PRESETS: readonly Preset[] = [
   {
     id: 'default', name: 'Default (our best guess)',
-    why: 'Antenna and panels 2 m up, the real skyline, Sun counted from its top edge, Earth from its centre, and a Deep Space Network dish at 10° or more.',
+    why: 'Antenna and panels 2 m up, no extra margin on the skyline, Sun counted from its top edge, Earth from its centre, and a Deep Space Network dish at 10° or more.',
     params: p({}),
   },
   {
     id: 'cautious', name: 'Cautious: 5° mask, whole Earth disc',
-    why: 'Pretends the skyline is 5° higher everywhere, a safety margin for things the map misses such as boulders, and only counts Earth once all of it is above that.',
+    why: 'Pretends the skyline is 5° higher everywhere, a safety margin for things the map misses such as boulders, and only counts Earth once all of it is above that; near the pole the Sun never climbs more than a few degrees, so some sites then get no Sun at all.',
     params: p({ maskOffsetDeg: 5, earthRule: 'whole_disc' }),
   },
   {
