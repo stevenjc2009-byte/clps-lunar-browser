@@ -13,19 +13,24 @@
 
 ## What it shows
 
+Recorded from the new app (7 sites, terrain skyline), 29.5 s, silent.
+
 | Time | Caption | Screen |
 |---|---|---|
-| 0:00-0:03 | We're The Big Four, for the Lunar Landing Site Navigator challenge. | Top of the live site |
-| 0:03-0:08 | At the Moon's south pole, the Sun skims the horizon. Landers need sunlight for power and Earth in view to call home. | Sky graph for Shackleton rim |
-| 0:08-0:11 | This is CLPS Lunar Mission Browser. | Scroll up to the controls |
-| 0:11-0:18 | Pick a landing date and compare sites: sunlight, Earth time, longest night and a verdict, from NASA JPL data. | Date set to 10 Jun 2027, look-ahead switched to 30 days, cards update |
-| 0:18-0:22 | See when the Sun and Earth next rise or set after landing. | The after-landing lines on each card are outlined |
-| 0:22-0:26 | Add any spot on the Moon of your own. | "Add to comparison" is pressed and a fourth card appears |
-| 0:26-0:29.5 | Students can press "Explain it to me". Clearer landing choices, for everyone. | "Explain it to me" is pressed and the notes open |
+| 0:00-0:03 | The Big Four: Lunar Landing Site Navigator | Top of the page |
+| 0:03-0:06 | Real NASA LOLA terrain skyline | Sky graph with the grey terrain shape |
+| 0:06-0:09 | Sun dots behind hills are hidden | Pointer moves over the sky graph |
+| 0:09-0:12.5 | Seven sites, one date, compared | The comparison cards |
+| 0:12.5-0:15.5 | Rim and ridge: about 86% Sun | Pointer on the Shackleton rim verdict |
+| 0:15.5-0:19.5 | Too close to call? We say so | The "too close to call" notes |
+| 0:19.5-0:22 | Best landing dates, day by day | Best landing dates heatmap |
+| 0:22-0:25 | Click a day to set the date | "Use this date" pressed, date marker moves |
+| 0:25-0:27.5 | Model presets and DSN link check | Model settings panel |
+| 0:27.5-0:29.5 | Share this exact view with one link | "Copy link" pressed |
 
 ## How to remake it
 
-The video is made by two scripts in `video/`, from the live site:
+The video is made by two scripts in `video/`, from the app served locally (`npx vite preview --port 5197` in `frontend/`; `record.mjs` takes any URL as an argument):
 
 ```
 cd video

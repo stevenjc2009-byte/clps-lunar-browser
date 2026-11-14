@@ -1,31 +1,40 @@
 1
 00:00:00,000 --> 00:00:03,000
-We're The Big Four, for the
-Lunar Landing Site Navigator challenge.
+The Big Four:
+Lunar Landing Site Navigator
 
 2
-00:00:03,000 --> 00:00:08,000
-At the Moon's south pole, the Sun skims the horizon.
-Landers need sunlight for power and Earth in view to call home.
+00:00:03,000 --> 00:00:06,000
+Real NASA LOLA terrain skyline
 
 3
-00:00:08,000 --> 00:00:11,000
-This is CLPS Lunar Mission Browser.
+00:00:06,000 --> 00:00:09,000
+Sun dots behind hills are hidden
 
 4
-00:00:11,000 --> 00:00:18,000
-Pick a landing date and compare sites: sunlight, Earth time,
-longest night and a verdict, from NASA JPL data.
+00:00:09,000 --> 00:00:12,500
+Seven sites, one date, compared
 
 5
-00:00:18,000 --> 00:00:22,000
-See when the Sun and Earth next rise or set after landing.
+00:00:12,500 --> 00:00:15,500
+Rim and ridge: about 86% Sun
 
 6
-00:00:22,000 --> 00:00:26,000
-Add any spot on the Moon of your own.
+00:00:15,500 --> 00:00:19,500
+Too close to call? We say so
 
 7
-00:00:26,000 --> 00:00:29,500
-Students can press "Explain it to me".
-Clearer landing choices, for everyone.
+00:00:19,500 --> 00:00:22,000
+Best landing dates, day by day
+
+8
+00:00:22,000 --> 00:00:25,000
+Click a day to set the date
+
+9
+00:00:25,000 --> 00:00:27,500
+Model presets and DSN link check
+
+10
+00:00:27,500 --> 00:00:29,500
+Share this exact view with one link

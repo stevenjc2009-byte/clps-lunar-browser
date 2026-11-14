@@ -90,92 +90,84 @@ pres.addSection({ title: 'Problem' })
     { text: 'No line of sight to Earth means no direct radio contact.', options: { color: MUTED } },
   ], { x: 1.0, y: 2.5, w: 3.2, h: 1.0, valign: 'top', objectName: 'need-earth' })
   T(s, 'A small change in site or landing date can decide both.', { x: 0.5, y: 3.85, w: 3.7, h: 0.7, fontSize: 16, italic: true, color: SUN, valign: 'top', objectName: 'point' })
-  s.addImage({ path: img('sky.png'), x: 4.5, y: 1.25, w: 5.0, h: 2.78, altText: 'Sky graph from our site for Shackleton rim', objectName: 'sky' })
-  T(s, 'Our sky graph, Shackleton rim, one year: the Sun (yellow) never rises more than about 2.5° above the horizon; Earth (blue) stays in a small patch of sky.', { x: 4.5, y: 4.12, w: 5.0, h: 0.6, fontSize: 11, color: MUTED, valign: 'top', objectName: 'sky-caption' })
-  s.addNotes('Near the pole the Sun never rises high. It circles round the horizon once a month, so whether a lander gets power and a radio link depends on exactly where and when it lands.')
+  s.addImage({ path: img('sky-plot.png'), x: 4.5, y: 1.25, w: 5.0, h: 2.23, altText: 'Sky graph from our site for Shackleton rim, with the terrain skyline', objectName: 'sky' })
+  T(s, 'Our sky graph, Shackleton rim, one year: Sun (yellow) and Earth (blue) stay close to the horizon. The grey shape is the real skyline.', { x: 4.5, y: 3.6, w: 5.0, h: 0.6, fontSize: 11, color: MUTED, valign: 'top', objectName: 'sky-caption' })
+  s.addNotes('Near the pole the Sun never rises high. Whether a lander gets power and a radio link depends on exactly where and when it lands.')
 }
 
-// 3. Solution
+// 3. Headline: real terrain
 pres.addSection({ title: 'Solution' })
 {
   const s = pres.addSlide({ masterName: 'Content', sectionTitle: 'Solution' })
-  s.addText('Compare sites for any landing date', { placeholder: 'title' })
-  s.addImage({ path: img('compare.png'), x: 0.5, y: 1.2, w: 9.0, h: 2.6, altText: 'Comparison cards for three sites from our site', objectName: 'cards' })
-  const items = [
-    ['Sun visible', '% of hours the Sun is up', SUN],
-    ['Earth visible', '% of hours Earth is up', EARTH],
-    ['Longest darkness', 'the night to survive on batteries', TEXT],
-    ['Verdict', 'energy, communication, balanced, or too close to call', GREEN],
-  ]
-  items.forEach(([h, d, col], i) => {
-    const x = 0.5 + i * 2.3
-    T(s, [
-      { text: h, options: { bold: true, color: col, fontSize: 15, breakLine: true } },
-      { text: d, options: { color: MUTED, fontSize: 13 } },
-    ], { x, y: 4.05, w: 2.1, h: 0.85, valign: 'top', objectName: `metric-${i}` })
-  })
-  s.addNotes('Pick a landing date and a look-ahead of 30 days or a year. Each site gets Sun time, Earth time, its longest night, and a plain-language verdict.')
+  s.addText('New: the real skyline, from NASA LOLA data', { placeholder: 'title' })
+  s.addImage({ path: img('sky-plot.png'), x: 0.5, y: 1.2, w: 6.2, h: 2.76, altText: 'Sky graph with the grey terrain skyline; Sun dots behind hills are hidden', objectName: 'terrain-plot' })
+  T(s, 'Shackleton rim, one year. Grey shape = the horizon seen from 2 m above the ground.', { x: 0.5, y: 4.08, w: 6.2, h: 0.5, fontSize: 12, color: MUTED, valign: 'top', objectName: 'terrain-caption' })
+  T(s, [
+    { text: 'Grey shape', options: { bold: true, color: TEXT, fontSize: 15, breakLine: true } },
+    { text: 'the real skyline from NASA LRO LOLA elevation maps', options: { color: MUTED, fontSize: 13, breakLine: true } },
+    { text: ' ', options: { fontSize: 8, breakLine: true } },
+    { text: 'Hidden Sun dots', options: { bold: true, color: SUN, fontSize: 15, breakLine: true } },
+    { text: 'a Sun behind a hill gives no power, so it is not counted', options: { color: MUTED, fontSize: 13, breakLine: true } },
+    { text: ' ', options: { fontSize: 8, breakLine: true } },
+    { text: 'All 7 cited sites', options: { bold: true, color: GREEN, fontSize: 15, breakLine: true } },
+    { text: 'a spot you type in still uses a flat horizon, and says so', options: { color: MUTED, fontSize: 13 } },
+  ], { x: 6.95, y: 1.2, w: 2.6, h: 3.4, valign: 'top', objectName: 'terrain-points' })
+  s.addNotes('The big change: the sky graph now draws the real skyline from NASA LOLA elevation data. Sun dots behind hills are hidden and not counted as power.')
 }
 
-// 4. New features
+// 4. Seven sites, before/after
 {
   const s = pres.addSlide({ masterName: 'Content', sectionTitle: 'Solution' })
-  s.addText('After landing, and anywhere you choose', { placeholder: 'title' })
-  s.addImage({ path: img('custom-form.png'), x: 0.95, y: 1.15, w: 5.4, h: 0.5, altText: 'The add-your-own-location form', objectName: 'form' })
-  T(s, 'Type any latitude and longitude: a fourth card, worked out in your browser from the same NASA data.', { x: 6.55, y: 1.1, w: 2.5, h: 0.6, fontSize: 12, color: MUTED, valign: 'middle', objectName: 'form-note' })
-  s.addImage({ path: img('compare4.png'), x: 0.95, y: 1.85, w: 8.1, h: 2.72, altText: 'Four comparison cards including the custom location', objectName: 'cards4' })
-  T(s, 'Each card says when the Sun and Earth next rise or set after landing.', { x: 0.95, y: 4.68, w: 8.1, h: 0.35, fontSize: 13, color: SUN, objectName: 'after-note' })
-  s.addNotes('Each card also says whether the Sun and Earth are up at the landing hour and when that next changes. You can add your own spot on the Moon; the browser computes its sky from the same NASA ephemeris.')
+  s.addText('Seven sites, and honest verdicts', { placeholder: 'title' })
+  s.addImage({ path: img('compare.png'), x: 0.5, y: 1.15, w: 5.8, h: 2.75, altText: 'First four of the seven comparison cards', objectName: 'cards' })
+  s.addImage({ path: img('caveats.png'), x: 0.5, y: 4.0, w: 5.8, h: 0.9, altText: 'Too close to call notes from our site', objectName: 'caveats' })
+  T(s, [
+    { text: 'Before: 3 sites, flat horizon', options: { bold: true, color: MUTED, fontSize: 14, breakLine: true } },
+    { text: 'Sun 53.0 / 51.6 / 51.3 %: all too close to call.', options: { color: MUTED, fontSize: 13, breakLine: true } },
+    { text: ' ', options: { fontSize: 8, breakLine: true } },
+    { text: 'After: 7 sites, real terrain', options: { bold: true, color: SUN, fontSize: 14, breakLine: true } },
+    { text: 'Shackleton rim and Connecting Ridge get about 86 % Sun; the rest 20 to 48 %.', options: { color: TEXT, fontSize: 13, breakLine: true } },
+    { text: ' ', options: { fontSize: 8, breakLine: true } },
+    { text: '86.2 vs 86.1 % is still "too close to call", and the page says so.', options: { color: GREEN, fontSize: 13 } },
+  ], { x: 6.55, y: 1.15, w: 2.95, h: 3.6, valign: 'top', objectName: 'before-after' })
+  s.addNotes('Same date, 15 Nov 2026, one year ahead. Before, all three sites looked the same. With terrain, the rim and ridge points clearly stand out. Numbers come from docs/FINAL_REPORT.md.')
 }
 
-// 5. Data & method
-pres.addSection({ title: 'Method' })
+// 5. Landing dates, settings
 {
-  const s = pres.addSlide({ masterName: 'Content', sectionTitle: 'Method' })
-  s.addText('Built on NASA data', { placeholder: 'title' })
-  const steps = [
-    ['NASA JPL DE421', 'ephemeris, plus NASA NAIF lunar orientation kernels', SUN],
-    ['Skyfield (Python)', 'Sun and Earth every hour for 2 years: 17,544 samples a site', EARTH],
-    ['Static files', 'sky.json for the sites; vectors.bin for any point on the Moon', GREEN],
-    ['Your browser', 'metrics, verdicts and next rise / set, instantly', TEXT],
-  ]
-  const w = 1.95, gap = 0.4
-  steps.forEach(([h, d, col], i) => {
-    const x = 0.5 + i * (w + gap)
-    card(s, { x, y: 1.45, w, h: 2.2 }, `step-${i}`)
-    dot(s, x + 0.2, 1.65, col, 0.3, `step-dot-${i}`)
-    T(s, [
-      { text: h, options: { bold: true, fontSize: 16, breakLine: true } },
-      { text: d, options: { color: MUTED, fontSize: 13 } },
-    ], { x: x + 0.2, y: 2.1, w: w - 0.4, h: 1.45, valign: 'top', objectName: `step-text-${i}` })
-    if (i < steps.length - 1) {
-      s.addShape(pres.shapes.CHEVRON, { x: x + w + 0.11, y: 2.4, w: 0.18, h: 0.3, fill: { color: MUTED }, line: { color: MUTED, width: 0 }, objectName: `arrow-${i}` })
-    }
-  })
-  T(s, 'Positions are worked out in the Moon\'s own body-fixed frame (MOON_ME_DE421), so a lunar latitude and longitude is a real place in space.', { x: 0.5, y: 3.95, w: 9.0, h: 0.7, fontSize: 14, color: MUTED, valign: 'top', objectName: 'frame-note' })
-  s.addNotes('Positions come from NASA JPL\'s DE421 ephemeris and NAIF lunar kernels via Skyfield, hourly for two years. The page itself is static files, so it loads fast and works anywhere.')
+  const s = pres.addSlide({ masterName: 'Content', sectionTitle: 'Solution' })
+  s.addText('Find the best landing day', { placeholder: 'title' })
+  s.addImage({ path: img('heatmap.png'), x: 0.5, y: 1.15, w: 4.9, h: 3.02, altText: 'Best landing dates heatmap for the seven sites', objectName: 'heatmap' })
+  T(s, 'Best landing dates: click a day (or "Use this date") to set it.', { x: 0.5, y: 4.3, w: 4.9, h: 0.5, fontSize: 12, color: MUTED, valign: 'top', objectName: 'heatmap-caption' })
+  s.addImage({ path: img('landing.png'), x: 5.6, y: 1.15, w: 3.9, h: 1.45, altText: 'Sun by landing date chart', objectName: 'landing' })
+  s.addImage({ path: img('settings.png'), x: 5.6, y: 2.75, w: 3.9, h: 1.24, altText: 'Model settings and presets', objectName: 'settings' })
+  T(s, 'Sun by landing date, model presets, and a Sensitivity panel that shows if a choice flips the answer. The radio check needs a NASA Deep Space Network dish in view.', { x: 5.6, y: 4.1, w: 3.9, h: 0.9, fontSize: 12, color: MUTED, valign: 'top', objectName: 'right-caption' })
+  s.addNotes('A heatmap of Sun by landing day for every site, a chart of Sun against landing date, and settings with presets. The Sensitivity panel shows how the verdict changes when assumptions change.')
 }
 
-// 6. Validation
+// 6. Method & validation
+pres.addSection({ title: 'Method' })
 {
   const s = pres.addSlide({ masterName: 'Content', sectionTitle: 'Method' })
   s.addText('Checked, and honest about the limits', { placeholder: 'title' })
   const stats = [
-    ['0.0000083°', 'largest difference from NASA JPL Horizons (78 checks)', SUN],
-    ['0.01°', 'custom-location maths vs the full calculation', EARTH],
-    ['68', 'automated tests; 52 run before every deploy', GREEN],
+    ['0.002"', 'positions vs NASA JPL Horizons (arcseconds)', SUN],
+    ['86.7 %', 'Shackleton rim Sun at 2 m; published (Gläser et al.) 85.5 %', EARTH],
+    ['86.6 %', 'Connecting Ridge Sun at 2 m; published 81.3 %', GREEN],
   ]
   stats.forEach(([n, d, col], i) => {
     const x = 0.5 + i * 3.1
-    T(s, n, { x, y: 1.25, w: 2.9, h: 0.85, fontSize: 40, bold: true, color: col, valign: 'bottom', objectName: `stat-${i}` })
-    T(s, d, { x, y: 2.15, w: 2.7, h: 0.65, fontSize: 13, color: MUTED, valign: 'top', objectName: `stat-label-${i}` })
+    T(s, n, { x, y: 1.1, w: 2.9, h: 0.8, fontSize: 38, bold: true, color: col, valign: 'bottom', objectName: `stat-${i}` })
+    T(s, d, { x, y: 1.95, w: 2.8, h: 0.6, fontSize: 12, color: MUTED, valign: 'top', objectName: `stat-label-${i}` })
   })
-  card(s, { x: 0.5, y: 3.1, w: 9.0, h: 1.25 }, 'limit-card')
+  T(s, 'NASA JPL ephemeris + NAIF lunar kernels  →  Skyfield (Python)  →  LOLA skyline per site  →  your browser', { x: 0.5, y: 2.7, w: 9.0, h: 0.35, fontSize: 13, color: TEXT, valign: 'middle', objectName: 'pipeline' })
+  T(s, 'Tests: 207 vitest (4 skipped), 6 Playwright browser tests with an accessibility scan, 37 terrain pytest (1 skipped).', { x: 0.5, y: 3.1, w: 9.0, h: 0.35, fontSize: 13, color: MUTED, valign: 'middle', objectName: 'tests' })
+  card(s, { x: 0.5, y: 3.6, w: 9.0, h: 1.3 }, 'limit-card')
   T(s, [
-    { text: 'Limitation, shown openly: a flat horizon', options: { bold: true, fontSize: 16, breakLine: true } },
-    { text: 'Hills and crater rims are not modelled. On the raised Shackleton rim our longest night is 112 days; with real terrain it is about 1.5 days (Mazarico et al. 2011). The page and README explain why.', options: { color: MUTED, fontSize: 14 } },
-  ], { x: 0.75, y: 3.28, w: 8.5, h: 0.95, valign: 'top', objectName: 'limit-text' })
-  s.addNotes('Every Sun and Earth position matches NASA JPL Horizons to within 0.0000083 degrees. Our main limitation is the flat horizon, and we say so plainly.')
+    { text: 'Limits, shown openly', options: { bold: true, fontSize: 15, breakLine: true } },
+    { text: 'Spots you type in use a flat horizon. Our numbers differ a little from published ones, so a "too close to call" is a real answer. This is not a mission-planning tool and not an official NASA product.', options: { color: MUTED, fontSize: 13 } },
+  ], { x: 0.75, y: 3.72, w: 8.5, h: 1.1, valign: 'top', objectName: 'limit-text' })
+  s.addNotes('Positions match NASA JPL Horizons to within 0.002 arcseconds. Our terrain Sun figures for two published points are 86.7 and 86.6 percent against 85.5 and 81.3 in the literature.')
 }
 
 // 7. Impact & next
@@ -191,12 +183,12 @@ pres.addSection({ title: 'Close' })
       { x: x + 0.25, y: 2.0, w: 3.85, h: 1.65, fontSize: 14, color: MUTED, valign: 'top', paraSpaceAfter: 6, objectName: `${name}-list` })
   }
   col(0.5, 'Impact', SUN, [
-    'Planners compare sites and landing dates in seconds',
-    'Students see why the south pole is hard, and valuable',
+    'Compare 7 sites and any landing date in seconds',
+    'Share the exact view with one link; open a site in LROC QuickMap or Moon Trek',
     '"Explain it to me" puts a plain note on every number',
   ], 'impact')
   col(5.15, 'Next steps', EARTH, [
-    'Real terrain horizons from LRO LOLA elevation data',
+    'Terrain skyline for spots you type in',
     'Sunlight on solar panels at a set height',
     'Relay-satellite coverage in the communication score',
   ], 'next')
@@ -206,7 +198,7 @@ pres.addSection({ title: 'Close' })
     { text: 'Code: ', options: { bold: true } },
     { text: 'github.com/stevenjc2009-byte/clps-lunar-browser', options: { color: EARTH, hyperlink: { url: 'https://github.com/stevenjc2009-byte/clps-lunar-browser' } } },
   ], { x: 0.5, y: 4.05, w: 9.0, h: 0.75, fontSize: 14, valign: 'top', objectName: 'links' })
-  s.addNotes('A clear, honest first look at a site before detailed terrain studies. Thank you from The Big Four.')
+  s.addNotes('A clear, honest first look at a site before detailed studies. Thank you from The Big Four.')
 }
 
 ;(async () => {

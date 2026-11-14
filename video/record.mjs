@@ -8,7 +8,7 @@ import { chromium } from 'playwright'
 import { mkdirSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
-const URL_ = process.argv[2] ?? 'https://stevenjc2009-byte.github.io/clps-lunar-browser/'
+const URL_ = process.argv[2] ?? 'http://localhost:5197/#d=2026-11-15&w=365&s=shackleton-rim,connecting-ridge,peak-near-shackleton,im2,im1&g=shackleton-rim'
 const OUT = new URL('./out/', import.meta.url)
 mkdirSync(OUT, { recursive: true })
 // Empty it rather than delete it: deleting fails if a shell has it open, and a
@@ -48,6 +48,10 @@ const tStart = Date.now()
 await page.goto(URL_, { waitUntil: 'networkidle' })
 await page.waitForSelector('.compare-card')
 await page.waitForSelector('.sky-chart .main-svg')
+// Compare all seven sites (before the clock starts).
+for (const n of ['Nobile Rim 2', 'de Gerlache Rim 2']) await page.locator('.site-picks label', { hasText: n }).locator('input').check()
+await page.waitForFunction(() => document.querySelectorAll('.compare-card').length === 7)
+await page.waitForTimeout(1500)
 await page.mouse.move(900, 300)
 await page.waitForTimeout(600) // let fonts and the chart settle
 const t0 = Date.now()
@@ -57,7 +61,6 @@ const at = async ms => { const wait = t0 + ms - Date.now(); if (wait > 0) await 
 const scrollTo = (sel, block = 'start') =>
   page.evaluate(([s, b]) => document.querySelector(s).scrollIntoView({ behavior: 'smooth', block: b }), [sel, block])
 async function moveTo(sel, steps = 25) {
-  // Wait for any smooth scroll to finish, or the box is measured mid-scroll and the pointer misses.
   for (let last = -1, y = await page.evaluate(() => scrollY); y !== last; ) {
     last = y; await page.waitForTimeout(80); y = await page.evaluate(() => scrollY)
   }
@@ -65,55 +68,46 @@ async function moveTo(sel, steps = 25) {
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps })
 }
 
-// 0-3 s: title (caption 1). 3-8 s: the sky graph (caption 2)
+// 0-3 s: title. 3-9 s: sky graph with the real terrain skyline
 await at(3000)
-await scrollTo('.sky-chart', 'center')
-await at(4600)
+await scrollTo('section[aria-label="Sky graph"] .sky-chart', 'center')
+await at(5000)
 await page.mouse.move(700, 420, { steps: 40 })
+await at(7500)
+await page.mouse.move(1100, 500, { steps: 40 })
 
-// 8-11 s: back up to the comparison (caption 3)
-await at(8000)
-await scrollTo('.controls')
-
-// 11-18 s: change the date and look-ahead, cards update (caption 4)
-await at(9800)
-await moveTo('input[type=date]')
-await at(11300)
-await page.locator('input[type=date]').fill('2027-06-10')
-await at(13000)
-await moveTo('.seg button:first-child') // "30 days" (1 year is the default)
-await at(14000)
-await page.click('.seg button:first-child')
-await at(15500)
-await scrollTo('.compare-grid', 'center')
-await at(16500)
-await moveTo('.compare-card .verdict')
-
-// 18-22 s: after-landing lines (caption 5)
-await at(18000)
-await page.addStyleTag({ content: '.compare-card .after{outline:2px solid #ffb627;outline-offset:4px;border-radius:6px;transition:outline-color .3s}' })
-await at(18800)
-await moveTo('.compare-card .after')
-
-// 22-26 s: add your own location (caption 6)
-await at(21800)
-await page.addStyleTag({ content: '.compare-card .after{outline-color:transparent}' })
-await scrollTo('form.custom', 'center')
-await at(22800)
-await moveTo('.custom-go')
-await at(23600)
-await page.click('.custom-go')
-await page.waitForSelector('.compare-card:nth-child(4)')
-await scrollTo('.compare-grid', 'center')
-
-// 26-29.5 s: Explain it to me (caption 7)
-await at(26000)
-await scrollTo('header')
-await at(26700)
-await moveTo('.explain-all', 15)
-await page.click('.explain-all')
-await at(27400)
+// 9-15.5 s: seven sites compared
+await at(9000)
 await scrollTo('.compare-grid', 'start')
+await at(12500)
+await moveTo('.compare-card:nth-child(2) .verdict', 40)
+
+// 15.5-19.5 s: the honest "too close to call" notes
+await at(15500)
+await scrollTo('.caveats', 'center')
+await at(17000)
+await moveTo('.caveats .close-call', 25)
+
+// 19.5-25 s: best landing dates heatmap, click a day
+await at(19500)
+await scrollTo('section[aria-label="Best landing dates"]', 'start')
+await at(22000)
+await moveTo('.hm-use >> nth=1', 30)
+await at(23800)
+await page.click('.hm-use >> nth=1')
+
+// 25-27.5 s: model settings
+await at(25000)
+await scrollTo('section[aria-label="Model settings"]', 'start')
+await at(26200)
+await moveTo('.preset select, .preset', 30)
+
+// 27.5-29.5 s: shareable link
+await at(27500)
+await scrollTo('.copy-btn', 'center')
+await at(28300)
+await moveTo('.copy-btn', 20)
+await page.click('.copy-btn')
 await at(30200) // a little spare; render.sh cuts at exactly 29.5 s
 
 await page.close()

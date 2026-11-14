@@ -1,6 +1,6 @@
 # Backup slides
 
-`docs/slides.pptx` and `docs/slides.pdf`: 7 slides, made by the SI assistant (Claude) and marked "AI-made" on every slide. The pictures are screenshots of our own live site; there are no photos, people or NASA logos.
+`docs/slides.pptx` and `docs/slides.pdf`: 7 slides, made by the SI assistant (Claude) and marked "AI-made" on every slide. The pictures are screenshots of our own site; there are no photos, people or NASA logos.
 
 To remake them:
 
@@ -8,7 +8,8 @@ To remake them:
 cd slides
 npm install
 npx playwright install chromium-headless-shell
-node shots.mjs      # screenshots of the live site -> img/
+(cd ../frontend && npm run build && npx vite preview --port 5197 --strictPort)   # in a second terminal
+node shots.mjs      # screenshots of http://localhost:5197 (or pass a URL) -> img/
 node build.cjs      # -> ../docs/slides.pptx
 soffice --headless --convert-to pdf --outdir ../docs ../docs/slides.pptx
 ```
