@@ -28,16 +28,15 @@ export function skyline(horizon: number[] | undefined, step: number | undefined)
   return { x, y, flat: !usable }
 }
 
-// y-axis range: -5..10 deg unless a dot in the window or the skyline would fall outside, then
-// widened to the next multiple of 5. (Audit B6: it used to come from the 2-year stats.)
-export function elevationRange(values: number[][], skylineMax = 0): { range: [number, number]; widened: boolean } {
-  let lo = Infinity, hi = -Infinity
-  for (const v of values) for (const a of v) { if (a < lo) lo = a; if (a > hi) hi = a }
-  hi = Math.max(hi, skylineMax)
-  let [rLo, rHi] = DEFAULT_RANGE
-  if (hi > rHi) rHi = Math.ceil(hi / 5) * 5
-  if (lo < rLo) rLo = Math.floor(lo / 5) * 5
-  return { range: [rLo, rHi], widened: rLo !== DEFAULT_RANGE[0] || rHi !== DEFAULT_RANGE[1] }
+// y-axis range: -5..10 deg, widened upward (to the next multiple of 5) only if a dot in the window or the
+// skyline is higher. Dots lower than the bottom are below any horizon here, so they are counted, not drawn.
+// (Audit B6: the range used to come from the 2-year stats.)
+export function elevationRange(values: number[][], skylineMax = 0): { range: [number, number]; widened: boolean; below: number } {
+  let hi = skylineMax, below = 0
+  const [rLo, baseHi] = DEFAULT_RANGE
+  for (const v of values) for (const a of v) { if (a > hi) hi = a; if (a < rLo) below++ }
+  const rHi = hi > baseHi ? Math.ceil(hi / 5) * 5 : baseHi
+  return { range: [rLo, rHi], widened: rHi !== baseHi, below }
 }
 
 export const mean = (a: number[]): number => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : NaN)

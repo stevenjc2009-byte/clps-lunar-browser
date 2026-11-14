@@ -210,7 +210,7 @@ footer a:hover { text-decoration: underline; }
 .pick { min-height: 44px; padding-top: 0; padding-bottom: 0; }
 .field input[type=date], .custom input { min-height: 44px; }
 .explain-btn { position: relative; }
-.explain-btn::after { content: ''; position: absolute; inset: -11px; }
+.explain-btn::after { content: ''; position: absolute; inset: -12px; }
 .why summary, .caveats a, .intro a { min-height: 44px; display: inline-flex; align-items: center; }
 footer a { text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px; }
 
@@ -226,3 +226,5 @@ footer a { text-decoration: underline; display: inline-flex; align-items: center
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+.sky-chart .modebar-btn:focus-visible, .sky-chart .modebar-btn:focus { outline: 2px solid #ffffff !important; outline-offset: 1px; }
+.sky-chart .modebar-btn { padding: 4px 6px; }

@@ -35,8 +35,8 @@ export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDe
     const cut = (a: number[]) => a.slice(span.start, span.end)
     const sky = skyline(horizon, horizonStep)
     const sunAlt = cut(site.sun_alt), earthAlt = cut(site.earth_alt)
-    const { range, widened } = elevationRange([sunAlt, earthAlt], Math.max(...sky.y))
-    return { sunAlt, earthAlt, sunAz: cut(site.sun_az), earthAz: cut(site.earth_az), sky, range, widened }
+    const { range, widened, below } = elevationRange([sunAlt, earthAlt], Math.max(...sky.y))
+    return { sunAlt, earthAlt, sunAz: cut(site.sun_az), earthAz: cut(site.earth_az), sky, range, widened, below }
   }, [site, span.start, span.end, horizon, horizonStep])
 
   useEffect(() => {
@@ -48,6 +48,7 @@ export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDe
       color: idx(n), colorscale: plotlyScale(ramp), cmin: 0, cmax: Math.max(1, n - 1),
       size: 4, opacity: 0.75, symbol, showscale: false,
     })
+    const narrow = el.clientWidth < 520
     const skyName = sky.flat ? 'Flat horizon (0°), no terrain data' : 'Terrain skyline'
 
     const data: Partial<Plotly.Data>[] = [
@@ -73,8 +74,9 @@ export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDe
       xaxis: {
         title: { text: 'Compass direction (° clockwise from lunar north)' },
         range: [-180, 180],
-        tickvals: [-180, -135, -90, -45, 0, 45, 90, 135, 180],
-        ticktext: ['S 180°', 'SW 225°', 'W 270°', 'NW 315°', 'N 0°', 'NE 45°', 'E 90°', 'SE 135°', 'S 180°'],
+        // narrow screens: only N, E, S, W so the labels do not overlap
+        tickvals: narrow ? [-180, -90, 0, 90, 180] : [-180, -135, -90, -45, 0, 45, 90, 135, 180],
+        ticktext: narrow ? ['S', 'W', 'N', 'E', 'S'] : ['S 180°', 'SW 225°', 'W 270°', 'NW 315°', 'N 0°', 'NE 45°', 'E 90°', 'SE 135°', 'S 180°'],
         gridcolor: GRID, zeroline: false,
       },
       yaxis: {
@@ -87,7 +89,7 @@ export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDe
 
     let cancelled = false
     loadPlotly()
-      .then(P => { if (!cancelled) P.react(el, data, layout, { responsive: true, displaylogo: false }) })
+      .then(P => { if (!cancelled) P.react(el, data, layout, { responsive: true, displaylogo: false, modeBarButtons: [['zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']] }) })
       .catch(() => { if (!cancelled) el.textContent = 'The chart library could not be loaded. Reload the page to try again.' })
     return () => { cancelled = true }
   }, [win])
@@ -101,9 +103,9 @@ export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDe
   const t = (i: number) => (t0Ms === undefined ? undefined : t0Ms + (span.start + i) * stepHours * 3_600_000)
   return (
     <>
-      <div ref={ref} className="sky-chart" role="img"
+      <div ref={ref} className="sky-chart" role="figure"
         aria-label={`Sky graph for ${site.name}: Sun and Earth positions, one dot per hour, ${win.sky.flat ? 'against a flat horizon' : 'against the terrain skyline'}. A table of the numbers follows the chart.`} />
-      <SkyLegend startMs={n ? t(0) : undefined} endMs={n ? t(n - 1) : undefined} flat={win.sky.flat} widened={win.widened}
+      <SkyLegend startMs={n ? t(0) : undefined} endMs={n ? t(n - 1) : undefined} flat={win.sky.flat} widened={win.widened} below={win.below}
         range={win.range} sunRadius={sunRadiusDeg} earthRadius={earthRadiusDeg} start={span.start} end={span.end}
         explainAll={explainAll} />
       <SkyTable siteName={site.name} sunAz={win.sunAz} sunAlt={win.sunAlt} earthAz={win.earthAz} earthAlt={win.earthAlt}

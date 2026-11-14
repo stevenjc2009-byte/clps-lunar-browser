@@ -6,13 +6,13 @@ const PX_PER_DEG = 30   // the size legend: 1 degree of sky is drawn 30 px long,
 
 interface Props {
   startMs?: number; endMs?: number
-  flat: boolean; widened: boolean; range: [number, number]
+  flat: boolean; widened: boolean; below: number; range: [number, number]
   sunRadius?: number[]; earthRadius?: number[]; start: number; end: number
   explainAll?: boolean
 }
 
 // Legend under the sky graph: time colour, skyline note, and Sun / Earth disc sizes to scale.
-export default function SkyLegend({ startMs, endMs, flat, widened, range, sunRadius, earthRadius, start, end, explainAll = false }: Props) {
+export default function SkyLegend({ startMs, endMs, flat, widened, below, range, sunRadius, earthRadius, start, end, explainAll = false }: Props) {
   const rs = meanRadius(sunRadius, start, end, SUN_MEAN_RADIUS_DEG)
   const re = meanRadius(earthRadius, start, end, EARTH_MEAN_RADIUS_DEG)
   const known = sunRadius && earthRadius
@@ -35,6 +35,7 @@ export default function SkyLegend({ startMs, endMs, flat, widened, range, sunRad
           ? <><b>Flat horizon:</b> no terrain data for this site, so hills and crater walls are not drawn and hidden or visible is approximate.</>
           : <><b>Terrain skyline:</b> the grey shape is the real horizon from NASA LOLA elevation data. Dots inside it are hidden.</>}
         {widened && <> The height axis was widened to {range[0]}° to {range[1]}° to fit the data.</>}
+        {below > 0 && <> {below} dots are lower than {range[0]}°, off the bottom of the chart and not drawn.</>}
       </p>
       <div className="sky-scale">
         <svg width={w} height={w} viewBox={`${-w / 2} ${-w / 2} ${w} ${w}`} role="img"

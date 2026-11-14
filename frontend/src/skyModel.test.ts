@@ -36,7 +36,7 @@ describe('elevationRange', () => {
   })
   it('widens to multiples of 5 when data or skyline exceed it', () => {
     expect(elevationRange([[0, 11.5]]).range).toEqual([-5, 15])
-    expect(elevationRange([[-7]]).range).toEqual([-10, 10])
+    expect(elevationRange([[-7, -8, 1]])).toMatchObject({ range: [-5, 10], below: 2 })
     expect(elevationRange([[1]], 12).range).toEqual([-5, 15])
   })
 })
