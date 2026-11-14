@@ -14,6 +14,16 @@ function fmtDay(iso: string) {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 }
 
+// Landing dates the UI offers: sky.json v2 carries landing_min/max_utc (the data starts earlier,
+// for context); older files start at the earliest landing date.
+function landingRange(d: SkyData, days: number): [string, string] {
+  const t0 = dataStartMs(d), stepMs = d.meta.step_hours * HOUR_MS
+  const lastFit = isoDay(t0 + (d.meta.samples - (days * 24) / d.meta.step_hours) * stepMs)
+  const lo = d.meta.landing_min_utc?.slice(0, 10) ?? isoDay(t0)
+  const hi = d.meta.landing_max_utc?.slice(0, 10)
+  return [lo, hi && hi < lastFit ? hi : lastFit]
+}
+
 const WINDOWS = [{ days: 30, label: '30 days' }, { days: 365, label: '1 year' }]
 const HOUR_MS = 3_600_000
 
@@ -34,7 +44,7 @@ export default function App() {
         setData(d)
         setSiteId(d.sites[0]?.id ?? '')
         setPicked(d.sites.slice(0, 3).map(s => s.id))
-        setStartDay(isoDay(dataStartMs(d)))
+        setStartDay(landingRange(d, 365)[0])
       })
       .catch(e => setError(String(e)))
   }, [])
@@ -52,8 +62,8 @@ export default function App() {
 
   const step = data.meta.step_hours * HOUR_MS
   const t0 = dataStartMs(data)
-  const minDay = isoDay(t0)
-  const maxDay = isoDay(t0 + (data.meta.samples - (days * 24) / data.meta.step_hours) * step)
+  const [minDay, maxDay] = landingRange(data, days)
+  const pickDay = (iso: string) => setStartDay(iso < minDay ? minDay : iso > maxDay ? maxDay : iso)
   const fromDay = isoDay(t0 + span.start * step)
   const toDay = isoDay(t0 + span.end * step)
   const site = sites.find(s => s.id === siteId) ?? sites[0]
@@ -91,7 +101,7 @@ export default function App() {
         <label className="field">
           <span>Landing date (UTC)</span>
           <input type="date" value={fromDay} min={minDay} max={maxDay}
-            onChange={e => e.target.value && setStartDay(e.target.value)} />
+            onChange={e => e.target.value && pickDay(e.target.value)} />
         </label>
         <div className="field">
           <span>Look ahead</span>
@@ -133,7 +143,7 @@ export default function App() {
         <p className="how-read">How much Sun each site gets over the next {days === 365 ? 'year' : `${days} days`}, if you landed on
           that date. <b>Click the chart to pick that landing date.</b></p>
         <LandingChart sites={rows.map(r => r.site)} days={days} stepHours={data.meta.step_hours} t0Ms={t0}
-          landingDay={fromDay} onPick={setStartDay} />
+          landingDay={fromDay} onPick={pickDay} />
       </section>
 
       <section className="panel" aria-label="Sky graph">
@@ -161,8 +171,9 @@ export default function App() {
       </section>
 
       <footer>
-        <p>Positions: NASA JPL DE421 ephemeris and NAIF lunar orientation kernels via Skyfield, checked against NASA JPL Horizons
-          to within 0.00001°. Model: {data.meta.horizon}. Hourly samples, 15 Nov 2026 to 14 Nov 2028.</p>
+        <p>Positions: NASA JPL DE440 ephemeris and NAIF lunar orientation kernels via Skyfield, checked against NASA JPL Horizons
+          to within 0.002 arcseconds. Model: {data.meta.horizon}. Hourly samples, {fmtDay(data.meta.start_utc.slice(0, 10))} to{' '}
+          {fmtDay(data.meta.end_utc.slice(0, 10))}; landing dates {fmtDay(minDay)} to {fmtDay(maxDay)}.</p>
         <p>Made by <b>The Big Four</b> ·{' '}
           <a href="https://github.com/stevenjc2009-byte/clps-lunar-browser#readme" target="_blank" rel="noreferrer">Method, sources and code</a></p>
       </footer>
