@@ -17,7 +17,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-from .products import PRODUCTS
+from .products import PRODUCTS, USED
 
 DEFAULT_DEST = Path(os.environ.get("CLPS_LOLA_DATA", r"D:\clps-lola-data"))
 CHUNK = 4 * 1024 * 1024
@@ -92,7 +92,8 @@ def ensure(name, dest):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("names", nargs="*", default=list(PRODUCTS))
+    ap.add_argument("names", nargs="*", default=USED,
+                    help=f"default: the grids the horizons use; all: {' '.join(PRODUCTS)}")
     ap.add_argument("--dest", type=Path, default=DEFAULT_DEST)
     a = ap.parse_args(argv)
     results = [ensure(n, a.dest) for n in a.names]

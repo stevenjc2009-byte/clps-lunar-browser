@@ -1,9 +1,11 @@
 # Decisions: LOLA terrain horizons (agent "lola", branch lola-terrain)
 
-1. **DEM products.** Options: the float32 grids (2x size), the 10 m 85 S grid, the 30 m
-   75 S grid, or the int16 set 5 m (87.5 S) + 20 m (80 S) + 60 m (75 S) + 240 m (60 S).
-   Chose the int16 set (4.3 GB total). Why: int16 at 0.5 m steps is far finer than the
-   horizon needs (0.5 m at 1 km is 0.03 deg); the 5 m grid covers every site within
+1. **DEM products** (superseded in part by item 16: the near and mid bands now use the
+   float versions of the same grids). Options: the float32 grids (2x size), the 10 m 85 S
+   grid, the 30 m 75 S grid, or the int16 set 5 m (87.5 S) + 20 m (80 S) + 60 m (75 S) +
+   240 m (60 S). First chose the int16 set (4.3 GB total), reasoning that 0.5 m steps are
+   fine for horizons (0.5 m at 1 km is 0.03 deg) -- true far out, wrong at 5-50 m (item
+   16). Coverage reasoning still holds: the 5 m grid covers every site within
    1.5 deg of the pole, the 20 m grid covers all 80-90 S sites, and the two coarse grids
    cover the long sight lines. The 30 m 75 S grid (1.86 GB) would only help the
    northern half of IM-1's first 10 km; skipped, IM-1 falls back to 60 m there and its
@@ -60,3 +62,25 @@
    windows (~150 MB per site). Measured: windows 98 s cold read, horizon 1.2 s; result
    identical to the full-grid memmap path (max |diff| 0.000000 deg at Shackleton rim),
    and test_dem_real checks bit-identical sampling plus NaN outside the window.
+16. **Float grids for the near and mid bands (bug found in validation, fixed).** The first
+   full run (int16 grids) gave Shackleton S at surface level 52.9 % Sun visible against
+   Glaser et al.'s 85.5 %, and the panoramas showed the 0 m horizon at exactly 0.00 deg on
+   62 % of azimuths at Shackleton rim. Cause, measured: the int16 grids store heights in
+   0.5 m steps (truncated); around the site the 5 m grid is flat 0.5 m plateaus, and a
+   0.5 m step at 5 m range is a 5.7 deg fake slope. Options: smooth the DEM, skip the first
+   N metres, or use the float32 versions of the same grids (PDS float_img/, V2.1). Chose
+   the floats: same data without rounding, no tunable parameter. Cost: 8.3 GB download
+   (5, 20, 60 m floats). The 240 m int16 grid stays for > 60 km (0.5 m there is < 0.0005
+   deg). The literature numbers were NOT the target: the fix was chosen from the cause,
+   and the after-fix comparison is reported as it comes out (docs/TERRAIN.md).
+17. **Second, independent reference: the LOLA team's average-visibility map**
+   (AVGVISIB_85S_060M_201608, PDS extras, 51 MB, MD5-checked; Mazarico et al. 2011 method,
+   60 m DEM, surface level, "sunlit by any fraction of the disc"). Options: literature
+   tables only, or also this map. Chose to add it: it is cheap, covers every site south
+   of ~85 S, and was produced by different code from a different DEM, so agreement with it
+   is real corroboration. It is read by `horizon.mazarico_ref` and only reported; nothing
+   is fitted to it. Its period is not stated in the label, so differences of a few percent
+   are expected for that reason alone.
+18. **Sabotage check found a test gap (fixed).** Breaking "upper limb" to "Sun centre"
+   (`vis = a > h`) left every test green. Added test_visible_means_upper_limb_not_centre
+   (Sun centre 0.1 deg below a flat horizon must count as visible); that arm is now red.

@@ -2,12 +2,13 @@
 
 The terrain horizons in `frontend/public/horizons.json` are computed from NASA Lunar
 Reconnaissance Orbiter (LRO) Lunar Orbiter Laser Altimeter (LOLA) polar elevation grids.
-The grids themselves (about 4.3 GB) are **not** committed. Download them with:
+The grids themselves are **not** committed. Download them with:
 
 ```
 cd backend
-py -3 -m horizon.download            # to D:\clps-lola-data (or set CLPS_LOLA_DATA / --dest)
-py -3 -m horizon.run                 # writes frontend/public/horizons.json
+py -3 -m horizon.download            # 8.4 GB to D:\clps-lola-data (or CLPS_LOLA_DATA / --dest)
+py -3 -m horizon.run --sites <sites-v2.json>   # writes frontend/public/horizons.json
+py -3 -m horizon.download ldem_875s_5m ldem_80s_20m ldem_75s_60m   # optional int16, tests only
 ```
 
 Everything below was read from the PDS server on 2026-11-14 (directory listings, PDS3
@@ -31,7 +32,24 @@ Everything below was read from the PDS server on 2026-11-14 (directory listings,
 
 ## Products used
 
+The horizons use the **float** grids (directory `polar/float_img/`, product version V2.1,
+created 2017-06-15) for everything within 60 km, and the int16 240 m grid beyond.
+
 | File | Size (bytes) | MD5 (PDS manifest) | Pixel | Grid | Full coverage | Used for |
+|---|---|---|---|---|---|---|
+| `float_img/ldem_875s_5m_float.img` | 3,681,091,584 | `E276D367838A53CF5C74443618B13819` | 5 m | 30336 x 30336 | 87.5 S - 90 S | first 10 km at sites inside it |
+| `float_img/ldem_80s_20m_float.img` | 3,696,640,000 | `AD5393CA08F7C243D8E37B6C4616A1D9` | 20 m | 30400 x 30400 | 80 S - 90 S | first 10 km at sites outside 87.5 S (and fallback) |
+| `float_img/ldem_75s_60m_float.img` | 930,006,016 | `152FC9CBA08A4D3F7522ADD8F98EDA9C` | 60 m | 15248 x 15248 | 75 S - 90 S | 10 - 60 km (and near-range fallback) |
+| `img/ldem_60s_240m.img` | 120,435,200 | `63C6F18693041352F5810D8C0397090A` | 240 m | 7760 x 7760 | 60 S - 90 S | beyond 60 km |
+
+The int16 versions of the 5, 20 and 60 m grids (below) were downloaded first and are kept
+for the tests (they check the two encodings agree). They are **not** used for the horizons:
+int16 stores height in 0.5 m steps, and right next to the observer a 0.5 m step is a fake
+slope of up to 5.7 deg (0.5 m at 5 m range). The first full run used them and gave
+0 m horizons of exactly 0.00 deg on 62 % of azimuths at Shackleton rim (flat 0.5 m
+plateaus); see `docs/decisions/lola.md` item 16.
+
+| File (int16, `img/`) | Size (bytes) | MD5 (PDS manifest) | Pixel | Grid | Full coverage | Used for |
 |---|---|---|---|---|---|---|
 | `ldem_875s_5m.img` | 1,840,545,792 | `1C0391292D2579A7DC5F21DE1B1DFC6A` | 5 m | 30336 x 30336 | 87.5 S - 90 S | first 10 km at sites inside it |
 | `ldem_80s_20m.img` | 1,848,320,000 | `F1388507C1984D5C963DE1F4323E43E8` | 20 m | 30400 x 30400 | 80 S - 90 S | first 10 km at sites outside 87.5 S (and fallback) |
@@ -57,9 +75,15 @@ data-count grids.
   **not** a height above a geoid ("planetopotential topography" would subtract a geoid).
 - No `MISSING_CONSTANT` is defined: the grids are gap-filled by GMT `surface`. We still
   treat DN -32768 as no-data; a sampled scan of `ldem_60s_240m` found none.
+- Float grids: `SAMPLE_TYPE = PC_REAL`, 32 bit, `UNIT = KILOMETER`, `SCALING_FACTOR = 1`,
+  `OFFSET = 1737.4` (km), same projection keywords and offsets as the int16 grids; no
+  `MISSING_CONSTANT`; non-finite values are treated as no-data. `DERIVED_MAXIMUM` (km):
+  5 m 2.372, 20 m 7.027, 60 m 7.027.
+- Measured relation between the encodings (test_dem_real.py): int16 * 0.5 m equals the
+  float height cut down to a 0.5 m step (truncated, not rounded), so they differ by < 0.5 m.
 - `DERIVED_MAXIMUM` / `MINIMUM` (DN): 875s_5m 4744 / -8760; 80s_20m 14054 / -14594;
   75s_60m 14053 / -15524; 60s_240m 14049 / -18253. Highest terrain in any product used:
-  14054 * 0.5 = 7027 m (used for the ray stopping rule).
+  14054 * 0.5 = 7027 m = float 7.027 km (used for the ray stopping rule).
 
 ## Projection (labels + `catalog/dsmap_polar.cat`)
 
@@ -76,5 +100,5 @@ data-count grids.
   own forward formula and text. We use the forward formula's inverse
   (`X = rho sin(lon)`, `Y = rho cos(lon)`, rho = 2 * 1737400 * tan((90 - |lat|) / 2)) and
   verified it on real terrain: Shackleton crater's floor is found at the IAU gazetteer
-  centre (-89.67, 129.78 E) in all four grids, while the east/west mirror point is high
+  centre (-89.67, 129.78 E) in all seven grids, while the east/west mirror point is high
   ground (`backend/horizon/test_dem_real.py`).

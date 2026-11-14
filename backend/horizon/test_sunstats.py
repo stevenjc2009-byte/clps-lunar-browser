@@ -38,3 +38,14 @@ def test_stats_with_terrain_block():
     s = sun_stats(alt, az, prof, 0.25)
     assert s["sun_visible_pct"] == pytest.approx(75.0, abs=1.0)
     assert s["longest_dark_h"] == pytest.approx(6.0, abs=0.5)
+
+
+def test_visible_means_upper_limb_not_centre():
+    # Sun centre 0.1 deg below a flat 0-deg horizon: upper limb (r = 0.2666) still shows
+    alt, az = np.full(48, -0.1), (np.arange(48) * 15.0) % 360.0
+    s = sun_stats(alt, az, np.zeros(1440), 0.25)
+    assert s["sun_visible_pct"] == 100.0
+    assert s["longest_dark_h"] == 0.0
+    # centre 0.3 deg below: whole disc hidden
+    s = sun_stats(np.full(48, -0.3), az, np.zeros(1440), 0.25)
+    assert s["sun_visible_pct"] == 0.0

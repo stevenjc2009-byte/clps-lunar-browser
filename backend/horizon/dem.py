@@ -1,18 +1,19 @@
-"""Memory-mapped LOLA polar DEM with bilinear sampling.
+"""Memory-mapped LOLA polar DEM (int16 or float32) with bilinear sampling.
 
 Bilinear interpolation between the four surrounding pixel centres (pixel-registered
 grid: pixel centre of 0-based column c is at X = (c + 0.5 - N/2) * scale). A point is
 "no data" (NaN) if any of its four neighbours lies outside the image or holds the
 nodata value. The LOLA polar int16 labels define no MISSING_CONSTANT (the grids are
 GMT 'surface' interpolations, i.e. gap-filled); we still treat -32768 as nodata so a
-corrupted or edge pixel can never become a fake 16 km pit.
+corrupted or edge pixel can never become a fake 16 km pit. For the float grids
+(also no MISSING_CONSTANT) any non-finite value is no data.
 """
 from pathlib import Path
 
 import numpy as np
 
 from .geometry import stereo_xy_from_unit
-from .products import PRODUCTS, SCALING_FACTOR
+from .products import PRODUCTS
 
 NODATA_DN = -32768
 
@@ -27,8 +28,9 @@ class PolarDEM:
         if path.stat().st_size != self.product.img_bytes:
             raise ValueError(f"{path} has wrong size (incomplete download?)")
         n = self.product.n
-        self.mm = np.memmap(path, dtype="<i2", mode="r", shape=(n, n))
+        self.mm = np.memmap(path, dtype=self.product.dtype, mode="r", shape=(n, n))
         self.n, self.scale = n, self.product.scale_m
+        self.to_m = self.product.to_m
 
     def pixel_coords(self, x, y):
         """0-based fractional (column, row) for stereographic X, Y in metres."""
@@ -39,7 +41,7 @@ class PolarDEM:
     def sample_xy(self, x, y):
         """Bilinear height (m above 1737.4 km) at stereographic X, Y; NaN = no data."""
         c, r = self.pixel_coords(np.asarray(x, float), np.asarray(y, float))
-        return _bilinear(self.mm, c, r)
+        return _bilinear(self.mm, c, r, self.to_m)
 
     def sample_unit(self, p):
         x, y = stereo_xy_from_unit(p)
@@ -64,16 +66,16 @@ class Window(PolarDEM):
 
     def __init__(self, parent, array, c0, r0):  # noqa: D107 (no file opened)
         self.product, self.name = parent.product, parent.name
-        self.n, self.scale = parent.n, parent.scale
+        self.n, self.scale, self.to_m = parent.n, parent.scale, parent.to_m
         self.mm, self.c0, self.r0 = array, c0, r0
 
     def sample_xy(self, x, y):
         c, r = self.pixel_coords(np.asarray(x, float), np.asarray(y, float))
-        return _bilinear(self.mm, c - self.c0, r - self.r0)
+        return _bilinear(self.mm, c - self.c0, r - self.r0, self.to_m)
 
 
-def _bilinear(arr, c, r):
-    """Bilinear sample of int16 DN array at fractional 0-based (c, r); NaN outside/nodata."""
+def _bilinear(arr, c, r, to_m):
+    """Bilinear height (m) from a DN array at fractional 0-based (c, r); NaN outside/nodata."""
     nr, nc = arr.shape
     c0, r0 = np.floor(c), np.floor(r)
     ok = (c0 >= 0) & (r0 >= 0) & (c0 + 1 <= nc - 1) & (r0 + 1 <= nr - 1)
@@ -86,10 +88,11 @@ def _bilinear(arr, c, r):
     v01 = arr[ri, ci + 1].astype(float)
     v10 = arr[ri + 1, ci].astype(float)
     v11 = arr[ri + 1, ci + 1].astype(float)
-    bad = (v00 == NODATA_DN) | (v01 == NODATA_DN) | (v10 == NODATA_DN) | (v11 == NODATA_DN)
+    corners = np.stack([v00, v01, v10, v11])
+    bad = ((corners == NODATA_DN) | ~np.isfinite(corners)).any(0)
     val = (1 - fr) * ((1 - fc) * v00 + fc * v01) + fr * ((1 - fc) * v10 + fc * v11)
     val[bad] = np.nan
-    out[ok] = val * SCALING_FACTOR
+    out[ok] = val * to_m
     return out
 
 

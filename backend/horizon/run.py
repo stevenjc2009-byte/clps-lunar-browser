@@ -1,7 +1,7 @@
 """Compute LOLA terrain horizons for every site and write frontend/public/horizons.json.
 
 One command, from backend/:
-    py -3 -m horizon.download          # once: ~4.3 GB of DEMs to D:\\clps-lola-data
+    py -3 -m horizon.download          # once: ~8.4 GB of DEMs to D:\\clps-lola-data
     py -3 -m horizon.run [--sites extra.json ...]
 
 Sites: backend/sites.json plus any --sites files (default also reads
@@ -24,9 +24,9 @@ from .dem import PolarDEM, chained_sampler
 from .download import DEFAULT_DEST
 from .geometry import offset_point, stereo_xy_from_latlon, unit_from_latlon
 from .march import compute_horizon
-from .products import BANDS, H_MAX_M, PRODUCTS
+from .products import BANDS, H_MAX_M, PRODUCTS, USED
 
-ALGORITHM_VERSION = "lola-horizon-1"
+ALGORITHM_VERSION = "lola-horizon-2"
 HEIGHTS = (0, 2, 5)
 AZ_STEP = 0.25
 RING_RADII = (50, 100)
@@ -41,15 +41,15 @@ OUT = BACKEND.parent / "frontend" / "public" / "horizons.json"
 
 class Terrain:
     def __init__(self, data_dir):
-        self.dems = {n: PolarDEM(n, data_dir) for n in PRODUCTS}
+        self.dems = {n: PolarDEM(n, data_dir) for n in USED}
         self.band_samplers = [chained_sampler([self.dems[n] for n in names])
                               for _, names in BANDS]
 
-    def bands_for(self, lat, lon, samplers=None):
+    def bands_for(self, lat, lon, samplers=None, bands=BANDS):
         """(r_outer, step, sampler) per band; step = finest product covering the site."""
         u = unit_from_latlon(lat, lon)[None, :]
         out = []
-        for i, (r_outer, names) in enumerate(BANDS):
+        for i, (r_outer, names) in enumerate(bands):
             step = next((self.dems[n].scale for n in names
                          if np.isfinite(self.dems[n].sample_unit(u)[0])), None)
             if step is None:
@@ -57,10 +57,12 @@ class Terrain:
             out.append((r_outer, step, (samplers or self.band_samplers)[i]))
         return out
 
-    def site_height(self, lat, lon):
-        return float(self.band_samplers[0](unit_from_latlon(lat, lon)[None, :])[0])
+    def site_height(self, lat, lon, samplers=None):
+        """Ground height (m) from the near band's grid (the one the rays start on)."""
+        near = (samplers or self.band_samplers)[0]
+        return float(near(unit_from_latlon(lat, lon)[None, :])[0])
 
-    def windowed_samplers(self, lat, lon, margin_m=WINDOW_MARGIN_M):
+    def windowed_samplers(self, lat, lon, margin_m=WINDOW_MARGIN_M, bands=BANDS):
         """Per-band samplers over in-RAM DEM windows around a site (same values, fast).
 
         Each window covers the band's outer radius (the last band: R_CAP) plus a margin
@@ -69,7 +71,7 @@ class Terrain:
         """
         x, y = stereo_xy_from_latlon(lat, lon)
         cache, samplers = {}, []
-        for r_outer, names in BANDS:
+        for r_outer, names in bands:
             rad = (R_CAP if np.isinf(r_outer) else r_outer) + margin_m
             # stereographic scale k = 1/cos^2(colat/2) >= 1: map distance >= ground distance
             rad *= 1.0 / np.cos(np.radians(90 + R_CAP / 1737400 * 180 / np.pi + lat) / 2) ** 2
@@ -83,9 +85,9 @@ class Terrain:
         return samplers
 
 
-def horizon(terrain, lat, lon, heights, az_step, samplers=None):
-    return compute_horizon(lat, lon, terrain.bands_for(lat, lon, samplers), heights,
-                           az_step=az_step, h_site=terrain.site_height(lat, lon),
+def horizon(terrain, lat, lon, heights, az_step, samplers=None, bands=BANDS):
+    return compute_horizon(lat, lon, terrain.bands_for(lat, lon, samplers, bands), heights,
+                           az_step=az_step, h_site=terrain.site_height(lat, lon, samplers),
                            h_max=H_MAX_M, r_cap=R_CAP)
 
 
@@ -140,8 +142,11 @@ def r2(a):
 
 def git_commit():
     try:
-        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=BACKEND,
+        head = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=BACKEND,
                               capture_output=True, text=True, check=True).stdout.strip()
+        dirty = subprocess.run(["git", "status", "--porcelain", "--", "horizon"], cwd=BACKEND,
+                               capture_output=True, text=True, check=True).stdout.strip()
+        return head + ("-dirty" if dirty else "")
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
 
@@ -149,7 +154,7 @@ def git_commit():
 def build_json(results, max_stop_km):
     meta = {
         "dem_products": [{"name": p.name.upper(), "url": p.img_url, "resolution_m": p.scale_m,
-                          "md5": p.img_md5} for p in PRODUCTS.values()],
+                          "md5": p.img_md5} for p in (PRODUCTS[n] for n in USED)],
         "algorithm_version": ALGORITHM_VERSION,
         "r_max_km": max_stop_km,
         "az_step_deg": AZ_STEP,
@@ -158,7 +163,7 @@ def build_json(results, max_stop_km):
         "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "script_commit": git_commit(),
         "notes": ("Horizon = max exact elevation angle of LOLA terrain along great-circle rays "
-                  "(sphere R=1737.4 km, heights relative to it). Azimuth clockwise from local "
+                  "(sphere R=1737.4 km, heights relative to it; float grids to 60 km, int16 240 m beyond). Azimuth clockwise from local "
                   "north (toward the lunar north pole), same as sky.json. Ray steps: 5 or 20 m "
                   "to 10 km, 60 m to 60 km, 240 m beyond; each ray stops when even a "
                   f"{H_MAX_M:.0f} m peak could not rise above the horizon found (r_max_km = "

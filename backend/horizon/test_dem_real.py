@@ -12,7 +12,7 @@ import pytest
 
 from horizon.dem import PolarDEM
 from horizon.geometry import latlon_from_stereo_xy, stereo_xy_from_latlon
-from horizon.products import PRODUCTS
+from horizon.products import BANDS, PRODUCTS
 
 DATA = Path(os.environ.get("CLPS_LOLA_DATA", r"D:\clps-lola-data"))
 SHACK = (-89.67, 129.78)
@@ -29,7 +29,9 @@ def dist_km(a, b):
     return np.hypot(xa - xb, ya - yb) / 1000.0
 
 
-@pytest.mark.parametrize("name", ["ldem_60s_240m", "ldem_75s_60m", "ldem_80s_20m", "ldem_875s_5m"])
+@pytest.mark.parametrize("name", ["ldem_60s_240m", "ldem_75s_60m", "ldem_80s_20m", "ldem_875s_5m",
+                                  "ldem_75s_60m_float", "ldem_80s_20m_float",
+                                  "ldem_875s_5m_float"])
 def test_shackleton_floor_is_where_the_gazetteer_says(name):
     if not have(name):
         pytest.skip(f"{name} not downloaded")
@@ -61,7 +63,7 @@ def test_products_agree_where_they_overlap():
             assert max(vals) - min(vals) < 400, (lat, lon, dict(zip(names, vals)))
 
 
-@pytest.mark.parametrize("name", ["ldem_60s_240m", "ldem_875s_5m"])
+@pytest.mark.parametrize("name", ["ldem_60s_240m", "ldem_875s_5m", "ldem_875s_5m_float"])
 def test_window_samples_identically_to_full_grid(name):
     """The in-RAM window used by horizon.run must give bit-identical heights inside it."""
     if not have(name):
@@ -78,3 +80,28 @@ def test_window_samples_identically_to_full_grid(name):
     np.testing.assert_array_equal(win, full)
     # outside the window: NaN, so a chained sampler falls back instead of inventing data
     assert np.isnan(w.sample_xy(np.array([x0 + 3 * rad]), np.array([y0])))[0]
+
+
+@pytest.mark.parametrize("res", ["875s_5m", "80s_20m", "75s_60m"])
+def test_float_grid_is_the_unrounded_int16_grid(res):
+    """Same grid, two encodings: int16 (0.5 m steps) must be the float (km) cut to 0.5 m.
+
+    Measured: the int16 value is the float truncated to a 0.5 m step (not rounded), so
+    the two differ by up to (not including) 0.5 m."""
+    fi, ii = f"ldem_{res}_float", f"ldem_{res}"
+    if not (have(fi) and have(ii)):
+        pytest.skip("need both encodings")
+    f, i = PolarDEM(fi, DATA), PolarDEM(ii, DATA)
+    x0, y0 = stereo_xy_from_latlon(-89.7849, -156.03)
+    c, r = f.pixel_coords(x0, y0)
+    c, r = int(c), int(r)
+    a = np.asarray(f.mm[r - 50:r + 50, c - 50:c + 50], float) * 1000.0
+    b = np.asarray(i.mm[r - 50:r + 50, c - 50:c + 50], float) * 0.5
+    assert np.abs(a - b).max() < 0.5 + 1e-3
+    assert np.abs(a - b).mean() > 0.05          # the float really carries sub-0.5 m detail
+
+
+def test_near_band_uses_unquantized_grids():
+    """0.5 m steps at 5-20 m range are degrees of fake horizon; the near band must be float."""
+    for r_outer, names in BANDS[:2]:
+        assert all(PRODUCTS[n].dtype == "<f4" for n in names if n != "ldem_60s_240m"), names

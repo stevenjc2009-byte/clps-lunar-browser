@@ -21,13 +21,15 @@ from .run import OUT, Terrain, horizon
 from .download import DEFAULT_DEST
 from .geometry import unit_from_latlon
 from .march import compute_horizon
-from .products import H_MAX_M
+from .products import BANDS, H_MAX_M
 from .sunstats import sun_stats
 
 BACKEND = Path(__file__).resolve().parents[1]
 DOCS = BACKEND.parent / "docs"
 SKY = BACKEND.parent / "frontend" / "public" / "sky.json"
 YEAR_H = 8760
+# literature check variant: near band on the 20 m grid (Glaser et al. used a 20 m DTM)
+BANDS_20M = ((BANDS[0][0], ("ldem_80s_20m_float", "ldem_75s_60m_float")),) + BANDS[1:]
 
 # Glaser et al., NTRS 20170007365, Tables 1-2 as read from the PDF text (see docs/TERRAIN.md).
 GLASER = [
@@ -87,6 +89,10 @@ def literature(terrain, state):
         alt, az = sun_track(state, lat, lon, start, hours)
         res = horizon(terrain, lat, lon, (hgt,), 0.25, terrain.windowed_samplers(lat, lon))
         ours = sun_stats(alt, az, res["h"][float(hgt)], 0.25)
+        # same point, near band on the 20 m grid only (the DTM resolution Glaser et al. used)
+        r20 = horizon(terrain, lat, lon, (hgt,), 0.25,
+                      terrain.windowed_samplers(lat, lon, bands=BANDS_20M), BANDS_20M)
+        ours20 = sun_stats(alt, az, r20["h"][float(hgt)], 0.25)
         # same point, 240 m/px DEM only (the resolution Mazarico et al. 2011 used)
         d240 = terrain.dems["ldem_60s_240m"]
         w240 = terrain.windowed_samplers(lat, lon)[-1]          # the 240 m-only far band
@@ -97,11 +103,12 @@ def literature(terrain, state):
         rows.append({"site": name, "lat": lat, "lon_e": lone, "height_m": hgt, "source": note,
                      "glaser": {"avg_sunlit_pct": g_avg, "sun_visible_pct": g_vis,
                                 "longest_dark_h": g_dark},
-                     "ours": ours, "ours_240m_dem": ours240,
+                     "ours": ours, "ours_20m_near": ours20, "ours_240m_dem": ours240,
                      "ground_m": round(res["h_site"], 1)})
         print(f"{name:28s} Glaser avg {g_avg:5.1f} vis {g_vis:5.1f} dark {g_dark:4d} h | ours avg "
               f"{ours['avg_sunlit_pct']:5.1f} vis {ours['sun_visible_pct']:5.1f} dark "
-              f"{ours['longest_dark_h']:6.1f} h | 240 m-only vis {ours240['sun_visible_pct']:5.1f}"
+              f"{ours['longest_dark_h']:6.1f} h | 20 m-near vis {ours20['sun_visible_pct']:5.1f} dark "
+              f"{ours20['longest_dark_h']:6.1f} h | 240 m-only vis {ours240['sun_visible_pct']:5.1f}"
               f" dark {ours240['longest_dark_h']:6.1f} h", flush=True)
     return rows
 
