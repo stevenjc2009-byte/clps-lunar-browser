@@ -39,7 +39,7 @@ export class EngineClient {
     try {
       const w = new Worker(new URL('./engine.worker.ts', import.meta.url), { type: 'module' })
       w.onmessage = (e: MessageEvent<FromWorker>) => this.receive(e.data)
-      w.onerror = e => { e.preventDefault(); this.fallBack(`worker error: ${e.message}`) }
+      w.onerror = e => { e.preventDefault(); this.fallBack(`worker error: ${e.message || 'the worker script could not start'}`) }
       this.post(w, { type: 'init', sky: ed.sky, horizons: ed.horizons })
       this.worker = w
       this.mode = 'worker'
