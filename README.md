@@ -28,10 +28,17 @@ Near the pole the Sun never climbs high. It circles round the horizon once a mon
   - **Verdict:** a badge (best for energy, best for communication, shortest night, balanced) only when a site leads by a clear margin. A smaller lead is shown as *too close to call*. Rules: [`docs/VERDICT.md`](docs/VERDICT.md).
   - **After landing:** whether the Sun and Earth are up at the landing hour, and when that next changes.
 - **Your own location.** Type any latitude and longitude on the Moon (between 89.99° S and 89.99° N; azimuth is undefined at the exact pole) and it joins the comparison, worked out in your browser from the same NASA ephemeris.
+- **Real terrain.** All seven listed sites use a skyline made from NASA LOLA laser-altimeter elevation data (`frontend/public/horizons.json`, method in [`docs/TERRAIN.md`](docs/TERRAIN.md)). A spot you add yourself has no terrain data, so it uses a flat horizon and is flagged *provisional*.
+- **Model settings and presets.** Observer height (0, 2 or 5 m), a skyline safety margin, how Earth counts as "in view", and the Deep Space Network elevation limit, plus one-click presets.
+- **"How sure are these numbers?"** A sensitivity panel shows how the answers change when those settings change.
 - **Sunlight by landing date.** A chart of the Sun % every possible landing date would give, one line per site.
+- **Best landing dates.** A heatmap of every site against every landing date.
+- **Compare two dates.** Put two landing dates side by side.
 - **Sky graph** for each site: the Sun's and Earth's height and compass direction over time.
+- **Look at the site.** Each site has links to LROC QuickMap and NASA Moon Trek, centred on it.
+- **Shareable URL.** The page address holds your whole view (date, window, sites, settings, own location). Copy it to share. There are no file exports.
 - **"Explain it to me"** mode: every metric has a "?" note in plain language for students.
-- **Honest about terrain.** A site without a terrain horizon uses a flat horizon and is flagged *provisional*. See Limitations.
+- **Keyboard and accessibility.** Arrow keys move between site tabs; an automated axe check finds no critical or serious accessibility problems (`frontend/e2e/smoke.spec.ts`).
 
 Built-in sites (`backend/sites.json`; sources are in `sky.json`):
 
@@ -53,7 +60,7 @@ Full detail with every number cited to a file: [`docs/METHOD.md`](docs/METHOD.md
 
 1. **Backend** (`backend/`, Python + Skyfield) reads NASA NAIF kernels (JPL **DE440** ephemeris, DE440 Moon-orientation kernels, `MOON_ME` frame) and writes `frontend/public/sky.json`: hourly Sun and Earth altitude and azimuth for every site from 2026-09-01 to 2029-01-01 (20,473 samples), plus hourly Sun and Earth disc radius and the best Moon elevation seen from the three Deep Space Network complexes (Goldstone, Madrid, Canberra). `backend/export_vectors.py` writes `vectors.bin`, which lets the browser compute any custom location.
 2. **Frontend** (`frontend/`, React 19, TypeScript, Vite, Plotly) loads those files and runs a visibility engine (`frontend/src/lib`): hourly data is smoothed to 10-minute steps, horizon crossings are placed to within a few minutes (largest check difference 2.4 min), and every percentage, night and badge is computed from visible time intervals.
-3. **Horizon.** The Sun counts as up when its top edge clears the skyline; Earth when its centre does. Defaults: observer height 2 m, mask offset 0°. The skyline comes from `horizons.json` (terrain) if that file is present, otherwise it is flat.
+3. **Horizon.** The Sun counts as up when its top edge clears the skyline; Earth when its centre does. Defaults: observer height 2 m, mask offset 0°. The skyline comes from `horizons.json` (LOLA terrain) for the seven listed sites. Custom spots, or any site missing from that file, get a flat horizon.
 4. Only static files are served, so the site can be hosted anywhere.
 
 ## Data
@@ -64,7 +71,8 @@ Full detail with every number cited to a file: [`docs/METHOD.md`](docs/METHOD.md
 | JPL Horizons | https://ssd.jpl.nasa.gov/horizons/ | Independent check of every computed position |
 | DSN antenna coordinates | JPL 810-005 Module 301 Rev K, Table 5 | Deep Space Network link rule |
 | Site coordinates | arXiv:2406.19863; Glaser et al. (NTRS 20170007365); LROC; NASA LRO | Built-in sites |
-| LOLA terrain (NASA LRO laser altimeter) | NASA PDS Geosciences Node | Terrain horizons. **Being built on a separate branch (`lola-terrain`); not part of the shipped data until `frontend/public/horizons.json` exists.** |
+| LOLA terrain (NASA LRO laser altimeter), polar elevation grids `LDEM_875S_5M_FLOAT`, `LDEM_80S_20M_FLOAT`, `LDEM_75S_60M_FLOAT`, `LDEM_60S_240M` | NASA PDS Geosciences Node, https://pds-geosciences.wustl.edu/missions/lro/lola.htm (file URLs and MD5 in `frontend/public/horizons.json` and `data/README.md`) | Terrain horizons for the seven listed sites |
+| LROC QuickMap, NASA Moon Trek | https://quickmap.lroc.im-ldi.com/ , https://trek.nasa.gov/moon/ | Links from each site so you can look at it; not used as data |
 
 Every source is listed with its URL and verification status in [`docs/REFERENCES.md`](docs/REFERENCES.md). Third-party code licences: [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
@@ -76,26 +84,26 @@ All numbers are from the reports in `docs/validation/` and `docs/SANITY.md`; eac
 - **10-minute interpolation** (`docs/validation/interpolation.md`): with the shipped 3-decimal data, largest altitude error 0.036 arcminutes and a horizon crossing placed within 2.42 minutes at worst.
 - **DE421 to DE440** (`docs/validation/ephemeris-checks.md`): largest change 0.0008 arcminutes.
 - **Sanity checks** (`docs/SANITY.md`): the Sun's height repeats every 29.51 to 29.56 days at every site (expected 29.53 days).
-- **Against a published terrain-aware study** (`docs/SANITY.md`, section 2): with a flat horizon we get far less Sun than Glaser et al. (Shackleton rim 60.5 % vs 85.5 %; Connecting Ridge 57.8 % vs 81.3 %). This is expected, not tuned away. A flat 0° horizon cannot represent a high rim whose skyline lies below 0°. The terrain horizon is what should close the gap.
+- **Against a published terrain-aware study** (`docs/SANITY.md`, section 2, and `docs/TERRAIN.md`, Validation): with a flat horizon we got far less Sun than Glaser et al. (Shackleton rim 60.5 % vs 85.5 %; Connecting Ridge 57.8 % vs 81.3 %). This was expected, not tuned away. With LOLA terrain at 2 m observer height, over one year from 15 Nov 2026, we get 86.7 % (Shackleton rim) and 86.6 % (Connecting Ridge) (`docs/terrain-validation.json`). Glaser et al. give 85.5 % and 81.3 % at ground level over 20 years, so the periods and heights differ and this is a rough agreement, not an exact match. At 0 m the answer depends on the elevation-grid resolution (Connecting Ridge 40.2 % on our 5 m grid). What is not verified: Glaser et al.'s Table 2 was read from scrambled PDF text; our 2 m longest nights are longer than theirs and we do not know why; the LOLA data licence wording was not confirmed with NASA.
 
 ### Tests
 
-Counts from a run of this branch on 2026-11-14:
+Counts from runs of the `integration` branch on 2026-11-14:
 
 | Command | Result |
 |---|---|
-| `cd frontend; ENGINE_SKY_V2=$PWD/public/sky.json npx vitest run` (PowerShell: `$env:ENGINE_SKY_V2="$PWD\public\sky.json"`) | 139 passed, 4 skipped |
-| `cd frontend; npx vitest run` (no `ENGINE_SKY_V2`, what `npm test` does) | 134 passed, 5 skipped |
-| `cd backend; py -3 -m pytest -q` (with the DE440 kernels downloaded) | 37 passed |
-| `cd frontend; npx tsc -b` and `npx oxlint src` | exit 0, no findings |
+| `cd frontend; ENGINE_SKY_V2=$PWD/public/sky.json npx vitest run` (PowerShell: `$env:ENGINE_SKY_V2="$PWD\public\sky.json"`) | 207 passed, 4 skipped (211) |
+| `cd frontend; npm run e2e` (browser smoke and accessibility tests) | 6 passed |
+| `cd backend; py -3 -m pytest horizon -q` (terrain tests) | 37 passed, 1 skipped |
+| `cd backend; py -3 -m pytest -q` (all backend tests) | 73 passed, 2 skipped |
 
-The skipped tests need data files that are not always present (the v2 sky.json path, or the kernels). GitHub Actions (`.github/workflows/ci.yml`) runs lint, type-check, frontend tests, build, and the backend tests with the kernels downloaded and checked against `MANIFEST.json`. The deploy workflow (`pages.yml`) runs the frontend tests and the build before publishing.
+The skipped tests need data files that are not always present (the v2 sky.json path, the kernels, or the 8.4 GB of LOLA grids). GitHub Actions (`.github/workflows/ci.yml`) runs lint, type-check, frontend tests, build, and the backend tests with the kernels downloaded and checked against `MANIFEST.json`. The deploy workflow (`pages.yml`) runs the frontend tests and the build before publishing.
 
 ## Limitations
 
 The full list is in [`docs/METHOD.md`](docs/METHOD.md), section 10. In short, this tool is **not** a mission-planning tool.
 
-- **Terrain.** Until `horizons.json` ships, every site uses a flat horizon (lowered a little for observer height) and is marked provisional. Rankings among them are not reliable.
+- **Terrain.** The seven listed sites use LOLA terrain. A custom spot uses a flat horizon (lowered a little for observer height) and is marked provisional; do not rank it against terrain sites. Near a ridge, 50 to 100 m can change the Sun % a lot, so terrain results are only as good as the site coordinates.
 - **Geometry only.** No power, battery, thermal or radio model. "Link" means Earth is in view and a Deep Space Network 70 m dish sees the Moon at 10° or more. No schedule, relays or lander antenna.
 - **Dates.** Data covers 2026-09-01 to 2029-01-01, UTC. The 18.6-year lunar orbit cycle is outside it.
 - **Site positions** carry no stated uncertainty, and near the pole 60 m matters.
@@ -134,8 +142,8 @@ py -3 .github/scripts/gen_third_party_notices.py      # regenerate THIRD_PARTY_N
 
 ## Tech stack
 
-- **Backend:** Python 3.13, Skyfield 1.55, NumPy, pytest.
-- **Frontend:** React 19, TypeScript, Vite, Plotly.js, Vitest, oxlint.
+- **Backend:** Python 3.13, Skyfield 1.55, NumPy, pytest. Terrain build: `backend/horizon/` (needs the LOLA grids, see `data/README.md`).
+- **Frontend:** React 19, TypeScript, Vite, Plotly.js, Vitest, Playwright, axe, oxlint.
 - **Hosting:** static files on GitHub Pages.
 
 ## Use of Super Intelligence (SI)
@@ -145,7 +153,7 @@ py -3 .github/scripts/gen_third_party_notices.py      # regenerate THIRD_PARTY_N
   - write and debug the Python and TypeScript code;
   - look up published reference values and site coordinates;
   - draft this README and the plain-language explanations.
-- **For the upgrade described here, AI agents built much of the work.** Several Claude agents, working in parallel on separate branches overnight under the team's direction, wrote the DE440 backend, the visibility engine and verdict rules, the validation scripts and reports, the tests, the CI workflows, the in-app method panel and these documents. Each agent recorded its choices in `docs/decisions/`; the build history is in [`docs/JOURNAL.md`](docs/JOURNAL.md).
+- **For the upgrade described here, AI agents built much of the work.** Several Claude agents, working in parallel on separate branches overnight under the team's direction, wrote the DE440 backend, the LOLA terrain-horizon code and its validation, the visibility engine and verdict rules, the controls, heatmap, sensitivity and compare panels, the Playwright and accessibility tests, the validation scripts and reports, the tests, the CI workflows, the in-app method panel and these documents. Each agent recorded its choices in `docs/decisions/`; the build history is in [`docs/JOURNAL.md`](docs/JOURNAL.md).
 - The team reviews and decides what ships. Computed positions are checked against NASA JPL Horizons (see Validation), not trusted because an AI wrote the code.
 - The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant.
 - The 30-second demo video and the backup slides were made by the SI assistant. The video is an automated, silent screen recording of the live site with subtitles; the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork, voice or person anywhere, and no NASA logo.

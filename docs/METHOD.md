@@ -9,7 +9,7 @@ Not an official NASA product.
 ## 1. Pipeline in one picture
 
 1. `backend/` (Python, Skyfield) reads NASA NAIF kernels and writes `frontend/public/sky.json` and `vectors.bin`.
-2. The browser (`frontend/src/lib/`) reads `sky.json`, adds a horizon (flat, or terrain if `horizons.json` exists), and computes everything else: visible intervals, percentages, nights, verdicts.
+2. The browser (`frontend/src/lib/`) reads `sky.json`, adds a horizon (LOLA terrain from `horizons.json` for the seven listed sites, flat for custom spots), and computes everything else: visible intervals, percentages, nights, verdicts.
 3. Nothing is computed on a server. The site is static files.
 
 ## 2. Ephemeris (where the Sun, Earth and Moon are)
@@ -96,23 +96,43 @@ The full table and its 17 tested cases are in `docs/VERDICT.md` (code: `frontend
 - A **censored night** cannot win the night badge unless its lower bound is already 24 h longer than the leader's. If a censored night blocks the call, the outcome is **undetermined**.
 - **Balanced** = best worst-case score, where worst case = min(Sun %, link %, night score), and it must be at least 25 out of 100. Below that: `below_floor`, no badge.
 - Scores never depend on which other sites are on the page.
-- **Provisional:** if any compared site has no terrain horizon, the page says "Terrain data not loaded: flat-horizon approximation, not reliable for ranking."
+- **Provisional:** if any compared site has no terrain horizon (a custom spot), the page says "Terrain data not loaded: flat-horizon approximation, not reliable for ranking."
 
-## 8. Terrain (horizons.json): being built
+## 8. Terrain (horizons.json)
 
-Status when this was written: the terrain file is being built on a separate branch (`lola-terrain`) and is **not part of the shipped data on the branch this page describes**. Check whether `frontend/public/horizons.json` exists before relying on this section.
+Source: `docs/TERRAIN.md` (full detail), `docs/terrain-validation.json`, `docs/decisions/lola.md`, `frontend/public/horizons.json`. Terrain is shipped for all seven listed sites.
 
-What it is, from the data contract and `frontend/src/lib/horizon.ts`:
+**What it is.** For each site, a skyline table: how many degrees above level the terrain rises, one value per 0.25 degrees of compass direction, for observer heights 0, 2 and 5 m. The engine reads it through `engineData(sky, horizons)`. Heights between the tabulated ones are interpolated in a straight line; a table that does not cover exactly 360 degrees is ignored with a console warning (`frontend/src/lib/horizon.ts`).
 
-- For each site, a skyline table (degrees above the local level, one value per 0.25 degrees of azimuth, for observer heights 0, 2 and 5 m), derived from NASA LOLA elevation models of the lunar south pole.
-- The engine reads it if present (`engineData(sky, horizons)`). Heights between the tabulated ones are interpolated in a straight line; outside the range the nearest table is used.
-- A table must cover exactly 360 degrees or it is ignored with a console warning.
+**How it is made** (`backend/horizon/`):
 
-What happens without it, and this is the case for every site until the terrain file is merged:
+- **Data.** NASA LOLA polar elevation grids from the PDS Geosciences Node: float32 grids at 5 m, 20 m and 60 m per pixel and the 240 m int16 grid (`meta.dem_products`; file names, sizes and MD5 sums in `data/README.md`). Heights are measured from a 1737.4 km sphere.
+- **Rays.** From the site, a great-circle line is followed outward in every direction (1440 directions, one per 0.25 degrees). The skyline angle is the highest elevation angle of any terrain point on the line, worked out exactly for a curved Moon (`atan2(r_t cos(theta) - r_o, r_t sin(theta))`), not with a flat-Moon shortcut.
+- **Resolution bands.** The finest grid within 10 km (5 m inside 87.5 S, else 20 m), the 60 m grid from 10 to 60 km, the 240 m grid beyond.
+- **How far to look.** Each ray stops once even the highest terrain in the data (7027 m above the sphere) could no longer rise above the skyline already found. The longest stop was 305.8 km (`meta.r_max_km`).
+- **Azimuth** is clockwise from local north, the same convention as `sky.json`; a test checks it against Skyfield to under 0.05 degrees.
+- **Position ring.** The same skyline for a 2 m observer 50 m and 100 m from the site on 8 bearings, to show how much the exact landing spot matters.
+- **A bug the validation found.** The first run used int16 grids that store height in 0.5 m steps; next to the observer that looks like a fake slope of up to 5.7 degrees. The near and mid bands now use the float32 grids (`docs/TERRAIN.md`, "Bug found by validation, fixed").
 
-- That site uses the flat horizon (lowered by the observer-height dip, plus the mask offset).
-- Its card is flagged "Flat horizon · provisional", and the verdict says its ranking is not reliable.
-- The size of the effect is not small. Against the published terrain-aware study of Glaser et al. (NTRS 20170007365, Table 1), the flat model gives Sun visibility of 60.5 % at shackleton-rim (published 85.5 %) and 57.8 % at connecting-ridge (published 81.3 %). This is a finding, not a tuned result (`docs/SANITY.md`, section 2). The two time spans differ (2.3 vs 20 years).
+**Validation** (`docs/terrain-validation.json`, `docs/TERRAIN.md`). Nothing was tuned toward the published numbers.
+
+| Site | Ours: Sun visible at 2 m, one year from 15 Nov 2026 | Published (Glaser et al., ground level, 20 years) |
+|---|---|---|
+| Shackleton rim | 86.7 % | 85.5 % |
+| Connecting Ridge | 86.6 % | 81.3 % |
+
+The heights and periods differ, so this is rough agreement, not an exact test. A cleaner test uses Glaser et al.'s own period (2017 to 2037) and a 20 m near band: we get 83.9 % (Shackleton S, they 85.5 %), 74.4 % (Connecting Ridge C1, they 81.3 %) and 78.6 % (C2, they 80.6 %). At 0 m the result depends on grid resolution (Connecting Ridge C1: 40.2 % on the 5 m grid, 74.4 % on a 20 m near band), so the 2 m and 5 m results are the robust ones. An independent LOLA-team map (`AVGVISIB_85S_060M_201608`) agrees within its pixel spread for the sites it covers. Two sites are poorly lit at 2 m (peak-near-shackleton 41.4 %, de-gerlache-rim-2 20.4 %), and the independent map agrees; this is a real result for those points.
+
+**Not verified.**
+
+- Glaser et al.'s Table 2 values were read from scrambled PDF text; the Shackleton 2 m row is low confidence.
+- Our 2 m longest nights are longer than Glaser et al.'s in every variant we tried (Connecting Ridge C1: 216 to 259 h against their 112 h). The reason was not found.
+- The data licence: no licence text was found on the LOLA pages. NASA-produced data are generally public domain, but this was not confirmed with NASA.
+- The illumination period of the independent map is not stated in its label.
+
+**Custom spots.** A spot typed in by the user has no terrain data. It uses the flat horizon (lowered by the observer-height dip, plus the mask offset), its card is flagged "Flat horizon · provisional", and the verdict says its ranking is not reliable.
+
+**Why this matters.** With a flat horizon the same sites gave 60.5 % (shackleton-rim) and 57.8 % (connecting-ridge) against the published 85.5 % and 81.3 % (`docs/SANITY.md`, section 2). A flat 0 degree horizon cannot represent a high rim whose skyline lies below 0 degrees; terrain closes most of that gap.
 
 ## 9. Validation
 
@@ -141,10 +161,12 @@ See section 3 (`docs/validation/interpolation.md`).
 - The yes/no Sun-visible flag near the pole has a weaker monthly signal (23.57 to 29.54 d across sites). The file documents this as a finding.
 - The 346.6-day eclipse year and the 18.6-year nodal cycle are outside this check; the latter is a stated limit of a 2.3-year data range.
 
-### Tests (counts from a run on this branch)
+### Tests (counts from runs of the integration branch, 2026-11-14)
 
-- `frontend`: `ENGINE_SKY_V2=$PWD/public/sky.json npx vitest run` gave 139 passed, 4 skipped (12 files passed, 1 skipped). Without `ENGINE_SKY_V2`: 134 passed, 5 skipped.
-- `backend`: `py -3 -m pytest -q` gave 37 passed (DE440 kernels present).
+- `frontend`: `ENGINE_SKY_V2=$PWD/public/sky.json npx vitest run` gave 207 passed, 4 skipped (211).
+- Browser smoke and accessibility tests: `npm run e2e` gave 6 passed.
+- `backend` terrain tests: `py -3 -m pytest horizon -q` gave 37 passed, 1 skipped.
+- `backend` all tests: `py -3 -m pytest -q` gave 73 passed, 2 skipped.
 - `npx tsc -b` and `npx oxlint src` exit 0.
 
 ## 10. Limits: what this tool is, and what it is not
@@ -159,7 +181,7 @@ It is not:
 
 - **A mission-planning or flight tool.** Do not use it to choose a real landing site or date.
 - **A thermal, power or battery model.** Any battery check on the page is illustrative only (`windowMetrics.ts`, `survivalCheck`: constant load, no cold losses).
-- **Terrain-accurate for every site yet.** Sites without `horizons.json` use a flat horizon and are flagged provisional (section 8).
+- **Terrain-accurate for custom spots.** The seven listed sites use LOLA terrain; a spot you add uses a flat horizon and is flagged provisional (section 8). Terrain results also depend on the exact site position and on the elevation-grid resolution.
 - **A communications simulation.** The link rule is Earth in view plus a DSN dish seeing the Moon at 10 degrees. No schedule, power, relay, lander antenna or radio-frequency effects.
 - **Aware of shadows cast by the lander, nearby objects, dust, or the real Sun's corona.**
 - **Valid outside its data range.** Dates are 2026-09-01 to 2029-01-01 (landing dates 2026-11-15 to 2027-12-03). The 18.6-year lunar nodal cycle is not covered.
