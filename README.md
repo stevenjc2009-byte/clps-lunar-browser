@@ -20,13 +20,14 @@ Near the pole, the Sun never climbs high. It circles round the horizon once a mo
 - **Compare 2 to 4 sites side by side** for a chosen landing date and look-ahead window (**30 days** or **1 year**):
   - **Sun visible:** % of hours the Sun's centre is above the horizon.
   - **Earth visible:** % of hours Earth's centre is above the horizon.
-  - **Longest darkness:** the longest unbroken stretch with no Sun. "≥" means the night runs past the edge of the window.
+  - **Longest darkness:** the longest unbroken night the lander lives through. A night still going when the window ends is followed on through the data, so its full length counts; "≥" means it runs past the end of the two years of data.
   - **Verdict:**
-    - most sunlight = *best for energy* (a tie goes to the shorter darkness);
-    - most Earth time = *best for communication*;
+    - most sunlight = *best for energy*, most Earth time = *best for communication*, but only when that site leads by at least 2 points;
+    - a smaller lead is shown as *too close to call*, because the flat-horizon model cannot honestly rank sites that close (counting the Sun's top edge instead of its centre alone moves Shackleton's first-year Sun % from 53.0 to 57.0);
     - of the remaining sites, the best weaker score = *balanced*.
   - **After landing:** whether the Sun and Earth are up at the landing hour, and when that next changes. For example, "Sun up at landing, sets in 15.8 days (30 Nov 2026, 18:30 UTC)".
 - **Your own location.** Type any latitude and longitude on the Moon and it joins the comparison as a fourth site, worked out in your browser from the same NASA ephemeris.
+- **Sunlight by landing date.** A chart of the Sun % every possible landing date would give, one line per site. Click it to pick that date.
 - **Sky graph** for each site. Every hourly position of the Sun and Earth is plotted, with compass direction across and height above the horizon up the side.
 - **"Explain it to me"** mode for students. Every metric has a "?" button with a plain-language note, and the header button opens all of them.
 
@@ -115,7 +116,7 @@ Our Sun and Earth *positions* match JPL Horizons. The difference comes from the 
 
 ### 4. Automated tests
 
-- `npm test` (Vitest): 38 tests of the comparison maths, window selection, verdicts and after-landing times. GitHub Actions runs them before every deploy, and a failure blocks the deploy.
+- `npm test` (Vitest): 52 tests of the comparison maths, window selection, verdicts and after-landing times. GitHub Actions runs them before every deploy, and a failure blocks the deploy.
 - `pytest` in `backend/`: 16 tests of the back-end helpers.
 
 ## Assumptions and limitations

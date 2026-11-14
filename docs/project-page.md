@@ -42,7 +42,7 @@ Live site: https://stevenjc2009-byte.github.io/clps-lunar-browser/
   - **Sun visible:** % of hours the Sun is above the horizon. This decides solar power.
   - **Earth visible:** % of hours Earth is above the horizon. This decides direct-to-Earth communication.
   - **Longest darkness:** the longest unbroken night the lander must survive on batteries.
-  - **A verdict.** The site with the most sunlight is "best for energy". The one with the most Earth time is "best for communication". Of the rest, the one with the best weaker score is "balanced".
+  - **A verdict.** The site with the most sunlight is "best for energy". The one with the most Earth time is "best for communication". A lead under 2 points is shown as "too close to call", because a flat-horizon model cannot honestly rank sites that close. Of the rest, the one with the best weaker score is "balanced".
   - **After landing:** whether the Sun and Earth are up at the landing hour, and when the next sunrise, sunset, Earthrise or Earthset comes.
 - **Your own location:** type any latitude and longitude and it joins the comparison. It is worked out in the browser from the same NASA ephemeris.
 - A sky graph plots every hourly position of the Sun and Earth: compass direction across, height above the horizon up the side. It shows why polar sites are hard. The Sun circles just above and below the horizon, while Earth hangs in nearly the same patch of sky.
@@ -63,7 +63,7 @@ Live site: https://stevenjc2009-byte.github.io/clps-lunar-browser/
 - We confirmed the check fails when it should: shifting a site by 5° is caught.
 - The browser's custom-location maths reproduces the full calculation for the 3 built-in sites to within 0.01°, with no hour's visibility differing.
 - The after-landing times match the ephemeris to within a few minutes in our checks. The worst case was 27 minutes, when the Sun grazed the horizon.
-- 38 automated front-end tests run before every deploy, plus 16 back-end tests.
+- 52 automated front-end tests run before every deploy, plus 16 back-end tests.
 - We compared Shackleton with a published LOLA-terrain study (Mazarico et al. 2011). Our flat-horizon model shows much longer nights than the real raised rim does: 112 days versus about 1.5 days. We explain why on the page and in the README rather than hide it.
 
 **Benefits**
