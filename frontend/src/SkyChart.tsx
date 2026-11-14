@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import Plotly from 'plotly.js-dist-min'
+import type Plotly from 'plotly.js-dist-min'
 import type { Span } from './metrics'
 import type { Site } from './types'
 
@@ -8,6 +8,11 @@ const EARTH = '#4da3ff'
 
 // Azimuth 0..360 -> -180..180 so north sits mid-chart. At south-pole sites Earth is
 // usually near north, and a 0..360 axis would split its trace across both edges.
+// Plotly is ~1.5 MB of the download; fetching it separately lets the comparison
+// cards show first while the chart library is still loading.
+let plotlyPromise: Promise<typeof Plotly> | null = null
+const loadPlotly = () => (plotlyPromise ??= import('plotly.js-dist-min').then(m => m.default))
+
 const wrap = (az: number[]) => az.map(a => (a > 180 ? a - 360 : a))
 
 // Sky graph: azimuth (deg from lunar north, clockwise) vs elevation above a flat horizon.
@@ -79,13 +84,17 @@ export default function SkyChart({ site, span }: { site: Site; span: Span }) {
       dragmode: 'zoom',
     }
 
-    Plotly.react(el, data, layout, { responsive: true, displaylogo: false })
+    let cancelled = false
+    loadPlotly()
+      .then(P => { if (!cancelled) P.react(el, data, layout, { responsive: true, displaylogo: false }) })
+      .catch(() => { if (!cancelled) el.textContent = 'The chart library could not be loaded. Reload the page to try again.' })
+    return () => { cancelled = true }
   }, [site, span.start, span.end])
 
   useEffect(() => {
     const el = ref.current
-    return () => { if (el) Plotly.purge(el) }
+    return () => { if (el && plotlyPromise) plotlyPromise.then(P => P.purge(el)).catch(() => {}) }
   }, [])
 
-  return <div ref={ref} className="sky-chart" aria-label={`Sky graph for ${site.name}`} />
+  return <div ref={ref} className="sky-chart" role="figure" aria-label={`Sky graph for ${site.name}: Sun and Earth positions, one dot per hour`} />
 }
