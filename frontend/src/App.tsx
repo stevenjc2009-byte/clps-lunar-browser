@@ -1,12 +1,18 @@
 import { useMemo, useState } from 'react'
 import Compare from './Compare'
+import CompareDates from './CompareDates'
 import Controls, { CopyLink } from './Controls'
 import CustomSite from './CustomSite'
 import Explain from './Explain'
+import Heatmap from './Heatmap'
 import LandingChart from './LandingChart'
+import Method from './Method'
+import MissionFraming from './MissionFraming'
+import PresetPicker from './PresetPicker'
 import Sensitivity from './Sensitivity'
 import { EXPLAIN } from './explanations'
 import { isoDay } from './lib/format'
+import { makeMask } from './lib/horizon'
 import { dataEndH, dataStartMs, defaultLandingDay, landingRangeH, spanOf, windowFor, type Span } from './lib/window'
 import SkyChart from './SkyChart'
 import { useShareState, useUrlSync } from './useShareState'
@@ -35,6 +41,9 @@ export default function App() {
   const { siteId, setSiteId, picked, toggle, startDay, setStartDay, days, setDays, params, setParams, custom, addCustom } = share
   // Loads the data, starts the engine (a Web Worker when possible, see worker/) and applies the URL.
   const { data, horizons, ed, client, error } = useSkyData(share.init)
+  // Two landing dates for the "Compare two dates" panel ('' = the landing date picked above).
+  const [dateA, setDateA] = useState('')
+  const [dateB, setDateB] = useState('')
 
   const sites = useMemo(() => (data ? [...data.sites, ...(custom ? [custom] : [])] : []), [data, custom])
   const pick = useMemo(() => (data && startDay ? windowFor(data, startDay, days) : null), [data, startDay, days])
@@ -61,6 +70,10 @@ export default function App() {
   const site = sites.find(s => s.id === siteId) ?? sites[0]
   const [sunMin, sunMax] = range(site.sun_alt, span)
   const [earthMin, earthMax] = range(site.earth_alt, span)
+  // Same skyline the engine uses (height + margin), drawn on the sky graph when terrain is loaded.
+  const mask = makeMask(horizons, site.id, params.observerHeightM, params.maskOffsetDeg)
+  const cdA = dateA || fromDay
+  const cdB = dateB || isoDay(t0 + (pick.startH + 182 * 24) * HOUR_MS)
   const clampNote = pick.clamped === 'before_range' ? `That date is before the supported landing range, so the dates start on ${fmtDay(isoDay(t0 + minH * HOUR_MS))}.`
     : pick.clamped === 'after_range' ? `That date leaves too little data for the look-ahead, so the dates start on ${fmtDay(fromDay)}.`
       : pick.clamped === 'invalid' ? `That date could not be read, so the dates start on ${fmtDay(fromDay)}.` : null
@@ -84,6 +97,11 @@ export default function App() {
         <li><b>Compare the sites:</b> time with sunlight for power, time with a radio link home, and the longest night.</li>
         <li><b>Read the verdict</b> on each card. New to this? Press <span className="q">?</span> next to anything, or "Explain it to me".</li>
       </ol>
+
+      <section className="panel" aria-label="What this is for">
+        <div className="section-head"><h2>What this is for</h2></div>
+        <MissionFraming />
+      </section>
 
       <section className="panel controls" aria-label="Dates">
         <label className="field">
@@ -109,6 +127,7 @@ export default function App() {
 
       <section className="panel" aria-label="Model settings">
         <div className="section-head"><h2>Model settings</h2></div>
+        <PresetPicker value={params} onChange={setParams} explainAll={explainAll} />
         <Controls params={params} onChange={setParams} explainAll={explainAll} dsnLoaded={ed.dsnLoaded} busy={busy} />
       </section>
 
@@ -152,12 +171,32 @@ export default function App() {
           t0Ms={t0} landingDay={fromDay} onPick={setStartDay} />
       </section>
 
+      <section className="panel" aria-label="Best landing dates">
+        <div className="section-head"><h2>Best landing dates</h2></div>
+        <Heatmap ed={ed} sites={sites} params={params} landingDay={fromDay} onPickDate={setStartDay} siteId={siteId} explainAll={explainAll} />
+      </section>
+
+      <section className="panel" aria-label="Compare two landing dates">
+        <div className="section-head"><h2>Compare two landing dates</h2></div>
+        <CompareDates ed={ed} site={site} params={params} days={days} dateA={cdA} dateB={cdB}
+          onChange={(a, b) => { setDateA(a); setDateB(b) }} explainAll={explainAll} />
+      </section>
+
       <section className="panel" aria-label="Sky graph">
         <div className="section-head">
           <h2>Sky graph <Explain term="Sky graph" all={explainAll}>{EXPLAIN.graph}</Explain></h2>
-          <nav className="site-tabs" role="tablist">
+          <nav className="site-tabs" role="tablist" aria-label="Site shown on the sky graph" onKeyDown={e => {
+            // Left/Right arrows move between site tabs (standard tab-list keys).
+            const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
+            if (!step) return
+            e.preventDefault()
+            const next = sites[(sites.findIndex(x => x.id === site.id) + step + sites.length) % sites.length]
+            setSiteId(next.id)
+            const nav = e.currentTarget  // React clears currentTarget after the handler returns
+            requestAnimationFrame(() => (nav.querySelector(`[data-site="${next.id}"]`) as HTMLElement | null)?.focus())
+          }}>
             {sites.map(s => (
-              <button key={s.id} role="tab" aria-selected={s.id === site.id}
+              <button key={s.id} role="tab" aria-selected={s.id === site.id} tabIndex={s.id === site.id ? 0 : -1} data-site={s.id}
                 className={s.id === site.id ? 'active' : ''} onClick={() => setSiteId(s.id)}>
                 {s.name}
               </button>
@@ -167,14 +206,17 @@ export default function App() {
         <p className="coords">{fmtLat(site.lat)}, {fmtLon(site.lon)} · {site.note}</p>
         <p className="how-read"><b>What am I looking at?</b> The sky seen from this site. Each dot is where the
           <span className="sun"> Sun</span> or <span className="earth">Earth</span> was at one hour: across is compass direction,
-          up is height. Dots in the brown band, below the 0° line, are under the horizon, so hidden.</p>
-        <SkyChart site={site} span={span} />
+          up is height. Dots under the skyline (the shaded band at the bottom) are hidden behind the ground or hills.</p>
+        <SkyChart site={site} span={span} horizon={mask.table ? Array.from(mask.table) : undefined} horizonStep={mask.step || undefined}
+          sunRadiusDeg={data.sun_radius_deg} earthRadiusDeg={data.earth_radius_deg} t0Ms={t0} stepHours={data.meta.step_hours} explainAll={explainAll} />
         <p className="caption">
           Each dot is one hour, {fmtDay(fromDay)} → {fmtDay(toDay)} UTC. Sun height {sunMin.toFixed(1)}° to {sunMax.toFixed(1)}°,
           Earth height {earthMin.toFixed(1)}° to {earthMax.toFixed(1)}°.
           <Explain term="Why the Sun stays low" all={explainAll}>{EXPLAIN.low}</Explain>
         </p>
       </section>
+
+      <Method terrainLoaded={!!horizons} />
 
       <footer>
         <p>Positions: NASA JPL DE440 ephemeris and NAIF lunar orientation kernels via Skyfield, checked against NASA JPL Horizons

@@ -4,7 +4,7 @@ import { isoDay } from './lib/format'
 import { sunPctByDay } from './lib/landingSeries'
 import { loadPlotly, plotlyLoaded } from './plotly'
 
-const LINE = ['#ffb627', '#7ee0a0', '#c79bff', '#ff7a7a']
+const LINE = ['#ffb627', '#7ee0a0', '#c79bff', '#ff7a7a', '#5ec8ff', '#f28fd0', '#e8dc6a', '#9aa7ff']  // up to 8 sites (7 + a custom one)
 const HOUR_MS = 3_600_000
 
 interface Props {
@@ -82,6 +82,15 @@ export default function LandingChart({ lines, days, firstH, lastH, t0Ms, landing
     return () => { const p = plotlyLoaded(); if (el && p) p.then(P => P.purge(el)).catch(() => {}) }
   }, [])
 
-  return <div ref={ref} className="landing-chart" role="figure"
-    aria-label={`Sun visible for each possible landing date, ${days}-day look-ahead`} />
+  // Keyboard: Left/Right move the landing date a day, Shift+Left/Right a week.
+  const onKey = (e: React.KeyboardEvent) => {
+    const dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
+    if (!dir) return
+    e.preventDefault()
+    const ms = Date.parse(`${landingDay}T00:00:00Z`) + dir * (e.shiftKey ? 7 : 1) * 86_400_000
+    const lo = t0Ms + firstH * HOUR_MS, hi = t0Ms + lastH * HOUR_MS
+    pickRef.current(isoDay(Math.min(hi, Math.max(lo, ms))))
+  }
+  return <div ref={ref} className="landing-chart" role="figure" tabIndex={0} onKeyDown={onKey}
+    aria-label={`Sun visible for each possible landing date, ${days}-day look-ahead. Left and right arrow keys move the landing date by a day, with Shift by a week.`} />
 }
