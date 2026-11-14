@@ -29,7 +29,9 @@ Near the pole the Sun never rises high. It skims round the horizon once a month,
 
 ## Link to Final Project
 
-(the team adds the GitHub repository link and/or the deployed website link)
+https://github.com/stevenjc2009-byte/clps-lunar-browser
+
+(add the deployed website link here too once it is live)
 
 ## Detailed Project Description
 
