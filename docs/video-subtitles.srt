@@ -6,27 +6,22 @@ Lunar Landing Site Navigator challenge.
 2
 00:00:03,000 --> 00:00:09,000
 At the Moon's south pole, the Sun skims the horizon.
-A lander needs sunlight for power and a view of Earth to call home.
+Landers need sunlight for power and Earth in view to call home.
 
 3
 00:00:09,000 --> 00:00:12,000
 This is CLPS Lunar Mission Browser.
 
 4
-00:00:12,000 --> 00:00:16,500
-Pick a landing date and up to three sites.
-It shows sunlight, Earth time, the longest night, and a verdict,
+00:00:12,000 --> 00:00:21,000
+Pick a date and up to three sites: sunlight, Earth time,
+longest night, and a verdict, from NASA JPL data.
 
 5
-00:00:16,500 --> 00:00:21,000
-all from NASA JPL ephemeris data,
-checked against JPL Horizons.
-
-6
 00:00:21,000 --> 00:00:25,000
 Students can press "Explain it to me".
 
-7
+6
 00:00:25,000 --> 00:00:30,000
-Faster, clearer landing choices, for planners
-and for everyone curious about the Moon.
+Clearer landing choices,
+for planners and the curious.

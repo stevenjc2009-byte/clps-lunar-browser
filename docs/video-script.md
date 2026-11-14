@@ -11,16 +11,16 @@
 
 ## Script
 
-The script follows the official beats: 0:00 team, 0:02 challenge, 0:05 title and tagline, 0:10 how it works and NASA data, 0:20 to 0:30 the future. It is about 75 words, which is a calm pace for 30 seconds.
+The script follows the official beats: 0:00 team, 0:02 challenge, 0:05 title and tagline, 0:10 how it works and NASA data, 0:20 to 0:30 the future. It is about 72 words, roughly 2.4 words a second, which is a calm pace for 30 seconds.
 
 | Time | Narration (say this) | Screen (record this) |
 |---|---|---|
 | 0:00-0:03 | "Hi, we're team ___, for the Lunar Landing Site Navigator challenge." | Page title at the top of the site |
-| 0:03-0:09 | "At the Moon's south pole, the Sun skims the horizon. A lander needs sunlight for power and a view of Earth to call home." | Sky graph, Shackleton tab: Sun dots crossing the horizon line |
+| 0:03-0:09 | "At the Moon's south pole, the Sun skims the horizon. Landers need sunlight for power and Earth in view to call home." | Sky graph, Shackleton tab: Sun dots crossing the horizon line |
 | 0:09-0:12 | "This is CLPS Lunar Mission Browser." | Scroll up to "Compare sites" |
-| 0:12-0:21 | "Pick a landing date and up to three sites. It shows sunlight, Earth time, the longest night, and a verdict, all from NASA JPL ephemeris data, checked against JPL Horizons." | Change the date, switch 30 days / 1 year, cards update; point at the verdict badges |
+| 0:12-0:21 | "Pick a date and up to three sites: sunlight, Earth time, longest night, and a verdict, from NASA JPL data." | Change the date, switch 30 days / 1 year, cards update; point at the verdict badges |
 | 0:21-0:25 | "Students can press 'Explain it to me'." | Click "Explain it to me", the notes open |
-| 0:25-0:30 | "Faster, clearer landing choices, for planners and for everyone curious about the Moon." | Hold on the comparison cards |
+| 0:25-0:30 | "Clearer landing choices, for planners and the curious." | Hold on the comparison cards |
 
 Before recording, fill in the team name at 0:00. Time it with a stopwatch and trim words if it runs over 29 seconds.
 
