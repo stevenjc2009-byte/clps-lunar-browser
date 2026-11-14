@@ -1,0 +1,70 @@
+# Checks on every push and pull request: lint, type-check, tests, build.
+# Deploy stays in pages.yml (push to main only) and is not changed by this file.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      # Makes the engine tests that read the shipped sky.json v2 run instead of skip.
+      ENGINE_SKY_V2: ${{ github.workspace }}/frontend/public/sky.json
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: oxlint
+        run: npx oxlint src
+      - name: Type-check (tsc -b)
+        run: npx tsc -b
+      - name: Unit tests (vitest)
+        run: npx vitest run
+      - name: Build
+        run: npm run build
+      # TODO (later agent): add a Playwright smoke test (page loads, no console errors,
+      # cards render) and an axe accessibility check here, against `npx vite preview`.
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: python -m pip install -r backend/requirements.txt
+      # The NAIF kernels (about 46 MB) are not in git. Cache them by the manifest, then
+      # verify every file against the sha256 in backend/data/MANIFEST.json (downloads
+      # anything missing from NAIF). The kernel-dependent tests therefore really run.
+      - name: Cache NAIF kernels
+        uses: actions/cache@v4
+        with:
+          path: |
+            backend/data/*.bsp
+            backend/data/*.bpc
+            backend/data/*.tf
+            backend/data/*.tpc
+          key: naif-kernels-${{ hashFiles('backend/data/MANIFEST.json') }}
+      - name: Fetch and verify kernels
+        run: python .github/scripts/fetch_kernels.py
+      - name: pytest
+        working-directory: backend
+        run: python -m pytest -q
