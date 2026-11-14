@@ -1,0 +1,26 @@
+[
+  {
+    "id": "shackleton",
+    "name": "Shackleton rim (Peak Near Shackleton)",
+    "lat": -89.0051,
+    "lon": 125.3093,
+    "note": "Artemis III candidate region; top-ranked point in arXiv:2406.19863 Table 3 (89°00'18.22\"S, 125°18'33.49\"E)",
+    "source": "https://arxiv.org/html/2406.19863v1"
+  },
+  {
+    "id": "im2",
+    "name": "IM-2 Athena (Mons Mouton)",
+    "lat": -84.791,
+    "lon": 29.196,
+    "note": "CLPS IM-2 landing target, 2025",
+    "source": "https://lroc.im-ldi.com/images/1401"
+  },
+  {
+    "id": "im1",
+    "name": "IM-1 Odysseus (Malapert A)",
+    "lat": -80.13,
+    "lon": 1.44,
+    "note": "CLPS IM-1 landing site, 22 Feb 2024",
+    "source": "https://en.wikipedia.org/wiki/IM-1"
+  }
+]
