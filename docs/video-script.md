@@ -1,32 +1,38 @@
-# 30-second demo video: script and shot list
+# 30-second demo video
 
-## Rules the video must meet (official 2026 guide)
+**File:** `docs/demo-video.mp4`. It is 29.5 seconds long, 1920×1080, 30 fps, H.264, with **no sound**. The English subtitles are burned into the picture.
 
-- **30 seconds or less.** Anything longer is not eligible for Global Judging.
-- Narration must be in English, or the video must have English subtitles. `video-subtitles.srt` in this folder has them ready.
-- Hosted publicly (YouTube unlisted, Google Drive "anyone with the link", and so on). It must open with no login. The video cannot be uploaded to the Space Apps site itself.
-- No NASA logo or other NASA branding.
-- If any participant is under 18, the video must not show photos, video or voices of anyone under 18.
-- If any part is made with SI (AI), it needs a visible watermark. This script assumes a plain screen recording plus your own voice, so no watermark is needed.
+## Rules the video meets (official 2026 guide)
 
-## Script
+- **30 seconds or less:** 29.5 s, checked with ffprobe.
+- **English subtitles:** burned in, from `video-subtitles.srt`.
+- **No NASA logo** or other NASA branding.
+- **No photos, video or voices of any person.** At least one team member is under 18, so the video is a silent screen recording of the site only.
+- **AI watermark.** An AI assistant (Claude) scripted and recorded the video automatically, so a visible line sits in the bottom-right corner the whole time: "AI-made video (Claude) - automated screen recording".
+- **Still to do by the team:** upload it publicly (for example YouTube unlisted, or Google Drive with "anyone with the link"), so it opens without a login. Then paste the link into the Project Page's "Link to Project Demo" field. It cannot be uploaded to the Space Apps site itself.
 
-The script follows the official beats: 0:00 team, 0:02 challenge, 0:05 title and tagline, 0:10 how it works and NASA data, 0:20 to 0:30 the future. It is about 74 words, roughly 2.5 words a second, which is a calm pace for 30 seconds.
+## What it shows
 
-| Time | Narration (say this) | Screen (record this) |
+| Time | Caption | Screen |
 |---|---|---|
-| 0:00-0:03 | "Hi, we're The Big Four, for the Lunar Landing Site Navigator challenge." | Page title at the top of the site |
-| 0:03-0:09 | "At the Moon's south pole, the Sun skims the horizon. Landers need sunlight for power and Earth in view to call home." | Sky graph, Shackleton tab: Sun dots crossing the horizon line |
-| 0:09-0:12 | "This is CLPS Lunar Mission Browser." | Scroll up to "Compare sites" |
-| 0:12-0:21 | "Pick a date and up to three sites: sunlight, Earth time, longest night, and a verdict, from NASA JPL data." | Change the date, switch 30 days / 1 year, cards update; point at the verdict badges |
-| 0:21-0:25 | "Students can press 'Explain it to me'." | Click "Explain it to me", the notes open |
-| 0:25-0:30 | "Clearer landing choices, for planners and the curious." | Hold on the comparison cards |
+| 0:00-0:03 | We're The Big Four, for the Lunar Landing Site Navigator challenge. | Top of the live site |
+| 0:03-0:08 | At the Moon's south pole, the Sun skims the horizon. Landers need sunlight for power and Earth in view to call home. | Sky graph for Shackleton rim |
+| 0:08-0:11 | This is CLPS Lunar Mission Browser. | Scroll up to the controls |
+| 0:11-0:18 | Pick a landing date and compare sites: sunlight, Earth time, longest night and a verdict, from NASA JPL data. | Date set to 10 Jun 2027, look-ahead switched to 30 days, cards update |
+| 0:18-0:22 | See when the Sun and Earth next rise or set after landing. | The after-landing lines on each card are outlined |
+| 0:22-0:26 | Add any spot on the Moon of your own. | "Add to comparison" is pressed and a fourth card appears |
+| 0:26-0:29.5 | Students can press "Explain it to me". Clearer landing choices, for everyone. | "Explain it to me" is pressed and the notes open |
 
-Time it with a stopwatch and trim words if it runs over 29 seconds.
+## How to remake it
 
-## How to record
+The video is made by two scripts in `video/`, from the live site:
 
-1. Open the deployed site or `npm run dev` in a desktop browser at full width, at 1080p if possible.
-2. Record with OBS, Xbox Game Bar (Win+Alt+R) or any screen recorder.
-3. Burn in `video-subtitles.srt`, or upload it as a caption track on YouTube.
-4. Check the final file is **≤ 0:30** before uploading.
+```
+cd video
+npm install
+npx playwright install chromium-headless-shell
+node record.mjs        # headless Chromium records out/raw.webm, with every action pinned to a time
+bash render.sh         # ffmpeg: trim, cut at 29.5 s, caption band, subtitles, watermark -> docs/demo-video.mp4
+```
+
+`render.sh` expects ffmpeg at `C:/ffmpeg/bin/ffmpeg`. To use another copy, set `FFMPEG=/path/to/ffmpeg`.

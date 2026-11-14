@@ -25,7 +25,7 @@ Near the pole the Sun never rises high. It skims round the horizon once a month,
 
 ## Link to Project Demo
 
-(the team adds the public link to the 30-second video)
+(the team adds the public link to the 30-second video. The file is `docs/demo-video.mp4` in the repository, ready to upload.)
 
 ## Link to Final Project
 
@@ -105,7 +105,8 @@ A clear, honest first look at a site before detailed terrain studies. Next steps
   - look up published reference values and site coordinates;
   - draft the README, the plain-language explanations and this text.
 - The team reviewed the output, and every computed position was checked against NASA JPL Horizons.
-- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant. No other SI-generated images, video or audio are used.
+- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant.
+- The 30-second demo video and the backup slides were also made by the SI assistant. The video is an automated, silent screen recording of the live site with subtitles; the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork, voice or person anywhere.
 
 ## NASA Data
 

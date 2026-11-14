@@ -4,6 +4,8 @@
 
 Compare Moon south-pole landing sites. For each site, see when the Sun is up (solar power) and when Earth is in view (direct radio contact with home), then get a plain-language verdict.
 
+**Live site:** https://stevenjc2009-byte.github.io/clps-lunar-browser/ · **30-second demo video:** [`docs/demo-video.mp4`](docs/demo-video.mp4) (silent, English subtitles; how it was made: [`docs/video-script.md`](docs/video-script.md))
+
 ## The problem
 
 Landers at the lunar south pole live or die by two things:
@@ -164,7 +166,8 @@ The NAIF and JPL kernels (about 17 MB) download automatically into `backend/data
   - look up published reference values and site coordinates;
   - draft this README and the plain-language explanations.
 - The team reviewed the results. Every computed position was checked against NASA JPL Horizons (see Validation).
-- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant. No other SI-generated images, video or audio are used.
+- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant.
+- The 30-second demo video and the backup slides were also made by the SI assistant. The video is an automated, silent screen recording of the live site with subtitles; the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork, voice or person anywhere.
 
 ## References
 
