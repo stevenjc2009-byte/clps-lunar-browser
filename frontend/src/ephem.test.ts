@@ -6,20 +6,29 @@ const header: VectorHeader = {
   units: 'km', frame: 'test', moon_radius_km: 1737.4, source: 'test',
 }
 // Two identical hours: Sun far along +x (lon 0, equator plane), Earth along -z (toward the south pole).
-const v = parseVectors(header, new Float32Array([1.5e8, 0, 0, 0, 0, -3.8e5, 1.5e8, 0, 0, 0, 0, -3.8e5]).buffer)
+const vec = parseVectors(header, new Float32Array([1.5e8, 0, 0, 0, 0, -3.8e5, 1.5e8, 0, 0, 0, 0, -3.8e5]).buffer)
 
 describe('computeSite (custom location)', () => {
   it('Earth straight "down" the south axis is overhead at the south pole region', () => {
-    const s = computeSite(v, -89, 0)
+    const s = computeSite(vec, -89, 0)
     expect(s.earth_alt[0]).toBeGreaterThan(88)
     expect(s.sun_alt[0]).toBeCloseTo(1, 1) // Sun on the equator plane is ~1 deg up at -89
     expect(s.sun_az[0]).toBeCloseTo(0, 0) // toward lon 0 = north from there
   })
+  it('keeps altitudes at full precision (no 0.01 deg rounding)', () => {
+    const lat = -89 * Math.PI / 180, R = 1737.4
+    const v = [1.5e8 - R * Math.cos(lat), 0, -R * Math.sin(lat)]
+    const up = [Math.cos(lat), 0, Math.sin(lat)]
+    const want = Math.asin((v[0] * up[0] + v[2] * up[2]) / Math.hypot(v[0], v[1], v[2])) * 180 / Math.PI
+    const s = computeSite(vec, -89, 0)
+    expect(Math.abs(s.sun_alt[0] - want)).toBeLessThan(1e-6)
+    expect(Math.abs(s.sun_alt[0] - Math.round(s.sun_alt[0] * 100) / 100)).toBeGreaterThan(1e-4)
+  })
   it('refuses latitudes beyond ±89.99 deg, where azimuth is undefined (audit B10)', () => {
-    expect(() => computeSite(v, -90, 0)).toThrow(/89\.99/)
-    expect(() => computeSite(v, 90, 0)).toThrow(/89\.99/)
-    expect(() => computeSite(v, NaN, 0)).toThrow()
-    expect(() => computeSite(v, -MAX_ABS_LAT_DEG, 0)).not.toThrow()
+    expect(() => computeSite(vec, -90, 0)).toThrow(/89\.99/)
+    expect(() => computeSite(vec, 90, 0)).toThrow(/89\.99/)
+    expect(() => computeSite(vec, NaN, 0)).toThrow()
+    expect(() => computeSite(vec, -MAX_ABS_LAT_DEG, 0)).not.toThrow()
   })
 })
 

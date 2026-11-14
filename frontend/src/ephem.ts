@@ -52,13 +52,6 @@ export async function loadVectors(url: string): Promise<Vectors> {
   return parseVectors(await headRes.json(), await binRes.arrayBuffer())
 }
 
-// Same rule as compute.py round_keep_sign: a positive value never rounds down to 0.
-function roundKeepSign(a: number, nd: number): number {
-  const f = 10 ** nd
-  const r = Math.round(a * f) / f
-  return a > 0 && r <= 0 ? 1 / f : r
-}
-
 const round = (a: number, nd: number) => Math.round(a * 10 ** nd) / 10 ** nd
 
 interface Basis {
@@ -141,9 +134,10 @@ export function computeSite(vectors: Vectors, latDeg: number, lonDeg: number, na
     note: 'Custom coordinates',
     source: 'computed in browser from vectors.bin',
     stats,
-    sun_alt: Array.from(sun.alt, a => roundKeepSign(a, 2)),
+    // Altitudes at full precision: rounding to 0.01 deg shifts a polar sunrise by up to ~35 min.
+    sun_alt: Array.from(sun.alt),
     sun_az: Array.from(sun.az, a => round(a, 1)),
-    earth_alt: Array.from(earth.alt, a => roundKeepSign(a, 2)),
+    earth_alt: Array.from(earth.alt),
     earth_az: Array.from(earth.az, a => round(a, 1)),
   }
 }
