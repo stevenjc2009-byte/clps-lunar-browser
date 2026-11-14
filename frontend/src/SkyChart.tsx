@@ -1,82 +1,87 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import type { Span } from './lib/window'
 import { loadPlotly, plotlyLoaded } from './plotly'
+import SkyLegend from './SkyLegend'
+import { elevationRange, EARTH_RAMP, plotlyScale, skyline, SUN_RAMP, wrapAz } from './skyModel'
+import SkyTable from './SkyTable'
 import type { Site } from './types'
 
-const SUN = '#ffb627'
-const EARTH = '#4da3ff'
+export interface SkyChartProps {
+  site: Site
+  span: Span
+  // Terrain skyline in degrees, index i <-> azimuth i*horizonStep. Omit for the flat-horizon line.
+  horizon?: number[]
+  horizonStep?: number
+  // Angular radii (deg), hourly, same length as site.sun_alt (sky.json v2). Used for the size legend.
+  sunRadiusDeg?: number[]
+  earthRadiusDeg?: number[]
+  // Time of sample 0 (ms since 1970 UTC) and hours per sample: used to label the time colour and the table.
+  t0Ms?: number
+  stepHours?: number
+  // The header switch that opens every "?" note.
+  explainAll?: boolean
+}
 
-// Azimuth 0..360 -> -180..180 so north sits mid-chart. At south-pole sites Earth is
-// usually near north, and a 0..360 axis would split its trace across both edges.
+const TEXT = '#c9d3e6'
+const GRID = '#1b2438'
+const SKYLINE_FILL = 'rgba(150, 138, 112, 0.55)'
 
-const wrap = (az: number[]) => az.map(a => (a > 180 ? a - 360 : a))
-
-// Sky graph: azimuth (deg from lunar north, clockwise) vs elevation above a flat horizon.
-// Shows only the samples inside `span` (the window picked on the page).
-export default function SkyChart({ site, span }: { site: Site; span: Span }) {
+// Sky graph: azimuth (compass direction, clockwise from lunar north) vs elevation above the horizon.
+// Dots are the samples inside `span`; their colour gets paler with time. The grey silhouette is the
+// terrain skyline when horizon data is given, otherwise a flat 0 deg line.
+export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDeg, earthRadiusDeg, t0Ms, stepHours = 1, explainAll = false }: SkyChartProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const win = useMemo(() => {
+    const cut = (a: number[]) => a.slice(span.start, span.end)
+    const sky = skyline(horizon, horizonStep)
+    const sunAlt = cut(site.sun_alt), earthAlt = cut(site.earth_alt)
+    const { range, widened } = elevationRange([sunAlt, earthAlt], Math.max(...sky.y))
+    return { sunAlt, earthAlt, sunAz: cut(site.sun_az), earthAz: cut(site.earth_az), sky, range, widened }
+  }, [site, span.start, span.end, horizon, horizonStep])
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const cut = (a: number[]) => a.slice(span.start, span.end)
-    const sunAlt = cut(site.sun_alt), earthAlt = cut(site.earth_alt)
-    // Fixed to the whole data range so the axes don't jump when the dates change.
-    const lo = Math.min(site.stats.sun_alt_min, site.stats.earth_alt_min) - 1
-    const hi = Math.max(site.stats.sun_alt_max, site.stats.earth_alt_max) + 1
+    const { sunAlt, earthAlt, sunAz, earthAz, sky, range } = win
+    const idx = (n: number) => Array.from({ length: n }, (_, i) => i)
+    const marker = (ramp: string[], n: number, symbol: 'circle' | 'diamond') => ({
+      color: idx(n), colorscale: plotlyScale(ramp), cmin: 0, cmax: Math.max(1, n - 1),
+      size: 4, opacity: 0.75, symbol, showscale: false,
+    })
+    const skyName = sky.flat ? 'Flat horizon (0°), no terrain data' : 'Terrain skyline'
 
     const data: Partial<Plotly.Data>[] = [
-      {
-        type: 'scattergl',
-        mode: 'markers',
-        name: 'Sun',
-        x: wrap(cut(site.sun_az)),
-        y: sunAlt,
-        marker: { color: SUN, size: 3, opacity: 0.5 },
-        hovertemplate: 'Sun<br>az %{x:.1f}°<br>el %{y:.2f}°<extra></extra>',
-      },
-      {
-        type: 'scattergl',
-        mode: 'markers',
-        name: 'Earth',
-        x: wrap(cut(site.earth_az)),
-        y: earthAlt,
-        marker: { color: EARTH, size: 3, opacity: 0.5 },
-        hovertemplate: 'Earth<br>az %{x:.1f}°<br>el %{y:.2f}°<extra></extra>',
-      },
+      // invisible floor so the skyline trace can fill down to the bottom of the chart
+      { type: 'scatter', mode: 'lines', x: [-180, 180], y: [range[0], range[0]], line: { width: 0 },
+        hoverinfo: 'skip', showlegend: false },
+      { type: 'scatter', mode: 'lines', name: skyName, x: sky.x, y: sky.y, fill: 'tonexty', fillcolor: SKYLINE_FILL,
+        line: { color: '#e8dcc0', width: sky.flat ? 1.5 : 1.2, dash: sky.flat ? 'dash' : 'solid' },
+        hovertemplate: `${skyName}<br>az %{x:.1f}°<br>%{y:.2f}°<extra></extra>` },
+      { type: 'scattergl', mode: 'markers', name: 'Sun', x: sunAz.map(wrapAz), y: sunAlt,
+        marker: marker(SUN_RAMP, sunAlt.length, 'circle'),
+        hovertemplate: 'Sun<br>az %{x:.1f}°<br>el %{y:.2f}°<extra></extra>' },
+      { type: 'scattergl', mode: 'markers', name: 'Earth', x: earthAz.map(wrapAz), y: earthAlt,
+        marker: marker(EARTH_RAMP, earthAlt.length, 'diamond'),
+        hovertemplate: 'Earth<br>az %{x:.1f}°<br>el %{y:.2f}°<extra></extra>' },
     ]
 
     const layout: Partial<Plotly.Layout> = {
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: '#070b16',
-      font: { color: '#c9d3e6', family: 'Inter, system-ui, sans-serif' },
-      margin: { l: 60, r: 20, t: 10, b: 50 },
+      font: { color: TEXT, family: 'Inter, system-ui, sans-serif' },
+      margin: { l: 56, r: 16, t: 10, b: 56 },
       xaxis: {
-        title: { text: 'Azimuth (° from lunar north, clockwise)' },
+        title: { text: 'Compass direction (° clockwise from lunar north)' },
         range: [-180, 180],
         tickvals: [-180, -135, -90, -45, 0, 45, 90, 135, 180],
-        ticktext: ['S 180', '225', 'W 270', '315', 'N 0', '45', 'E 90', '135', 'S 180'],
-        gridcolor: '#1b2438',
-        zeroline: false,
+        ticktext: ['S 180°', 'SW 225°', 'W 270°', 'NW 315°', 'N 0°', 'NE 45°', 'E 90°', 'SE 135°', 'S 180°'],
+        gridcolor: GRID, zeroline: false,
       },
       yaxis: {
-        title: { text: 'Elevation above flat horizon (°)' },
-        range: [lo, hi],
-        gridcolor: '#1b2438',
-        zeroline: false,
+        title: { text: 'Height above level (°)' },
+        range, gridcolor: GRID, zeroline: false,
       },
-      shapes: [
-        // ground below the flat horizon
-        { type: 'rect', xref: 'x', yref: 'y', x0: -180, x1: 180, y0: lo, y1: 0,
-          fillcolor: '#3a3326', opacity: 0.55, line: { width: 0 }, layer: 'below' },
-        { type: 'line', xref: 'x', yref: 'y', x0: -180, x1: 180, y0: 0, y1: 0,
-          line: { color: '#e8dcc0', width: 1.5 } },
-      ],
-      annotations: [
-        { x: 178, y: 0, xanchor: 'right', yanchor: 'bottom', text: 'flat horizon (0°)',
-          showarrow: false, font: { size: 11, color: '#e8dcc0' } },
-      ],
-      legend: { orientation: 'h', x: 0, y: 1.08, itemsizing: 'constant' },
+      legend: { orientation: 'h', x: 0, y: 1.1, itemsizing: 'constant' },
       dragmode: 'zoom',
     }
 
@@ -85,12 +90,24 @@ export default function SkyChart({ site, span }: { site: Site; span: Span }) {
       .then(P => { if (!cancelled) P.react(el, data, layout, { responsive: true, displaylogo: false }) })
       .catch(() => { if (!cancelled) el.textContent = 'The chart library could not be loaded. Reload the page to try again.' })
     return () => { cancelled = true }
-  }, [site, span.start, span.end])
+  }, [win])
 
   useEffect(() => {
     const el = ref.current
     return () => { const p = plotlyLoaded(); if (el && p) p.then(P => P.purge(el)).catch(() => {}) }
   }, [])
 
-  return <div ref={ref} className="sky-chart" role="figure" aria-label={`Sky graph for ${site.name}: Sun and Earth positions, one dot per hour`} />
+  const n = win.sunAlt.length
+  const t = (i: number) => (t0Ms === undefined ? undefined : t0Ms + (span.start + i) * stepHours * 3_600_000)
+  return (
+    <>
+      <div ref={ref} className="sky-chart" role="img"
+        aria-label={`Sky graph for ${site.name}: Sun and Earth positions, one dot per hour, ${win.sky.flat ? 'against a flat horizon' : 'against the terrain skyline'}. A table of the numbers follows the chart.`} />
+      <SkyLegend startMs={n ? t(0) : undefined} endMs={n ? t(n - 1) : undefined} flat={win.sky.flat} widened={win.widened}
+        range={win.range} sunRadius={sunRadiusDeg} earthRadius={earthRadiusDeg} start={span.start} end={span.end}
+        explainAll={explainAll} />
+      <SkyTable siteName={site.name} sunAz={win.sunAz} sunAlt={win.sunAlt} earthAz={win.earthAz} earthAlt={win.earthAlt}
+        t0Ms={t(0)} stepHours={stepHours} />
+    </>
+  )
 }
