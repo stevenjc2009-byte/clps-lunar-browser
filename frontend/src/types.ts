@@ -16,7 +16,7 @@ export interface Site {
   note: string
   source: string
   status?: 'candidate' | 'target' | 'landing'   // sky.json v2
-  uncertainty_m?: number | null                 // sky.json v2
+  uncertainty_m?: number | null                // sky.json v2
   stats: SiteStats
   sun_alt: number[]
   sun_az: number[]
