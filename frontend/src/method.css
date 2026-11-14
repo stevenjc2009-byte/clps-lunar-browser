@@ -1,0 +1,32 @@
+/* "Method & limits" panel. Colours come from the app's :root variables in index.css. */
+.method { margin: 24px 0 0; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
+.method > summary {
+  cursor: pointer; padding: 14px 16px; font-weight: 700; font-size: 1.05rem; list-style: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 12px;
+}
+.method > summary::-webkit-details-marker { display: none; }
+.method > summary::after { content: '+'; color: var(--sun); font-size: 1.3rem; line-height: 1; }
+.method[open] > summary::after { content: '\2212'; }
+.method > summary:focus-visible { outline: 2px solid var(--earth); outline-offset: 2px; }
+.method-body { padding: 0 16px 16px; color: #cfdaf0; font-size: 0.9rem; line-height: 1.5; }
+.method-body h3 { margin: 18px 0 6px; font-size: 0.95rem; color: var(--text); }
+.method-body p { margin: 0 0 8px; }
+.method-body ul { margin: 0 0 8px; padding-left: 20px; }
+.method-body li { margin-bottom: 4px; }
+.method-note { color: var(--muted); font-size: 0.82rem; }
+.method-flag {
+  margin: 0 0 12px; padding: 8px 12px; border-radius: 8px; border: 1px solid #5a4a1e; background: #221b09; color: #f3dca0;
+}
+.method-flag.ok { border-color: #1f4d3a; background: #0b1f18; color: #b4ecd0; }
+.method-tablewrap { overflow-x: auto; margin: 6px 0 8px; }
+.method table { border-collapse: collapse; width: 100%; min-width: 420px; font-size: 0.85rem; }
+.method th, .method td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.method th { color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.method td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.method caption { text-align: left; padding-bottom: 4px; }
+.method-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.method-cols > div { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: #0a101e; }
+.method-cols h3 { margin-top: 0; }
+.method-is h3 { color: #b4ecd0; }
+.method-isnt h3 { color: #f3dca0; }
+.method a { color: var(--earth); }
