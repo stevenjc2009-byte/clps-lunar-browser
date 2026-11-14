@@ -9,3 +9,5 @@ video/node_modules/
 video/out/
 slides/node_modules/
 slides/qa/
+frontend/test-results/
+frontend/playwright-report/

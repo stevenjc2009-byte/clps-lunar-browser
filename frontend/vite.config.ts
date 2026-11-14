@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 // Short commit hash shown in the page footer; "dev" when git is not available.
 function buildCommit(): string {
@@ -18,4 +18,6 @@ export default defineConfig({
   base: './',
   plugins: [react()],
   define: { __BUILD_COMMIT__: JSON.stringify(buildCommit()) },
+  // Playwright specs live in e2e/ and run with `npm run e2e`, not vitest.
+  test: { exclude: [...configDefaults.exclude, 'e2e/**'] },
 })
