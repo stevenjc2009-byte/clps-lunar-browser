@@ -126,7 +126,7 @@ The NAIF and JPL kernels (about 17 MB) download automatically into `backend/data
   - look up published reference values and site coordinates;
   - draft this README and the plain-language explanations.
 - The team reviewed the results. Every computed position was checked against NASA JPL Horizons (see Validation).
-- No SI-generated images, video or audio are used.
+- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant. No other SI-generated images, video or audio are used.
 
 ## References
 
@@ -152,4 +152,4 @@ Software (all open source):
 - Vite (MIT): https://vite.dev/
 - TypeScript (Apache-2.0): https://www.typescriptlang.org/
 - Plotly.js (MIT): https://plotly.com/javascript/
-- The favicon `frontend/public/favicon.svg` is the Vite project template's logo (MIT).
+- The favicon `frontend/public/favicon.svg` was drawn for this project (SVG code written by the SI assistant).

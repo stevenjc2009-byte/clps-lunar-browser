@@ -98,7 +98,7 @@ A clear, honest first look at a site before detailed terrain studies. Next steps
   - look up published reference values and site coordinates;
   - draft the README, the plain-language explanations and this text.
 - The team reviewed the output, and every computed position was checked against NASA JPL Horizons.
-- No SI-generated images, video or audio are used.
+- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant. No other SI-generated images, video or audio are used.
 
 ## NASA Data
 
@@ -133,6 +133,5 @@ Software (open source):
 - Vite (MIT)
 - TypeScript (Apache-2.0)
 - Plotly.js (MIT)
-- Favicon: the Vite template logo (MIT)
 
 No Space Agency Partner data was used.
