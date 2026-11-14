@@ -1,0 +1,387 @@
+{
+ "sites": {
+  "shackleton": {
+   "0": {
+    "sun_visible_pct": 21.6,
+    "avg_sunlit_pct": 17.5,
+    "longest_dark_h": 699.2,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 41.4,
+    "avg_sunlit_pct": 35.8,
+    "longest_dark_h": 669.8,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 43.7,
+    "avg_sunlit_pct": 37.5,
+    "longest_dark_h": 667.7,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 28.6,
+    "sun_visible_pct_max": 43.2,
+    "sun_visible_pct_sd": 4.3,
+    "longest_dark_h_min": 669.3,
+    "longest_dark_h_max": 2098.7
+   },
+   "sun_track_source": "sky.json"
+  },
+  "im2": {
+   "0": {
+    "sun_visible_pct": 48.1,
+    "avg_sunlit_pct": 46.3,
+    "longest_dark_h": 413.2,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 48.5,
+    "avg_sunlit_pct": 46.7,
+    "longest_dark_h": 411.5,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 48.9,
+    "avg_sunlit_pct": 47.0,
+    "longest_dark_h": 409.0,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 46.2,
+    "sun_visible_pct_max": 48.7,
+    "sun_visible_pct_sd": 0.5,
+    "longest_dark_h_min": 408.7,
+    "longest_dark_h_max": 444.8
+   },
+   "sun_track_source": "sky.json"
+  },
+  "im1": {
+   "0": {
+    "sun_visible_pct": 36.5,
+    "avg_sunlit_pct": 35.8,
+    "longest_dark_h": 477.8,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 40.0,
+    "avg_sunlit_pct": 39.4,
+    "longest_dark_h": 455.0,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 41.5,
+    "avg_sunlit_pct": 40.9,
+    "longest_dark_h": 444.7,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 37.8,
+    "sun_visible_pct_max": 41.6,
+    "sun_visible_pct_sd": 1.4,
+    "longest_dark_h_min": 444.7,
+    "longest_dark_h_max": 468.8
+   },
+   "sun_track_source": "sky.json"
+  },
+  "peak-near-shackleton": {
+   "0": {
+    "sun_visible_pct": 21.7,
+    "avg_sunlit_pct": 17.5,
+    "longest_dark_h": 699.5,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 41.4,
+    "avg_sunlit_pct": 35.7,
+    "longest_dark_h": 670.2,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 43.7,
+    "avg_sunlit_pct": 37.5,
+    "longest_dark_h": 667.8,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 28.1,
+    "sun_visible_pct_max": 43.2,
+    "sun_visible_pct_sd": 4.4,
+    "longest_dark_h_min": 669.5,
+    "longest_dark_h_max": 2098.3
+   },
+   "sun_track_source": "skyfield (compute.py method)"
+  },
+  "shackleton-rim": {
+   "0": {
+    "sun_visible_pct": 72.5,
+    "avg_sunlit_pct": 65.6,
+    "longest_dark_h": 636.5,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 86.7,
+    "avg_sunlit_pct": 82.2,
+    "longest_dark_h": 177.3,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 90.8,
+    "avg_sunlit_pct": 86.2,
+    "longest_dark_h": 63.3,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 40.2,
+    "sun_visible_pct_max": 82.7,
+    "sun_visible_pct_sd": 14.2,
+    "longest_dark_h_min": 205.7,
+    "longest_dark_h_max": 2083.3
+   },
+   "sun_track_source": "skyfield (compute.py method)"
+  },
+  "connecting-ridge": {
+   "0": {
+    "sun_visible_pct": 40.2,
+    "avg_sunlit_pct": 37.7,
+    "longest_dark_h": 509.2,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 86.6,
+    "avg_sunlit_pct": 81.8,
+    "longest_dark_h": 127.8,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 90.9,
+    "avg_sunlit_pct": 86.7,
+    "longest_dark_h": 88.8,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 22.0,
+    "sun_visible_pct_max": 87.2,
+    "sun_visible_pct_sd": 18.1,
+    "longest_dark_h_min": 121.5,
+    "longest_dark_h_max": 682.2
+   },
+   "sun_track_source": "skyfield (compute.py method)"
+  },
+  "nobile-rim-2": {
+   "0": {
+    "sun_visible_pct": 30.0,
+    "avg_sunlit_pct": 28.5,
+    "longest_dark_h": 563.0,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 34.4,
+    "avg_sunlit_pct": 33.0,
+    "longest_dark_h": 522.3,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 36.3,
+    "avg_sunlit_pct": 35.2,
+    "longest_dark_h": 493.3,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 30.6,
+    "sun_visible_pct_max": 38.2,
+    "sun_visible_pct_sd": 2.2,
+    "longest_dark_h_min": 471.5,
+    "longest_dark_h_max": 557.3
+   },
+   "sun_track_source": "skyfield (compute.py method)"
+  },
+  "de-gerlache-rim-2": {
+   "0": {
+    "sun_visible_pct": 17.5,
+    "avg_sunlit_pct": 15.7,
+    "longest_dark_h": 2112.5,
+    "dark_run_censored": false
+   },
+   "2": {
+    "sun_visible_pct": 20.4,
+    "avg_sunlit_pct": 18.5,
+    "longest_dark_h": 2067.5,
+    "dark_run_censored": false
+   },
+   "5": {
+    "sun_visible_pct": 23.5,
+    "avg_sunlit_pct": 21.4,
+    "longest_dark_h": 697.5,
+    "dark_run_censored": false
+   },
+   "ring_2m": {
+    "sun_visible_pct_min": 16.1,
+    "sun_visible_pct_max": 26.5,
+    "sun_visible_pct_sd": 3.4,
+    "longest_dark_h_min": 684.8,
+    "longest_dark_h_max": 2708.0
+   },
+   "sun_track_source": "skyfield (compute.py method)"
+  }
+ },
+ "literature": [
+  {
+   "site": "Shackleton S",
+   "lat": -89.7849,
+   "lon_e": 203.97,
+   "height_m": 0,
+   "source": "Table 1",
+   "glaser": {
+    "avg_sunlit_pct": 81.0,
+    "sun_visible_pct": 85.5,
+    "longest_dark_h": 221
+   },
+   "ours": {
+    "sun_visible_pct": 71.7,
+    "avg_sunlit_pct": 64.1,
+    "longest_dark_h": 644.7,
+    "dark_run_censored": false
+   },
+   "ours_20m_near": {
+    "sun_visible_pct": 83.9,
+    "avg_sunlit_pct": 79.4,
+    "longest_dark_h": 230.3,
+    "dark_run_censored": false
+   },
+   "ours_240m_dem": {
+    "sun_visible_pct": 68.3,
+    "avg_sunlit_pct": 64.1,
+    "longest_dark_h": 376.2,
+    "dark_run_censored": false
+   },
+   "ground_m": 1737.4
+  },
+  {
+   "site": "Connecting Ridge C1",
+   "lat": -89.4505,
+   "lon_e": 222.84,
+   "height_m": 0,
+   "source": "Table 1",
+   "glaser": {
+    "avg_sunlit_pct": 76.0,
+    "sun_visible_pct": 81.3,
+    "longest_dark_h": 268
+   },
+   "ours": {
+    "sun_visible_pct": 40.7,
+    "avg_sunlit_pct": 38.2,
+    "longest_dark_h": 512.2,
+    "dark_run_censored": false
+   },
+   "ours_20m_near": {
+    "sun_visible_pct": 74.4,
+    "avg_sunlit_pct": 69.1,
+    "longest_dark_h": 308.2,
+    "dark_run_censored": false
+   },
+   "ours_240m_dem": {
+    "sun_visible_pct": 82.8,
+    "avg_sunlit_pct": 77.2,
+    "longest_dark_h": 184.7,
+    "dark_run_censored": false
+   },
+   "ground_m": 1957.2
+  },
+  {
+   "site": "Connecting Ridge C2",
+   "lat": -89.3157,
+   "lon_e": 245.94,
+   "height_m": 0,
+   "source": "Table 1",
+   "glaser": {
+    "avg_sunlit_pct": 75.6,
+    "sun_visible_pct": 80.6,
+    "longest_dark_h": 166
+   },
+   "ours": {
+    "sun_visible_pct": 43.4,
+    "avg_sunlit_pct": 38.1,
+    "longest_dark_h": 556.7,
+    "dark_run_censored": false
+   },
+   "ours_20m_near": {
+    "sun_visible_pct": 78.6,
+    "avg_sunlit_pct": 71.7,
+    "longest_dark_h": 165.5,
+    "dark_run_censored": false
+   },
+   "ours_240m_dem": {
+    "sun_visible_pct": 78.2,
+    "avg_sunlit_pct": 72.0,
+    "longest_dark_h": 165.8,
+    "dark_run_censored": false
+   },
+   "ground_m": 1692.5
+  },
+  {
+   "site": "Connecting Ridge C1 (2 m)",
+   "lat": -89.4398,
+   "lon_e": 222.83,
+   "height_m": 2,
+   "source": "Table 2; 88.0/92.1 confirmed by the paper's text, 112 h from scrambled table text",
+   "glaser": {
+    "avg_sunlit_pct": 88.0,
+    "sun_visible_pct": 92.1,
+    "longest_dark_h": 112
+   },
+   "ours": {
+    "sun_visible_pct": 79.7,
+    "avg_sunlit_pct": 76.3,
+    "longest_dark_h": 241.3,
+    "dark_run_censored": false
+   },
+   "ours_20m_near": {
+    "sun_visible_pct": 89.8,
+    "avg_sunlit_pct": 85.2,
+    "longest_dark_h": 259.3,
+    "dark_run_censored": false
+   },
+   "ours_240m_dem": {
+    "sun_visible_pct": 88.9,
+    "avg_sunlit_pct": 84.9,
+    "longest_dark_h": 215.8,
+    "dark_run_censored": false
+   },
+   "ground_m": 1958.6
+  },
+  {
+   "site": "Shackleton (2 m)",
+   "lat": -89.7815,
+   "lon_e": 204.7,
+   "height_m": 2,
+   "source": "Table 2; column order inferred from scrambled PDF text (low confidence)",
+   "glaser": {
+    "avg_sunlit_pct": 82.1,
+    "sun_visible_pct": 89.8,
+    "longest_dark_h": 65
+   },
+   "ours": {
+    "sun_visible_pct": 85.1,
+    "avg_sunlit_pct": 78.3,
+    "longest_dark_h": 137.2,
+    "dark_run_censored": false
+   },
+   "ours_20m_near": {
+    "sun_visible_pct": 83.8,
+    "avg_sunlit_pct": 76.9,
+    "longest_dark_h": 197.7,
+    "dark_run_censored": false
+   },
+   "ours_240m_dem": {
+    "sun_visible_pct": 90.4,
+    "avg_sunlit_pct": 86.2,
+    "longest_dark_h": 64.8,
+    "dark_run_censored": false
+   },
+   "ground_m": 1738.1
+  }
+ ],
+ "period_sites": "2026-11-15T00Z + 8760 h, 10-min linear interpolation",
+ "period_literature": "2017-01-01T00Z to 2037-01-01T00Z hourly, 10-min interpolation"
+}
