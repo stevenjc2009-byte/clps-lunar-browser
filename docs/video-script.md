@@ -11,7 +11,7 @@
 
 ## Script
 
-The script follows the official beats: 0:00 team, 0:02 challenge, 0:05 title and tagline, 0:10 how it works and NASA data, 0:20 to 0:30 the future. It is about 72 words, roughly 2.4 words a second, which is a calm pace for 30 seconds.
+The script follows the official beats: 0:00 team, 0:02 challenge, 0:05 title and tagline, 0:10 how it works and NASA data, 0:20 to 0:30 the future. It is about 74 words, roughly 2.5 words a second, which is a calm pace for 30 seconds.
 
 | Time | Narration (say this) | Screen (record this) |
 |---|---|---|
