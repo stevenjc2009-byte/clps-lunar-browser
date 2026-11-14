@@ -15,14 +15,14 @@ The script follows the official beats: 0:00 team, 0:02 challenge, 0:05 title and
 
 | Time | Narration (say this) | Screen (record this) |
 |---|---|---|
-| 0:00-0:03 | "Hi, we're team ___, for the Lunar Landing Site Navigator challenge." | Page title at the top of the site |
+| 0:00-0:03 | "Hi, we're The Big Four, for the Lunar Landing Site Navigator challenge." | Page title at the top of the site |
 | 0:03-0:09 | "At the Moon's south pole, the Sun skims the horizon. Landers need sunlight for power and Earth in view to call home." | Sky graph, Shackleton tab: Sun dots crossing the horizon line |
 | 0:09-0:12 | "This is CLPS Lunar Mission Browser." | Scroll up to "Compare sites" |
 | 0:12-0:21 | "Pick a date and up to three sites: sunlight, Earth time, longest night, and a verdict, from NASA JPL data." | Change the date, switch 30 days / 1 year, cards update; point at the verdict badges |
 | 0:21-0:25 | "Students can press 'Explain it to me'." | Click "Explain it to me", the notes open |
 | 0:25-0:30 | "Clearer landing choices, for planners and the curious." | Hold on the comparison cards |
 
-Before recording, fill in the team name at 0:00. Time it with a stopwatch and trim words if it runs over 29 seconds.
+Time it with a stopwatch and trim words if it runs over 29 seconds.
 
 ## How to record
 
