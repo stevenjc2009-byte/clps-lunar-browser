@@ -34,6 +34,7 @@ DEFAULT_STATUS = {"shackleton": "candidate", "peak-near-shackleton": "candidate"
                   "im1": "landing", "im2": "landing"}
 STATUSES = ("candidate", "target", "landing")
 AZ_DECIMALS = 1          # size decision: 7 sites x 4 arrays; see decisions file
+ALT_DECIMALS = 3         # 2 dp gave up to 35 min Sun rise/set error at the pole (tenmin.py)
 
 
 def load_moon_frame(load=None, set_name="de440"):
@@ -134,6 +135,7 @@ def build(sites: list[dict], set_name: str = "de440") -> dict:
             "landing_min_utc": iso(ephem.LANDING_MIN_UTC),
             "landing_max_utc": iso(ephem.LANDING_MAX_UTC),
             "az_decimals": AZ_DECIMALS,
+            "alt_decimals": ALT_DECIMALS,
         },
         "sun_radius_deg": np.round(sun_r, 4).tolist(),
         "earth_radius_deg": np.round(earth_r, 4).tolist(),
@@ -147,9 +149,9 @@ def build(sites: list[dict], set_name: str = "de440") -> dict:
         result["sites"].append({
             **site_record(site),
             "stats": stats,
-            "sun_alt": round_keep_sign(sun_alt, 2).tolist(),
+            "sun_alt": round_keep_sign(sun_alt, ALT_DECIMALS).tolist(),
             "sun_az": np.round(sun_az, AZ_DECIMALS).tolist(),
-            "earth_alt": round_keep_sign(earth_alt, 2).tolist(),
+            "earth_alt": round_keep_sign(earth_alt, ALT_DECIMALS).tolist(),
             "earth_az": np.round(earth_az, AZ_DECIMALS).tolist(),
         })
         print(f"{site['id']:22s} sun {stats['sun_visible_pct']:5.1f}%  "
