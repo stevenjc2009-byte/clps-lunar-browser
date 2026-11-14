@@ -50,7 +50,8 @@ export function siteMetrics(site: Site, span: Span, stepHours: number): Metrics 
     sunPct: round1((100 * sunUp) / n),
     earthPct: round1((100 * earthUp) / n),
     longestDarkHours: best * stepHours,
-    darkCut: best > 0 && (bestStartsAt === start || bestEndsAt === end - 1),
+    // `run` is now the dark run still going at the window's end; if it ties the longest, the real night may be longer.
+    darkCut: best > 0 && (bestStartsAt === start || bestEndsAt === end - 1 || run === best),
     sunMin, sunMax, earthMin, earthMax,
   }
 }
