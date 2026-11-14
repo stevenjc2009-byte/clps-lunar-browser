@@ -42,9 +42,10 @@ const VALIDATION: ValidationRow[] = [
 ]
 
 // docs/SANITY.md section 2: flat 0 degree horizon vs Glaser et al. (NASA NTRS 20170007365), Table 1.
+// terrain = docs/terrain-validation.json sites.<id>["2"].sun_visible_pct (any part of the Sun, 2 m, 1 year from 15 Nov 2026).
 const FLAT_VS_PUBLISHED = [
-  { site: 'Shackleton rim point', ours: '60.5 %', published: '85.5 %' },
-  { site: 'Connecting Ridge point', ours: '57.8 %', published: '81.3 %' },
+  { site: 'Shackleton rim point', ours: '60.5 %', terrain: '86.7 %', published: '85.5 %' },
+  { site: 'Connecting Ridge point', ours: '57.8 %', terrain: '86.6 %', published: '81.3 %' },
 ]
 
 const IS = [
@@ -125,22 +126,22 @@ export default function Method(props: { terrainLoaded: boolean }) {
         <h3>Terrain</h3>
         <p>
           Real skylines come from NASA&rsquo;s LOLA laser altimeter on the Lunar Reconnaissance Orbiter. Without them, the flat-horizon
-          model gives much less sunlight than a terrain-aware study at the same kind of point:
+          model gives much less sunlight than a terrain-aware study at the same kind of point. With the LOLA skyline loaded, our numbers come close to the published ones:
         </p>
         <div className="method-tablewrap">
           <table>
             <caption className="method-note">
-              Share of time with the Sun up. Our numbers count the Sun's centre above a flat 0&deg; line over 2.3 years, so they differ a little from the cards (top edge of the Sun, 2 m height, your dates); the published ones are over 20 years (docs/SANITY.md).
+              Share of time with the Sun up. Flat column: the Sun's centre above a flat 0&deg; line over 2.3 years (docs/SANITY.md). Terrain column: any part of the Sun above the LOLA skyline, seen from 2 m, over 1 year from 15 Nov 2026 (docs/TERRAIN.md). Published: Gl&auml;ser et al., any part of the Sun, ground level, over 20 years. The cards can differ a little (top edge of the Sun, your dates).
             </caption>
-            <thead><tr><th>Site</th><th>This tool, flat horizon</th><th>Published, with terrain</th></tr></thead>
+            <thead><tr><th>Site</th><th>This tool, flat horizon</th><th>This tool, LOLA terrain</th><th>Published, with terrain</th></tr></thead>
             <tbody>
               {FLAT_VS_PUBLISHED.map(r => (
-                <tr key={r.site}><td>{r.site}</td><td className="num">{r.ours}</td><td className="num">{r.published}</td></tr>
+                <tr key={r.site}><td>{r.site}</td><td className="num">{r.ours}</td><td className="num">{r.terrain}</td><td className="num">{r.published}</td></tr>
               ))}
             </tbody>
           </table>
         </div>
-        <p className="method-note">This gap is a finding, not a tuned result. It is why flat-horizon sites are flagged provisional.</p>
+        <p className="method-note">The flat-horizon gap is a finding, not a tuned result. It is why flat-horizon sites are flagged provisional. The terrain numbers were not tuned to match either.</p>
 
         <h3>How well does it match NASA?</h3>
         <div className="method-tablewrap">
