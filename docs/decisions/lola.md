@@ -84,3 +84,11 @@
 18. **Sabotage check found a test gap (fixed).** Breaking "upper limb" to "Sun centre"
    (`vis = a > h`) left every test green. Added test_visible_means_upper_limb_not_centre
    (Sun centre 0.1 deg below a flat horizon must count as visible); that arm is now red.
+19. **Keep the 5 m near band, even though 20 m matches the literature better at 0 m.**
+   Validation found 0 m results are resolution-dependent: Glaser's points at 0 m give
+   71.7 / 40.7 / 43.4 % Sun-visible with the 5 m near band and 83.9 / 74.4 / 78.6 % with a
+   20 m near band (Glaser: 85.5 / 81.3 / 80.6 %). Options: switch the shipped near band to
+   20 m, or keep 5 m and report it. Kept 5 m: switching after seeing the comparison would
+   be tuning toward the expected number, and 5 m is the more detailed data. The 2 m and
+   5 m results move much less with resolution, so docs/TERRAIN.md recommends them; the
+   20 m variant is in docs/terrain-validation.json for anyone who wants it.
