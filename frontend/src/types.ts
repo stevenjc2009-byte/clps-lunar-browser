@@ -15,6 +15,8 @@ export interface Site {
   lon: number
   note: string
   source: string
+  status?: 'candidate' | 'target' | 'landing'   // sky.json v2
+  uncertainty_m?: number | null                // sky.json v2
   stats: SiteStats
   sun_alt: number[]
   sun_az: number[]
@@ -30,6 +32,10 @@ export interface SkyData {
     samples: number
     ephemeris: string
     horizon: string
+    // sky.json v2: the data range starts > 1 synodic month before the earliest landing date
+    version?: number
+    landing_min_utc?: string
+    landing_max_utc?: string
   }
   sites: Site[]
 }

@@ -1,18 +1,17 @@
 """Cross-check the vector method (vectors.bin) against Skyfield for a custom site.
 
-Skyfield direct = compute.py's compute_site; vector method = the maths in
+Skyfield direct = ephem.site_altaz; vector method = the maths in
 frontend/src/ephem.ts, here on the float32 data actually shipped. Exit 1 if off.
 """
 import json
 import sys
 
 import numpy as np
-from skyfield.api import Loader
 
-from compute import DATA_DIR, DAYS, START, compute_site, load_moon_frame
+import ephem
 from export_vectors import BIN_FILE, JSON_FILE
 
-SITE = {"lat": -87.5, "lon": 45.0}
+SITES = [{"lat": -87.5, "lon": 45.0}, {"lat": -89.7849, "lon": -156.03}, {"lat": -80.13, "lon": 1.44}]
 MAX_ALT_ERR = 0.02  # deg
 
 
@@ -33,20 +32,22 @@ def vector_method(vecs, radius, lat_deg, lon_deg):
 def main():
     header = json.loads(JSON_FILE.read_text(encoding="utf-8"))
     vecs = np.fromfile(BIN_FILE, dtype="<f4").reshape(-1, 6)
-    load = Loader(str(DATA_DIR), verbose=False)
-    ts = load.timescale()
-    eph, pc, frame = load_moon_frame(load)
-    t = ts.utc(START[0], START[1], START[2], np.arange(0, DAYS * 24))
-
-    ref = compute_site(SITE, eph, pc, frame, t)
-    got = vector_method(vecs, header["moon_radius_km"], SITE["lat"], SITE["lon"])
+    _, ts = ephem.make_loader()
+    eph, pc, frame = ephem.load_moon_frame()
+    assert header["count"] == len(vecs) == ephem.n_samples(), "vectors.bin length != grid"
+    assert header["start_utc"] == ephem.START_UTC.strftime("%Y-%m-%dT%H:%M:%SZ"), "start moved"
+    t = ephem.time_grid(ts)
     ok = True
-    for body in ("sun", "earth"):
-        d_alt = np.abs(got[body][0] - ref[body][0]).max()
-        d_az = np.abs((got[body][1] - ref[body][1] + 180) % 360 - 180).max()
-        vis = int(((got[body][0] > 0) != (ref[body][0] > 0)).sum())
-        print(f"{body:5s} max|dalt| {d_alt:.5f}  max|daz| {d_az:.5f}  visibility hours differing {vis}")
-        ok &= d_alt <= MAX_ALT_ERR and vis <= 2
+    for site in SITES:
+        ref = ephem.site_altaz(site, eph, pc, frame, t)
+        got = vector_method(vecs, header["moon_radius_km"], site["lat"], site["lon"])
+        for body in ("sun", "earth"):
+            d_alt = np.abs(got[body][0] - ref[body][0]).max()
+            d_az = np.abs((got[body][1] - ref[body][1] + 180) % 360 - 180).max()
+            vis = int(((got[body][0] > 0) != (ref[body][0] > 0)).sum())
+            print(f"({site['lat']:+.4f},{site['lon']:+.4f}) {body:5s} max|dalt| {d_alt:.5f} deg  "
+                  f"max|daz| {d_az:.5f} deg  visibility hours differing {vis}")
+            ok &= d_alt <= MAX_ALT_ERR and vis <= 2
     print("OK" if ok else "FAIL")
     return 0 if ok else 1
 

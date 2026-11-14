@@ -1,26 +1,72 @@
 [
   {
-    "id": "shackleton",
-    "name": "Shackleton rim (Peak Near Shackleton)",
-    "lat": -89.0051,
+    "id": "peak-near-shackleton",
+    "name": "Peak near Shackleton",
+    "lat": -89.00506,
     "lon": 125.3093,
-    "note": "Artemis III candidate region; top-ranked point in arXiv:2406.19863 Table 3 (89°00'18.22\"S, 125°18'33.49\"E)",
-    "source": "https://arxiv.org/html/2406.19863v1"
+    "status": "candidate",
+    "uncertainty_m": null,
+    "source": "https://arxiv.org/html/2406.19863v1 Table 3 (ID 1223, region Site07 'Peak Near Shackleton', TOPSIS rank 15 of 20)",
+    "note": "Artemis III candidate-region point from a GIS ranking, about 1 deg (30 km) from the pole; NOT on Shackleton crater rim. 5 m LOLA DEMs. Paper reports no sunlit % for it."
+  },
+  {
+    "id": "shackleton-rim",
+    "name": "Shackleton rim",
+    "lat": -89.7849,
+    "lon": -156.03,
+    "status": "candidate",
+    "uncertainty_m": null,
+    "source": "Glaser et al. 2018, NTRS 20170007365, Table 1 row Shackleton S 'This study' (surface level, 20 m/px LOLA DTM, 2017-2037)",
+    "note": "Most-illuminated spot on the Shackleton crater rim: 81.0 % average sunlit, 85.5 % Sun visible, longest shadow 221 h. Mazarico 2011 (240 m/px): -89.78, 204.27 E, 86.7 %."
+  },
+  {
+    "id": "connecting-ridge",
+    "name": "Connecting Ridge",
+    "lat": -89.4505,
+    "lon": -137.16,
+    "status": "candidate",
+    "uncertainty_m": null,
+    "source": "Glaser et al. 2018, NTRS 20170007365, Table 1 row Connecting Ridge C1 'This study' (surface level)",
+    "note": "76.0 % average sunlit, 81.3 % Sun visible, longest shadow 268 h (Mazarico 2011: 89.0 %, 141.12 h). Ridge between Shackleton and de Gerlache."
+  },
+  {
+    "id": "nobile-rim-2",
+    "name": "Nobile Rim 2",
+    "lat": -84.20156,
+    "lon": 60.69989,
+    "status": "candidate",
+    "uncertainty_m": null,
+    "source": "https://arxiv.org/html/2406.19863v1 Table 3 (ID 358, region DM2 'Nobile Rim 2', TOPSIS rank 1)",
+    "note": "Top-ranked point in that paper's equal-weight ranking; no sunlit % reported."
+  },
+  {
+    "id": "de-gerlache-rim-2",
+    "name": "de Gerlache Rim 2",
+    "lat": -88.51566,
+    "lon": -61.16732,
+    "status": "candidate",
+    "uncertainty_m": null,
+    "source": "https://arxiv.org/html/2406.19863v1 Table 3 (ID 726, region SL2 'de Gerlache Rim 2', rank 18; longitude printed 61 10 2.35 'O' = west)",
+    "note": "No sunlit % reported."
   },
   {
     "id": "im2",
     "name": "IM-2 Athena (Mons Mouton)",
-    "lat": -84.791,
-    "lon": 29.196,
-    "note": "CLPS IM-2 landing target, 2025",
-    "source": "https://lroc.im-ldi.com/images/1401"
+    "lat": -84.7906,
+    "lon": 29.1957,
+    "status": "landing",
+    "uncertainty_m": null,
+    "source": "https://lroc.im-ldi.com/images/1408 (LROC oblique view)",
+    "note": "Athena's actual resting place: inside a 20 m crater, lying on its side after landing 6 Mar 2025. LROC gives no uncertainty. Intended site was -84.78, 29.13 (images/1401)."
   },
   {
     "id": "im1",
     "name": "IM-1 Odysseus (Malapert A)",
     "lat": -80.13,
     "lon": 1.44,
-    "note": "CLPS IM-1 landing site, 22 Feb 2024",
-    "source": "https://en.wikipedia.org/wiki/IM-1"
+    "status": "landing",
+    "uncertainty_m": null,
+    "source": "https://www.nasa.gov/missions/lro/nasas-lro-images-intuitive-machines-odysseus-lander/",
+    "note": "Landed 22 Feb 2024 on a slope near Malapert A, about 1.5 km from the target (Intuitive Machines). NASA gives no uncertainty or datum."
   }
 ]
