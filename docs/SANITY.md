@@ -1,6 +1,6 @@
 # Sanity checks
 
-Generated 2026-11-14 21:53 UTC by `backend/sanity.py`, commit 4b859a8, from `frontend/public/sky.json` (2026-09-01 to 2029-01-01, hourly, flat 0 deg horizon, body centre).
+Generated 2026-11-14 21:58 UTC by `backend/sanity.py`, commit bd259a8, from `frontend/public/sky.json` (2026-09-01 to 2029-01-01, hourly, flat 0 deg horizon, body centre).
 
 ## 1. Periodicity (autocorrelation peak between 20 and 40 days)
 

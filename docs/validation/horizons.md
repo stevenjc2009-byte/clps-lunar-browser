@@ -1,6 +1,6 @@
 # Validation against NASA JPL Horizons
 
-Generated 2026-11-14 21:54 UTC by `backend/validate_horizons.py`, commit 4b859a8. 218 instants per site and body (200 spread evenly over 2026-09-01 to 2029-01-01, plus perigee/apogee, the Sun's lunar-latitude extremes and Earth libration extremes). Raw Horizons replies are cached in `backend/data/horizons-cache/`; every row is in `horizons.csv`.
+Generated 2026-11-14 21:58 UTC by `backend/validate_horizons.py`, commit bd259a8. 218 instants per site and body (200 spread evenly over 2026-09-01 to 2029-01-01, plus perigee/apogee, the Sun's lunar-latitude extremes and Earth libration extremes). Raw Horizons replies are cached in `backend/data/horizons-cache/`; every row is in `horizons.csv`.
 
 Ours: Skyfield + DE440s, frame MOON_ME (= MOON_ME_DE440_ME421), site on a 1737.4 km sphere, apparent (light-time, aberration, deflection), airless.  
 Horizons: target `Sun (10) {source: DE441}`; centre frame `MEAN_ME (high precision) {East-longitude positive}`; centre radii `1737.4, 1737.4, 1737.4 km {Equator_a, b, pole_c}`; QUANTITIES=4 airless apparent az/el; times UTC.

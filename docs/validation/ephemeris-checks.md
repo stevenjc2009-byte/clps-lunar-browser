@@ -1,6 +1,6 @@
 # Ephemeris checks (data-v2)
 
-Generated 2026-11-14 21:45 UTC by `backend/compare_ephem.py`, commit 4b859a8. Grid: hourly 2026-09-01 to 2029-01-01 (20473 samples). All values are maxima over the whole grid.
+Generated 2026-11-14 21:58 UTC by `backend/compare_ephem.py`, commit bd259a8. Grid: hourly 2026-09-01 to 2029-01-01 (20473 samples). All values are maxima over the whole grid.
 
 ## 1. DE421 -> DE440 change (arcminutes)
 
