@@ -12,6 +12,9 @@ export interface SkyChartProps {
   // Terrain skyline in degrees, index i <-> azimuth i*horizonStep. Omit for the flat-horizon line.
   horizon?: number[]
   horizonStep?: number
+  // Height of the flat horizon line (deg) when there is no terrain table: the engine's own level
+  // (minus the dip for the observer height, plus any safety margin). Default 0.
+  flatDeg?: number
   // Angular radii (deg), hourly, same length as site.sun_alt (sky.json v2). Used for the size legend.
   sunRadiusDeg?: number[]
   earthRadiusDeg?: number[]
@@ -29,15 +32,15 @@ const SKYLINE_FILL = 'rgba(150, 138, 112, 0.55)'
 // Sky graph: azimuth (compass direction, clockwise from lunar north) vs elevation above the horizon.
 // Dots are the samples inside `span`; their colour gets paler with time. The grey silhouette is the
 // terrain skyline when horizon data is given, otherwise a flat 0 deg line.
-export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDeg, earthRadiusDeg, t0Ms, stepHours = 1, explainAll = false }: SkyChartProps) {
+export default function SkyChart({ site, span, horizon, horizonStep, flatDeg = 0, sunRadiusDeg, earthRadiusDeg, t0Ms, stepHours = 1, explainAll = false }: SkyChartProps) {
   const ref = useRef<HTMLDivElement>(null)
   const win = useMemo(() => {
     const cut = (a: number[]) => a.slice(span.start, span.end)
-    const sky = skyline(horizon, horizonStep)
+    const sky = skyline(horizon, horizonStep, flatDeg)
     const sunAlt = cut(site.sun_alt), earthAlt = cut(site.earth_alt)
     const { range, widened, below } = elevationRange([sunAlt, earthAlt], Math.max(...sky.y))
     return { sunAlt, earthAlt, sunAz: cut(site.sun_az), earthAz: cut(site.earth_az), sky, range, widened, below }
-  }, [site, span.start, span.end, horizon, horizonStep])
+  }, [site, span.start, span.end, horizon, horizonStep, flatDeg])
 
   useEffect(() => {
     const el = ref.current
@@ -49,7 +52,7 @@ export default function SkyChart({ site, span, horizon, horizonStep, sunRadiusDe
       size: 4, opacity: 0.75, symbol, showscale: false,
     })
     const narrow = el.clientWidth < 520
-    const skyName = sky.flat ? 'Flat horizon (0°), no terrain data' : 'Terrain skyline'
+    const skyName = sky.flat ? `Flat horizon (${sky.y[0].toFixed(1)}°), no terrain data` : 'Terrain skyline'
 
     const data: Partial<Plotly.Data>[] = [
       // invisible floor so the skyline trace can fill down to the bottom of the chart

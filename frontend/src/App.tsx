@@ -73,9 +73,10 @@ export default function App() {
   // Same skyline the engine uses (height + margin), drawn on the sky graph when terrain is loaded.
   const mask = makeMask(horizons, site.id, params.observerHeightM, params.maskOffsetDeg)
   const cdA = dateA || fromDay
-  const cdB = dateB || isoDay(t0 + (pick.startH + 182 * 24) * HOUR_MS)
+  const halfYearH = 182 * 24
+  const cdB = dateB || isoDay(t0 + (pick.startH + halfYearH <= maxH ? pick.startH + halfYearH : Math.max(firstH, pick.startH - halfYearH)) * HOUR_MS)
   const clampNote = pick.clamped === 'before_range' ? `That date is before the supported landing range, so the dates start on ${fmtDay(isoDay(t0 + minH * HOUR_MS))}.`
-    : pick.clamped === 'after_range' ? `That date leaves too little data for the look-ahead, so the dates start on ${fmtDay(fromDay)}.`
+    : pick.clamped === 'after_range' ? `That date is after the last landing date this tool covers, so the dates start on ${fmtDay(fromDay)}.`
       : pick.clamped === 'invalid' ? `That date could not be read, so the dates start on ${fmtDay(fromDay)}.` : null
 
   return (
@@ -207,7 +208,7 @@ export default function App() {
         <p className="how-read"><b>What am I looking at?</b> The sky seen from this site. Each dot is where the
           <span className="sun"> Sun</span> or <span className="earth">Earth</span> was at one hour: across is compass direction,
           up is height. Dots under the skyline (the shaded band at the bottom) are hidden behind the ground or hills.</p>
-        <SkyChart site={site} span={span} horizon={mask.table ? Array.from(mask.table) : undefined} horizonStep={mask.step || undefined}
+        <SkyChart site={site} span={span} horizon={mask.table ? Array.from(mask.table) : undefined} horizonStep={mask.step || undefined} flatDeg={mask.flatDeg}
           sunRadiusDeg={data.sun_radius_deg} earthRadiusDeg={data.earth_radius_deg} t0Ms={t0} stepHours={data.meta.step_hours} explainAll={explainAll} />
         <p className="caption">
           Each dot is one hour, {fmtDay(fromDay)} → {fmtDay(toDay)} UTC. Sun height {sunMin.toFixed(1)}° to {sunMax.toFixed(1)}°,

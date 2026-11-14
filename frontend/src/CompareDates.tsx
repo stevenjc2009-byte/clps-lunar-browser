@@ -26,7 +26,7 @@ const HOUR_MS = 3_600_000
 
 function clampText(p: WindowPick, used: string): string | null {
   if (p.clamped === 'before_range') return `before the landing range, so ${fmtDay(used)} is used`
-  if (p.clamped === 'after_range') return `too late for the look-ahead, so ${fmtDay(used)} is used`
+  if (p.clamped === 'after_range') return `after the last landing date covered, so ${fmtDay(used)} is used`
   if (p.clamped === 'invalid') return `not a date we could read, so ${fmtDay(used)} is used`
   return null
 }

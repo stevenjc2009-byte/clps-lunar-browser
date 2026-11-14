@@ -130,7 +130,7 @@ export default function Method(props: { terrainLoaded: boolean }) {
         <div className="method-tablewrap">
           <table>
             <caption className="method-note">
-              Share of time with the Sun up. Our numbers are over 2.3 years, the published ones over 20 years (docs/SANITY.md).
+              Share of time with the Sun up. Our numbers count the Sun's centre above a flat 0&deg; line over 2.3 years, so they differ a little from the cards (top edge of the Sun, 2 m height, your dates); the published ones are over 20 years (docs/SANITY.md).
             </caption>
             <thead><tr><th>Site</th><th>This tool, flat horizon</th><th>Published, with terrain</th></tr></thead>
             <tbody>
@@ -156,7 +156,7 @@ export default function Method(props: { terrainLoaded: boolean }) {
           </table>
         </div>
         <p className="method-note">
-          An arcminute is 1/60 of a degree. Near the pole the Sun climbs about 0.007&deg; an hour, so 0.05 arcminutes is about 7 minutes of
+          An arcminute is 1/60 of a degree. Near the pole the Sun climbs about 0.01&deg; an hour, so 0.05 arcminutes is about 5 minutes of
           sunrise timing.
         </p>
 

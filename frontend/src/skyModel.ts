@@ -10,8 +10,8 @@ export const wrapAz = (az: number): number => (az > 180 ? az - 360 : az)
 
 // Skyline from a horizon table (index i <-> azimuth i*step, degrees) as a polyline over az -180..180.
 // Values between table entries are interpolated linearly; the table wraps at 360.
-// Without a usable table: a flat line at 0 deg.
-export function skyline(horizon: number[] | undefined, step: number | undefined): { x: number[]; y: number[]; flat: boolean } {
+// Without a usable table: a flat line at flatDeg (0 by default; the app passes the engine's flat level).
+export function skyline(horizon: number[] | undefined, step: number | undefined, flatDeg = 0): { x: number[]; y: number[]; flat: boolean } {
   const usable = !!horizon && horizon.length >= 2 && !!step && step > 0 && horizon.every(Number.isFinite)
   const n = Math.max(1, Math.round(360 / (usable ? step! : 1)))
   const dAz = 360 / n
@@ -19,7 +19,7 @@ export function skyline(horizon: number[] | undefined, step: number | undefined)
   for (let k = 0; k <= n; k++) {
     const az = -180 + k * dAz
     x.push(az)
-    if (!usable) { y.push(0); continue }
+    if (!usable) { y.push(flatDeg); continue }
     const len = horizon!.length
     const pos = ((((az % 360) + 360) % 360) / step!) % len
     const i0 = Math.floor(pos), f = pos - i0

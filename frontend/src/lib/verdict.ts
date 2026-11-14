@@ -4,7 +4,7 @@
 //
 // Works for any number of sites; nothing here knows site ids.
 
-import { fmtDuration, listAnd } from './format'
+import { fmtDuration, fmtNight, listAnd } from './format'
 import { SYNODIC_MONTH_H, type Censor } from './windowMetrics'
 
 export type Badge = 'energy' | 'comms' | 'night' | 'balanced'
@@ -116,7 +116,8 @@ function commsRule(rows: VerdictInput[], kind: 'link' | 'earth'): RuleOutcome {
 function nightRule(rows: VerdictInput[]): RuleOutcome {
   const exact = rows.filter(r => r.dark.status === 'exact').sort((a, b) => a.dark.hours - b.dark.hours)
   const censored = rows.filter(r => r.dark.status !== 'exact')
-  const showDark = (r: VerdictInput) => (r.dark.status === 'exact' ? fmtDuration(r.dark.hours) : `at least ${fmtDuration(r.dark.hours)}`)
+  const showDark = (r: VerdictInput) => (r.dark.status === 'exact' ? (r.dark.hours <= 0 ? 'with no night' : fmtNight(r.dark.hours)) : `at least ${fmtDuration(r.dark.hours)}`)
+  const longest = (r: VerdictInput) => (r.dark.hours <= 0 ? `${r.name} has no night in this period` : `${r.name}'s longest night is ${fmtNight(r.dark.hours)}`)
   if (!exact.length) {
     return { rule: 'night', state: 'undetermined', winner: null, group: censored.map(r => r.id),
       sentence: 'Shortest night: cannot call. Every site\'s longest night runs past the edge of our data, so none of them is known in full.' }
@@ -129,16 +130,18 @@ function nightRule(rows: VerdictInput[]): RuleOutcome {
     : ''
   if (closeExact.length > 1) {
     return { rule: 'night', state: 'comparable', winner: null, group: closeExact.map(r => r.id),
-      sentence: `Shortest night: too close to call. ${names(closeExact, showDark)} are less than 1 day apart.${blockText}` }
+      sentence: closeExact.every(r => r.dark.hours <= 0)
+        ? `Shortest night: too close to call. ${listAnd(closeExact.map(r => r.name))} have no night in this period.${blockText}`
+        : `Shortest night: too close to call. ${names(closeExact, showDark)} are less than 1 day apart.${blockText}` }
   }
   if (blockers.length) {
     return { rule: 'night', state: 'undetermined', winner: null, group: blockers.map(r => r.id),
-      sentence: `Shortest night: cannot call. ${w.name}'s longest night is ${fmtDuration(w.dark.hours)}, but${blockText}` }
+      sentence: `Shortest night: cannot call. ${longest(w)}, but${blockText}` }
   }
   const others = rows.filter(r => r.id !== w.id).sort((a, b) => a.dark.hours - b.dark.hours)
   const runner = others[0]
   return { rule: 'night', state: 'winner', winner: w.id, group: [],
-    sentence: `Shortest night: ${w.name}'s longest night is ${fmtDuration(w.dark.hours)}, at least 1 day shorter than every other site's (next: ${runner.name}, ${showDark(runner)}).` }
+    sentence: `Shortest night: ${longest(w)}, at least 1 day shorter than every other site's (next: ${runner.name}, ${showDark(runner)}).` }
 }
 
 function balancedRule(rows: VerdictInput[], kind: 'link' | 'earth'): RuleOutcome {

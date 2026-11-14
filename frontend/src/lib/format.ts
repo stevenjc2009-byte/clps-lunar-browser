@@ -7,6 +7,13 @@ export function fmtDuration(hours: number) {
   return `${(hours / 24).toFixed(1)} days`
 }
 
+// Longest night: "no night" when there was none (0 h reads like a number to beat), "under 1 h" for a short dip.
+export function fmtNight(hours: number) {
+  if (hours <= 0) return 'no night'
+  if (Math.round(hours) < 1) return 'under 1 h'
+  return fmtDuration(hours)
+}
+
 // Waiting times: whole hours under two days, else days.
 export function fmtWait(hours: number) {
   if (hours < 48) return `${Math.round(hours)} h`

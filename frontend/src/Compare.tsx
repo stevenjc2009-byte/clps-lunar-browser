@@ -2,7 +2,7 @@ import AfterLanding, { type Landing } from './AfterLanding'
 import Explain from './Explain'
 import { EXPLAIN } from './explanations'
 import type { Timeline } from './lib/engine'
-import { fmtDuration, listAnd } from './lib/format'
+import { fmtDuration, fmtNight, listAnd } from './lib/format'
 import type { Params } from './lib/params'
 import { BADGE_TEXT, BADGES, FLAT_WARNING, verdict, type Badge, type Verdict } from './lib/verdict'
 import type { WindowMetrics } from './lib/windowMetrics'
@@ -21,7 +21,7 @@ function Dark({ m }: { m: WindowMetrics }) {
   const d = m.longestDark
   return (
     <dd>
-      {d.status === 'at_least' ? '≥ ' : ''}{fmtDuration(d.hours)}
+      {d.status === 'at_least' ? '≥ ' : ''}{fmtNight(d.hours)}
       {d.status === 'at_least' && <span className="sub"> (at least)</span>}
       {d.startedBefore && <span className="sub block">already dark at landing; {fmtDuration(d.insideHours)} of it after landing</span>}
     </dd>

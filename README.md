@@ -52,7 +52,7 @@ No site has a stated position uncertainty (`uncertainty_m` is null for all seven
 Full detail with every number cited to a file: [`docs/METHOD.md`](docs/METHOD.md).
 
 1. **Backend** (`backend/`, Python + Skyfield) reads NASA NAIF kernels (JPL **DE440** ephemeris, DE440 Moon-orientation kernels, `MOON_ME` frame) and writes `frontend/public/sky.json`: hourly Sun and Earth altitude and azimuth for every site from 2026-09-01 to 2029-01-01 (20,473 samples), plus hourly Sun and Earth disc radius and the best Moon elevation seen from the three Deep Space Network complexes (Goldstone, Madrid, Canberra). `backend/export_vectors.py` writes `vectors.bin`, which lets the browser compute any custom location.
-2. **Frontend** (`frontend/`, React 19, TypeScript, Vite, Plotly) loads those files and runs a visibility engine (`frontend/src/lib`): hourly data is smoothed to 10-minute steps, horizon crossings are placed to the minute, and every percentage, night and badge is computed from visible time intervals.
+2. **Frontend** (`frontend/`, React 19, TypeScript, Vite, Plotly) loads those files and runs a visibility engine (`frontend/src/lib`): hourly data is smoothed to 10-minute steps, horizon crossings are placed to within a few minutes (largest check difference 2.4 min), and every percentage, night and badge is computed from visible time intervals.
 3. **Horizon.** The Sun counts as up when its top edge clears the skyline; Earth when its centre does. Defaults: observer height 2 m, mask offset 0°. The skyline comes from `horizons.json` (terrain) if that file is present, otherwise it is flat.
 4. Only static files are served, so the site can be hosted anywhere.
 

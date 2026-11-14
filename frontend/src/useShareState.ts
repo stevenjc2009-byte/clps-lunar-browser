@@ -27,8 +27,10 @@ export function useShareState() {
     setStartDay(u.day ?? defaultLandingDay(d))
     setDays(u.days ?? 365)
     setParams({ ...DEFAULT_PARAMS, ...u.params })
-    setPicked(sites.length >= 2 ? sites : defaultPicks(ids))
-    setSiteId(u.sky && known(u.sky) ? u.sky : (ids[0] ?? ''))
+    const picks = sites.length >= 2 ? sites : defaultPicks(ids)
+    setPicked(picks)
+    // Sky graph opens on the first compared site unless the link names one.
+    setSiteId(u.sky && known(u.sky) ? u.sky : (picks[0] ?? ids[0] ?? ''))
     setLinkNote(null)
     if (!u.custom) { setCustom(null); return }
     const { lat, lon } = u.custom
