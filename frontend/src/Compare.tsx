@@ -6,6 +6,7 @@ import { fmtDuration, listAnd } from './lib/format'
 import type { Params } from './lib/params'
 import { BADGE_TEXT, BADGES, FLAT_WARNING, verdict, type Badge, type Verdict } from './lib/verdict'
 import type { WindowMetrics } from './lib/windowMetrics'
+import { coordsText, siteLinks } from './siteLinks'
 import type { Site } from './types'
 
 export interface Row { site: Site; m: WindowMetrics; tl: Timeline }
@@ -24,6 +25,22 @@ function Dark({ m }: { m: WindowMetrics }) {
       {d.status === 'at_least' && <span className="sub"> (at least)</span>}
       {d.startedBefore && <span className="sub block">already dark at landing; {fmtDuration(d.insideHours)} of it after landing</span>}
     </dd>
+  )
+}
+
+// Links into NASA's LROC QuickMap and Moon Trek. If a deep link cannot be built, the tool's home page is used.
+function MapLinks({ site }: { site: Site }) {
+  const links = siteLinks(site.lat, site.lon)
+  return (
+    <p className="map-links">
+      {links.map(l => (
+        <a key={l.label} href={l.href} target="_blank" rel="noreferrer">
+          {l.label}<span className="sr-only"> for {site.name} (opens in a new tab)</span>
+        </a>
+      ))}
+      {links.some(l => !l.deep) &&
+        <span className="sub">Opens the tool's home page: search for {coordsText(site.lat, site.lon)}.</span>}
+    </p>
   )
 }
 
@@ -92,6 +109,7 @@ export default function Compare({ rows, params, explainAll, landing }: { rows: R
                 <AfterLanding ivs={tl.sun} body="Sun" cls="sun" landing={landing} />
                 <AfterLanding ivs={link ? tl.link : tl.earth} body={link ? 'Link' : 'Earth'} cls="earth" landing={landing} />
               </ul>
+              <MapLinks site={site} />
             </article>
           )
         })}
