@@ -19,7 +19,7 @@ CLPS Lunar Mission Browser
 
 ## High-Level Project Summary
 
-CLPS Lunar Mission Browser is a web tool that compares landing sites at the Moon's south pole. For any landing date, it shows how often each site sees the Sun (for solar power) and Earth (for direct radio contact), and how long its longest night lasts. It then gives a plain-language verdict: best for energy, best for communication, or balanced.
+CLPS Lunar Mission Browser is a web tool that compares landing sites at the Moon's south pole. For any landing date, it shows how often each site sees the Sun (for solar power) and Earth (for direct radio contact), and how long its longest night lasts. It then gives a plain-language verdict: best for energy, best for communication, or balanced. It also says when the Sun and Earth next rise or set after landing, and lets you add any spot on the Moon of your own.
 
 Near the pole the Sun never rises high. It skims round the horizon once a month, so small changes in place or date decide whether a lander has power and a link home. Our positions come from NASA JPL's DE421 ephemeris and NAIF lunar kernels, and match NASA JPL Horizons to within 0.00001°. An "Explain it to me" mode makes every number understandable to a student.
 
@@ -37,12 +37,14 @@ Live site: https://stevenjc2009-byte.github.io/clps-lunar-browser/
 
 **What it does**
 
-- Pick 2 or 3 south-pole sites, a landing date, and a look-ahead of 30 days (one lunar day-night cycle) or 1 year (the Moon's seasons).
+- Pick 2 to 4 south-pole sites, a landing date, and a look-ahead of 30 days (one lunar day-night cycle) or 1 year (the Moon's seasons).
 - For each site the tool shows:
   - **Sun visible:** % of hours the Sun is above the horizon. This decides solar power.
   - **Earth visible:** % of hours Earth is above the horizon. This decides direct-to-Earth communication.
   - **Longest darkness:** the longest unbroken night the lander must survive on batteries.
   - **A verdict.** The site with the most sunlight is "best for energy". The one with the most Earth time is "best for communication". Of the rest, the one with the best weaker score is "balanced".
+  - **After landing:** whether the Sun and Earth are up at the landing hour, and when the next sunrise, sunset, Earthrise or Earthset comes.
+- **Your own location:** type any latitude and longitude and it joins the comparison. It is worked out in the browser from the same NASA ephemeris.
 - A sky graph plots every hourly position of the Sun and Earth: compass direction across, height above the horizon up the side. It shows why polar sites are hard. The Sun circles just above and below the horizon, while Earth hangs in nearly the same patch of sky.
 - "Explain it to me" puts a plain-language note on every number, for students and the public.
 
@@ -51,13 +53,17 @@ Live site: https://stevenjc2009-byte.github.io/clps-lunar-browser/
 1. A Python back end uses the Skyfield library with NASA JPL's DE421 ephemeris and NASA NAIF's lunar orientation kernels (frame MOON_ME_DE421).
 2. It computes the apparent elevation and azimuth of the Sun and Earth from each site every hour for two years: 17,544 samples per site, 15 Nov 2026 to 14 Nov 2028.
 3. The React web page loads those positions and computes the comparison for whatever window the user picks.
-4. The site is static files only, so it loads fast and can be hosted anywhere.
+4. For custom locations, the back end also exports the Sun's and Earth's positions as seen from the Moon's centre (about 400 KB). The browser shifts these to any surface point and works out the sky there.
+5. The site is static files only, so it loads fast and can be hosted anywhere.
 
 **Validation**
 
 - Every position was checked against NASA JPL Horizons: 13 dates × 2 bodies × 3 sites.
 - The largest difference was 0.0000083°.
 - We confirmed the check fails when it should: shifting a site by 5° is caught.
+- The browser's custom-location maths reproduces the full calculation for the 3 built-in sites to within 0.01°, with no hour's visibility differing.
+- The after-landing times match the ephemeris to within a few minutes in our checks. The worst case was 27 minutes, when the Sun grazed the horizon.
+- 38 automated front-end tests run before every deploy, plus 16 back-end tests.
 - We compared Shackleton with a published LOLA-terrain study (Mazarico et al. 2011). Our flat-horizon model shows much longer nights than the real raised rim does: 112 days versus about 1.5 days. We explain why on the page and in the README rather than hide it.
 
 **Benefits**
@@ -71,13 +77,14 @@ Live site: https://stevenjc2009-byte.github.io/clps-lunar-browser/
 A clear, honest first look at a site before detailed terrain studies. Next steps would be:
 
 - add real terrain horizons from LRO LOLA elevation data;
-- allow custom coordinates;
-- add a timeline of the next sunrise, sunset, Earthrise and Earthset.
+- show sunlight on solar panels at a set height above the ground;
+- add relay-satellite coverage to the communication score.
 
 **Tools**
 
 - Python 3.13, Skyfield 1.55, NumPy.
 - React 19, TypeScript, Vite, Plotly.js.
+- Vitest and pytest for automated tests; GitHub Pages for hosting.
 - NASA JPL Horizons API for validation.
 - Git.
 
@@ -133,5 +140,6 @@ Software (open source):
 - Vite (MIT)
 - TypeScript (Apache-2.0)
 - Plotly.js (MIT)
+- Vitest (MIT), pytest (MIT)
 
 No Space Agency Partner data was used.
