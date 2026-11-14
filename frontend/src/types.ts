@@ -24,8 +24,11 @@ export interface Site {
   earth_az: number[]
 }
 
+export interface KernelInfo { name: string; url: string; sha256: string; bytes: number }
+
 export interface SkyData {
   meta: {
+    version?: number              // 2 for sky.json v2; absent in v1
     start_utc: string
     end_utc: string
     step_hours: number
@@ -33,9 +36,15 @@ export interface SkyData {
     ephemeris: string
     horizon: string
     // sky.json v2: the data range starts > 1 synodic month before the earliest landing date
-    version?: number
-    landing_min_utc?: string
+    kernels?: KernelInfo[]
+    generated_utc?: string
+    script_commit?: string
+    landing_min_utc?: string      // supported landing range shown in the UI (v2)
     landing_max_utc?: string
   }
+  // v2 only: hourly, same length as samples, the same for every site.
+  sun_radius_deg?: number[]
+  earth_radius_deg?: number[]
+  dsn_moon_el_max?: number[]
   sites: Site[]
 }

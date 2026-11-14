@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
-import Compare from './Compare'
+import Compare, { type Row } from './Compare'
 import CustomSite from './CustomSite'
 import Explain from './Explain'
 import LandingChart from './LandingChart'
 import { EXPLAIN } from './explanations'
-import { dataStartMs, isoDay, siteMetrics, spanFor } from './metrics'
+import { engineData, siteTimeline } from './lib/engine'
+import { isoDay } from './lib/format'
+import type { HorizonsFile } from './lib/horizon'
+import { DEFAULT_PARAMS, type Params } from './lib/params'
+import { dataEndH, dataStartMs, defaultLandingDay, landingRangeH, spanOf, windowFor, type Span } from './lib/window'
+import { windowMetrics } from './lib/windowMetrics'
 import SkyChart from './SkyChart'
 import type { Site, SkyData } from './types'
 
@@ -14,21 +19,29 @@ function fmtDay(iso: string) {
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
 }
 
-// Landing dates the UI offers: sky.json v2 carries landing_min/max_utc (the data starts earlier,
-// for context); older files start at the earliest landing date.
-function landingRange(d: SkyData, days: number): [string, string] {
-  const t0 = dataStartMs(d), stepMs = d.meta.step_hours * HOUR_MS
-  const lastFit = isoDay(t0 + (d.meta.samples - (days * 24) / d.meta.step_hours) * stepMs)
-  const lo = d.meta.landing_min_utc?.slice(0, 10) ?? isoDay(t0)
-  const hi = d.meta.landing_max_utc?.slice(0, 10)
-  return [lo, hi && hi < lastFit ? hi : lastFit]
-}
-
 const WINDOWS = [{ days: 30, label: '30 days' }, { days: 365, label: '1 year' }]
 const HOUR_MS = 3_600_000
 
+// Lowest and highest value inside the sample span (for the sky graph caption).
+function range(a: number[], span: Span): [number, number] {
+  let lo = Infinity, hi = -Infinity
+  for (let i = span.start; i < span.end; i++) { lo = Math.min(lo, a[i]); hi = Math.max(hi, a[i]) }
+  return [lo, hi]
+}
+
+// horizons.json is optional: without it every site uses the flat horizon (provisional).
+async function loadHorizons(): Promise<HorizonsFile | null> {
+  try {
+    const r = await fetch(`${import.meta.env.BASE_URL}horizons.json`)
+    if (!r.ok) return null
+    const h = await r.json() as HorizonsFile
+    return h && typeof h === 'object' && h.sites ? h : null
+  } catch { return null }
+}
+
 export default function App() {
   const [data, setData] = useState<SkyData | null>(null)
+  const [horizons, setHorizons] = useState<HorizonsFile | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [siteId, setSiteId] = useState('')
   const [picked, setPicked] = useState<string[]>([])
@@ -36,38 +49,51 @@ export default function App() {
   const [days, setDays] = useState(365)
   const [explainAll, setExplainAll] = useState(false)
   const [custom, setCustom] = useState<Site | null>(null)
+  // Model parameters (spec 6.2). No controls yet; the defaults are the engine's.
+  const [params] = useState<Params>(DEFAULT_PARAMS)
 
   useEffect(() => {
-    fetch(`${import.meta.env.BASE_URL}sky.json`)
-      .then(r => { if (!r.ok) throw new Error(`sky.json: HTTP ${r.status}`); return r.json() })
-      .then((d: SkyData) => {
+    const sky = fetch(`${import.meta.env.BASE_URL}sky.json`)
+      .then(r => { if (!r.ok) throw new Error(`sky.json: HTTP ${r.status}`); return r.json() as Promise<SkyData> })
+    Promise.all([sky, loadHorizons()])
+      .then(([d, h]) => {
+        setHorizons(h)
         setData(d)
         setSiteId(d.sites[0]?.id ?? '')
         setPicked(d.sites.slice(0, 3).map(s => s.id))
-        setStartDay(landingRange(d, 365)[0])
+        setStartDay(defaultLandingDay(d))
       })
       .catch(e => setError(String(e)))
   }, [])
 
+  const ed = useMemo(() => (data ? engineData(data, horizons) : null), [data, horizons])
   const sites = useMemo(() => (data ? [...data.sites, ...(custom ? [custom] : [])] : []), [data, custom])
-  const span = useMemo(() => (data && startDay ? spanFor(data, startDay, days) : null), [data, startDay, days])
-  const rows = useMemo(() => {
-    if (!data || !span) return []
-    return sites.filter(s => picked.includes(s.id))
-      .map(site => ({ site, m: siteMetrics(site, span, data.meta.step_hours) }))
-  }, [data, sites, span, picked])
+  const pick = useMemo(() => (data && startDay ? windowFor(data, startDay, days) : null), [data, startDay, days])
+  const rows: Row[] = useMemo(() => {
+    if (!ed || !pick) return []
+    return sites.filter(s => picked.includes(s.id)).map(site => {
+      const tl = siteTimeline(ed, site, params)
+      return { site, tl, m: windowMetrics(tl, pick.startH, pick.lenH) }
+    })
+  }, [ed, sites, pick, picked, params])
 
   if (error) return <main className="app"><p className="error">Could not load data: {error}</p></main>
-  if (!data || !span) return <main className="app"><p className="loading">Loading ephemeris data…</p></main>
+  if (!data || !pick || !ed) return <main className="app"><p className="loading">Loading ephemeris data…</p></main>
 
-  const step = data.meta.step_hours * HOUR_MS
   const t0 = dataStartMs(data)
-  const [minDay, maxDay] = landingRange(data, days)
-  const pickDay = (iso: string) => setStartDay(iso < minDay ? minDay : iso > maxDay ? maxDay : iso)
-  const fromDay = isoDay(t0 + span.start * step)
-  const toDay = isoDay(t0 + span.end * step)
+  const { minH, maxH } = landingRangeH(data, days * 24)
+  const minDay = defaultLandingDay(data)
+  const firstH = (Date.parse(`${minDay}T00:00:00Z`) - t0) / HOUR_MS
+  const maxDay = isoDay(t0 + maxH * HOUR_MS)
+  const fromDay = isoDay(t0 + pick.startH * HOUR_MS)
+  const toDay = isoDay(t0 + (pick.startH + pick.lenH) * HOUR_MS)
+  const span = spanOf(data, pick)
   const site = sites.find(s => s.id === siteId) ?? sites[0]
-  const chartM = siteMetrics(site, span, data.meta.step_hours)
+  const [sunMin, sunMax] = range(site.sun_alt, span)
+  const [earthMin, earthMax] = range(site.earth_alt, span)
+  const clampNote = pick.clamped === 'before_range' ? `That date is before the supported landing range, so the dates start on ${fmtDay(isoDay(t0 + minH * HOUR_MS))}.`
+    : pick.clamped === 'after_range' ? `That date leaves too little data for the look-ahead, so the dates start on ${fmtDay(fromDay)}.`
+      : pick.clamped === 'invalid' ? `That date could not be read, so the dates start on ${fmtDay(fromDay)}.` : null
 
   const toggle = (id: string) => setPicked(p =>
     p.includes(id) ? (p.length > 2 ? p.filter(x => x !== id) : p) : [...p, id])
@@ -93,7 +119,7 @@ export default function App() {
 
       <ol className="intro" aria-label="How to use this page">
         <li><b>Pick a landing date</b> and how far ahead to look.</li>
-        <li><b>Compare the sites:</b> hours of sunlight for power, hours with Earth in view for radio, and the longest night.</li>
+        <li><b>Compare the sites:</b> time with sunlight for power, time with a radio link home, and the longest night.</li>
         <li><b>Read the verdict</b> on each card. New to this? Press <span className="q">?</span> next to anything, or "Explain it to me".</li>
       </ol>
 
@@ -101,7 +127,7 @@ export default function App() {
         <label className="field">
           <span>Landing date (UTC)</span>
           <input type="date" value={fromDay} min={minDay} max={maxDay}
-            onChange={e => e.target.value && pickDay(e.target.value)} />
+            onChange={e => e.target.value && setStartDay(e.target.value)} />
         </label>
         <div className="field">
           <span>Look ahead</span>
@@ -114,6 +140,7 @@ export default function App() {
         </div>
         <p className="period">{fmtDay(fromDay)} → {fmtDay(toDay)}
           <Explain term="Dates" all={explainAll}>{EXPLAIN.dates}</Explain></p>
+        {clampNote && <p className="period clamp-note" role="status">{clampNote}</p>}
       </section>
 
       <section className="panel" aria-label="Compare sites">
@@ -132,8 +159,9 @@ export default function App() {
             })}
           </div>
         </div>
-        <CustomSite onSite={addCustom} explainAll={explainAll} />
-        <Compare rows={rows} explainAll={explainAll} landing={{ index: span.start, t0Ms: t0, stepHours: data.meta.step_hours }} />
+        <CustomSite onSite={addCustom} explainAll={explainAll} meta={data.meta} />
+        <Compare rows={rows} params={params} explainAll={explainAll}
+          landing={{ startH: pick.startH, t0Ms: t0, endH: dataEndH(data) }} />
       </section>
 
       <section className="panel" aria-label="Sunlight by landing date">
@@ -142,8 +170,8 @@ export default function App() {
         </div>
         <p className="how-read">How much Sun each site gets over the next {days === 365 ? 'year' : `${days} days`}, if you landed on
           that date. <b>Click the chart to pick that landing date.</b></p>
-        <LandingChart sites={rows.map(r => r.site)} days={days} stepHours={data.meta.step_hours} t0Ms={t0}
-          landingDay={fromDay} onPick={pickDay} />
+        <LandingChart lines={rows.map(r => ({ name: r.site.name, tl: r.tl }))} days={days} firstH={firstH} lastH={maxH}
+          t0Ms={t0} landingDay={fromDay} onPick={setStartDay} />
       </section>
 
       <section className="panel" aria-label="Sky graph">
@@ -164,8 +192,8 @@ export default function App() {
           up is height. Dots in the brown band, below the 0° line, are under the horizon, so hidden.</p>
         <SkyChart site={site} span={span} />
         <p className="caption">
-          Each dot is one hour, {fmtDay(fromDay)} → {fmtDay(toDay)} UTC. Sun height {chartM.sunMin.toFixed(1)}° to {chartM.sunMax.toFixed(1)}°,
-          Earth height {chartM.earthMin.toFixed(1)}° to {chartM.earthMax.toFixed(1)}°.
+          Each dot is one hour, {fmtDay(fromDay)} → {fmtDay(toDay)} UTC. Sun height {sunMin.toFixed(1)}° to {sunMax.toFixed(1)}°,
+          Earth height {earthMin.toFixed(1)}° to {earthMax.toFixed(1)}°.
           <Explain term="Why the Sun stays low" all={explainAll}>{EXPLAIN.low}</Explain>
         </p>
       </section>

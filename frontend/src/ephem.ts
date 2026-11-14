@@ -24,6 +24,19 @@ export interface Vectors {
 const FLOATS_PER_HOUR = 6
 const DEG = 180 / Math.PI
 
+// Audit B10: at the pole "north" and "east" are undefined, so azimuth would be arbitrary.
+// 89.99 deg is ~300 m from the pole on the Moon; closer than that is refused.
+export const MAX_ABS_LAT_DEG = 89.99
+
+// A custom site is compared hour by hour with the sky.json sites, so vectors.bin must use
+// the same time axis. Returns a reason when it does not, else null.
+export function vectorsMismatch(h: VectorHeader, meta: { start_utc: string; step_hours: number; samples: number }): string | null {
+  if (Date.parse(h.start_utc) !== Date.parse(meta.start_utc)) return `vectors start ${h.start_utc}, sky data starts ${meta.start_utc}`
+  if (h.step_hours !== meta.step_hours) return `vectors step ${h.step_hours} h, sky data step ${meta.step_hours} h`
+  if (h.count !== meta.samples) return `vectors hold ${h.count} hours, sky data holds ${meta.samples}`
+  return null
+}
+
 export function parseVectors(header: VectorHeader, buf: ArrayBuffer): Vectors {
   const data = new Float32Array(buf)
   if (data.length !== header.count * FLOATS_PER_HOUR) {
@@ -37,13 +50,6 @@ export async function loadVectors(url: string): Promise<Vectors> {
   const [binRes, headRes] = await Promise.all([fetch(url), fetch(url.replace(/\.bin$/, '.json'))])
   if (!binRes.ok || !headRes.ok) throw new Error(`could not load ${url}`)
   return parseVectors(await headRes.json(), await binRes.arrayBuffer())
-}
-
-// Same rule as compute.py round_keep_sign: a positive value never rounds down to 0.
-function roundKeepSign(a: number, nd: number): number {
-  const f = 10 ** nd
-  const r = Math.round(a * f) / f
-  return a > 0 && r <= 0 ? 1 / f : r
 }
 
 const round = (a: number, nd: number) => Math.round(a * 10 ** nd) / 10 ** nd
@@ -105,6 +111,9 @@ const minOf = (a: Float64Array) => a.reduce((m, v) => Math.min(m, v), Infinity)
 // Same shape (and the same stats rules) as one site entry in sky.json.
 export function computeSite(vectors: Vectors, latDeg: number, lonDeg: number, name = 'Custom location'): Site {
   const { data, header } = vectors
+  if (!Number.isFinite(latDeg) || Math.abs(latDeg) > MAX_ABS_LAT_DEG) {
+    throw new Error(`latitude must be within ±${MAX_ABS_LAT_DEG}° (azimuth is undefined at the pole)`)
+  }
   const basis = localBasis(latDeg, lonDeg)
   const sun = skyOf(data, 0, basis, header.moon_radius_km)
   const earth = skyOf(data, 3, basis, header.moon_radius_km)
@@ -125,9 +134,10 @@ export function computeSite(vectors: Vectors, latDeg: number, lonDeg: number, na
     note: 'Custom coordinates',
     source: 'computed in browser from vectors.bin',
     stats,
-    sun_alt: Array.from(sun.alt, a => roundKeepSign(a, 2)),
+    // Altitudes at full precision: rounding to 0.01 deg shifts a polar sunrise by up to ~35 min.
+    sun_alt: Array.from(sun.alt),
     sun_az: Array.from(sun.az, a => round(a, 1)),
-    earth_alt: Array.from(earth.alt, a => roundKeepSign(a, 2)),
+    earth_alt: Array.from(earth.alt),
     earth_az: Array.from(earth.az, a => round(a, 1)),
   }
 }
