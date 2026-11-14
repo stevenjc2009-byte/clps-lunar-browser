@@ -1,7 +1,7 @@
 import Explain from './Explain'
 import { EXPLAIN } from './explanations'
 import { fmtUtc, fmtWait, nextChange } from './events'
-import { bestDarkHours, fmtDuration, VERDICT_TEXT, verdicts, type Metrics } from './metrics'
+import { bestDarkHours, CLOSE_PTS, closeCall, fmtDuration, nearTop, VERDICT_TEXT, verdicts, type Metrics } from './metrics'
 import type { Site } from './types'
 
 interface Row { site: Site; m: Metrics }
@@ -21,34 +21,54 @@ function AfterLanding({ alt, body, landing }: { alt: number[]; body: 'Sun' | 'Ea
   return <li><b className={body === 'Sun' ? 'sun' : 'earth'}>{body}</b> {state} at landing, {verb} in {fmtWait(waitH)} <span className="when">({fmtUtc(ms)})</span></li>
 }
 
+// Names and values of the sites within CLOSE_PTS of the leader, e.g. "Shackleton rim 53.0%, IM-2 51.6% and IM-1 51.3%".
+function closeList(rows: Row[], score: (m: Metrics) => number, top: number) {
+  const items = rows.filter(r => nearTop(top, score(r.m)))
+    .sort((a, b) => score(b.m) - score(a.m))
+    .map(r => `${r.site.name} ${score(r.m).toFixed(1)}%`)
+  return items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0]
+}
+
 // Side-by-side comparison of the selected sites for the chosen window.
 export default function Compare({ rows, explainAll, landing }: { rows: Row[]; explainAll: boolean; landing: Landing }) {
   const verdict = verdicts(rows.map(r => ({ id: r.site.id, m: r.m })))
-  const bestSun = Math.max(...rows.map(r => r.m.sunPct))
-  const bestEarth = Math.max(...rows.map(r => r.m.earthPct))
+  const sun = closeCall(rows.map(r => r.m.sunPct))
+  const earth = closeCall(rows.map(r => r.m.earthPct))
   const bestDark = bestDarkHours(rows.map(r => r.m))
+  const tooClose = (m: Metrics) =>
+    (sun.close && nearTop(sun.top, m.sunPct)) || (earth.close && nearTop(earth.top, m.earthPct))
 
   return (
     <div className="compare">
-      <div className="compare-legend">
-        <span><b>Sun visible</b> <Explain term="Sun visible" all={explainAll}>{EXPLAIN.sun}</Explain></span>
-        <span><b>Earth visible</b> <Explain term="Earth visible" all={explainAll}>{EXPLAIN.earth}</Explain></span>
-        <span><b>Longest darkness</b> <Explain term="Longest darkness" all={explainAll}>{EXPLAIN.dark}</Explain></span>
-        <span><b>Verdict</b> <Explain term="Verdict" all={explainAll}>{EXPLAIN.verdict}</Explain></span>
-        <span><b>After landing</b> <Explain term="After landing" all={explainAll}>{EXPLAIN.next}</Explain></span>
+      <div className="caveats" role="note">
+        {sun.close && (
+          <p className="close-call"><b>Too close to call on sunlight.</b> {closeList(rows, m => m.sunPct, sun.top)} are
+            less than {CLOSE_PTS} points apart. A flat-horizon model cannot rank sites that close; real terrain decides it.
+            <Explain term="Too close to call" all={explainAll}>{EXPLAIN.close}</Explain></p>
+        )}
+        {earth.close && (
+          <p className="close-call"><b>Too close to call on Earth time.</b> {closeList(rows, m => m.earthPct, earth.top)} are
+            less than {CLOSE_PTS} points apart, so no site is named best for communication.</p>
+        )}
+        <p className="flat"><b>Flat horizon.</b> Hills and crater walls are not modelled, so real sunlight on high rims is
+          higher and nights shorter than shown.
+          <Explain term="Flat horizon" all={explainAll}>{EXPLAIN.flat}</Explain></p>
       </div>
       <div className="compare-grid">
         {rows.map(({ site, m }) => {
           const v = verdict[site.id]
+          const close = !v && tooClose(m)
           return (
             <article key={site.id} className="compare-card">
               <h3>{site.name}</h3>
-              <p className={`verdict ${v ?? 'none'}`}>{v ? VERDICT_TEXT[v] : 'No top score'}</p>
+              <p className={`verdict ${v ?? (close ? 'close' : 'none')}`}>
+                {v ? VERDICT_TEXT[v] : close ? 'Too close to call' : 'No top score'}
+              </p>
               <dl>
-                <div className={m.sunPct === bestSun ? 'best' : ''}>
+                <div className={!sun.close && m.sunPct === sun.top ? 'best' : ''}>
                   <dt>Sun visible</dt><dd className="sun">{m.sunPct.toFixed(1)}%</dd>
                 </div>
-                <div className={m.earthPct === bestEarth ? 'best' : ''}>
+                <div className={!earth.close && m.earthPct === earth.top ? 'best' : ''}>
                   <dt>Earth visible</dt><dd className="earth">{m.earthPct.toFixed(1)}%</dd>
                 </div>
                 <div className={!m.darkCut && m.longestDarkHours === bestDark ? 'best' : ''}>
@@ -64,6 +84,19 @@ export default function Compare({ rows, explainAll, landing }: { rows: Row[]; ex
           )
         })}
       </div>
+      <dl className="card-key" aria-label="How to read the cards">
+        <div><dt className="sun">Sun visible <Explain term="Sun visible" all={explainAll}>{EXPLAIN.sun}</Explain></dt>
+          <dd>Share of hours the Sun is up: solar power. Higher is better.</dd></div>
+        <div><dt className="earth">Earth visible <Explain term="Earth visible" all={explainAll}>{EXPLAIN.earth}</Explain></dt>
+          <dd>Share of hours Earth is up: direct radio home. Higher is better.</dd></div>
+        <div><dt>Longest darkness <Explain term="Longest darkness" all={explainAll}>{EXPLAIN.dark}</Explain></dt>
+          <dd>Longest night on batteries. Shorter is better. ≥ means it runs past our data.</dd></div>
+        <div><dt>Verdict <Explain term="Verdict" all={explainAll}>{EXPLAIN.verdict}</Explain></dt>
+          <dd>One-line summary of the scores.</dd></div>
+        <div><dt>After landing <Explain term="After landing" all={explainAll}>{EXPLAIN.next}</Explain></dt>
+          <dd>Sun and Earth at the landing hour, and when that next changes.</dd></div>
+        <div><dt>★</dt><dd>Best of the sites shown. Left off a score that is too close to call.</dd></div>
+      </dl>
     </div>
   )
 }

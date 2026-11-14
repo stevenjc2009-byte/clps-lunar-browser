@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Compare from './Compare'
 import CustomSite from './CustomSite'
 import Explain from './Explain'
+import LandingChart from './LandingChart'
 import { EXPLAIN } from './explanations'
 import { dataStartMs, isoDay, siteMetrics, spanFor } from './metrics'
 import SkyChart from './SkyChart'
@@ -70,6 +71,7 @@ export default function App() {
     <main className="app">
       <header>
         <div>
+          <p className="eyebrow">NASA Space Apps Challenge 2026 · Lunar Landing Site Navigator</p>
           <h1>CLPS Lunar Mission Browser</h1>
           <p className="tagline">Compare Moon south-pole landing sites: when is the Sun up for power, and when can you see Earth to phone home?</p>
         </div>
@@ -78,6 +80,12 @@ export default function App() {
           {explainAll ? 'Hide explanations' : 'Explain it to me'}
         </button>
       </header>
+
+      <ol className="intro" aria-label="How to use this page">
+        <li><b>Pick a landing date</b> and how far ahead to look.</li>
+        <li><b>Compare the sites:</b> hours of sunlight for power, hours with Earth in view for radio, and the longest night.</li>
+        <li><b>Read the verdict</b> on each card. New to this? Press <span className="q">?</span> next to anything, or "Explain it to me".</li>
+      </ol>
 
       <section className="panel controls" aria-label="Dates">
         <label className="field">
@@ -118,6 +126,16 @@ export default function App() {
         <Compare rows={rows} explainAll={explainAll} landing={{ index: span.start, t0Ms: t0, stepHours: data.meta.step_hours }} />
       </section>
 
+      <section className="panel" aria-label="Sunlight by landing date">
+        <div className="section-head">
+          <h2>Sunlight by landing date <Explain term="Sunlight by landing date" all={explainAll}>{EXPLAIN.landing}</Explain></h2>
+        </div>
+        <p className="how-read">How much Sun each site gets over the next {days === 365 ? 'year' : `${days} days`}, if you landed on
+          that date. <b>Click the chart to pick that landing date.</b></p>
+        <LandingChart sites={rows.map(r => r.site)} days={days} stepHours={data.meta.step_hours} t0Ms={t0}
+          landingDay={fromDay} onPick={setStartDay} />
+      </section>
+
       <section className="panel" aria-label="Sky graph">
         <div className="section-head">
           <h2>Sky graph <Explain term="Sky graph" all={explainAll}>{EXPLAIN.graph}</Explain></h2>
@@ -131,6 +149,9 @@ export default function App() {
           </nav>
         </div>
         <p className="coords">{fmtLat(site.lat)}, {fmtLon(site.lon)} · {site.note}</p>
+        <p className="how-read"><b>What am I looking at?</b> The sky seen from this site. Each dot is where the
+          <span className="sun"> Sun</span> or <span className="earth">Earth</span> was at one hour: across is compass direction,
+          up is height. Dots in the brown band, below the 0° line, are under the horizon, so hidden.</p>
         <SkyChart site={site} span={span} />
         <p className="caption">
           Each dot is one hour, {fmtDay(fromDay)} → {fmtDay(toDay)} UTC. Sun height {chartM.sunMin.toFixed(1)}° to {chartM.sunMax.toFixed(1)}°,
@@ -139,13 +160,11 @@ export default function App() {
         </p>
       </section>
 
-      <section className="panel note" aria-label="Assumption">
-        <p><b>Flat horizon.</b> Local hills and crater walls are not modelled, so real sunlight on high rims is higher and nights shorter than shown.
-          <Explain term="Flat horizon" all={explainAll}>{EXPLAIN.flat}</Explain></p>
-      </section>
-
       <footer>
-        <p>Positions: NASA JPL DE421 ephemeris and NAIF lunar orientation kernels via Skyfield, checked against NASA JPL Horizons. {data.meta.horizon}. Hourly samples.</p>
+        <p>Positions: NASA JPL DE421 ephemeris and NAIF lunar orientation kernels via Skyfield, checked against NASA JPL Horizons
+          to within 0.00001°. Model: {data.meta.horizon}. Hourly samples, 15 Nov 2026 to 14 Nov 2028.</p>
+        <p>Made by <b>The Big Four</b> ·{' '}
+          <a href="https://github.com/stevenjc2009-byte/clps-lunar-browser#readme" target="_blank" rel="noreferrer">Method, sources and code</a></p>
       </footer>
     </main>
   )

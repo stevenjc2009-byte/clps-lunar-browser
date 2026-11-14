@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bestDarkHours, fmtDuration, siteMetrics, spanFor, verdicts, type Metrics } from './metrics'
+import { bestDarkHours, CLOSE_PTS, closeCall, fmtDuration, siteMetrics, spanFor, verdicts, type Metrics } from './metrics'
 import type { Site, SkyData } from './types'
 
 const START = '2026-11-15T00:00:00Z'
@@ -79,12 +79,28 @@ describe('siteMetrics', () => {
     expect(r.darkCut).toBe(false)
     expect(r.sunPct).toBe(42.9) // 3 of 7
   })
-  it('dark run touching the start is cut', () => {
+  it('dark run already going at landing counts from landing and is not cut', () => {
     const r = siteMetrics(makeSite([-1, -1, 3, 3, 3]), { start: 0, end: 5 }, 1)
     expect(r.longestDarkHours).toBe(2)
-    expect(r.darkCut).toBe(true)
+    expect(r.darkCut).toBe(false)
   })
-  it('dark run touching the end is cut', () => {
+  it('a night still going at the window end is followed into the later data', () => {
+    const r = siteMetrics(makeSite([3, 3, -1, -1, -1, -1, 3]), { start: 0, end: 4 }, 1)
+    expect(r.longestDarkHours).toBe(4) // 2 h inside the window + 2 h after it
+    expect(r.darkCut).toBe(false)
+    expect(r.sunPct).toBe(50) // Sun % still counts the window only
+  })
+  it('the followed night can beat a longer-looking night inside the window', () => {
+    const r = siteMetrics(makeSite([-1, -1, -1, 3, -1, -1, -1, -1, -1]), { start: 0, end: 5 }, 1)
+    expect(r.longestDarkHours).toBe(5) // the 3 h night loses to 1 h + 4 h after the window
+    expect(r.darkCut).toBe(true) // and that night reaches the end of the data
+  })
+  it('a followed night shorter than the longest does not change it', () => {
+    const r = siteMetrics(makeSite([3, -1, -1, -1, 3, -1, -1, 3]), { start: 0, end: 6 }, 1)
+    expect(r.longestDarkHours).toBe(3)
+    expect(r.darkCut).toBe(false)
+  })
+  it('dark run touching the end of the data is cut', () => {
     const r = siteMetrics(makeSite([3, 3, 3, -1, -1]), { start: 0, end: 5 }, 1)
     expect(r.longestDarkHours).toBe(2)
     expect(r.darkCut).toBe(true)
@@ -138,32 +154,42 @@ describe('verdicts', () => {
     ])
     expect(v).toEqual({ sun: 'energy', earth: 'comms', mid: 'balanced' })
   })
-  it('energy tie on Sun % is broken by shorter darkness', () => {
+  it('Sun % within 2 points is too close to call: nobody gets energy', () => {
     const v = verdicts([
       { id: 'a', m: m(80, 10, 40) },
-      { id: 'b', m: m(80, 20, 10) },
+      { id: 'b', m: m(78.1, 20, 10) },
       { id: 'c', m: m(10, 90, 99) },
     ])
-    expect(v.b).toBe('energy')
-    expect(v.a).not.toBe('energy')
-    expect(v.c).toBe('comms')
+    expect(v).toEqual({ a: null, b: 'balanced', c: 'comms' })
   })
-  it('energy tie on both Sun % and darkness shares the label', () => {
+  it('darkness no longer breaks a Sun tie', () => {
     const v = verdicts([
-      { id: 'a', m: m(80, 10, 10) },
-      { id: 'b', m: m(80, 20, 10) },
+      { id: 'a', m: m(80, 10, 400) },
+      { id: 'b', m: m(80, 10, 10) },
       { id: 'c', m: m(10, 90, 99) },
     ])
-    expect(v.a).toBe('energy')
-    expect(v.b).toBe('energy')
+    expect(v.a).not.toBe('energy')
+    expect(v.b).not.toBe('energy')
   })
-  it('comms tie is shared', () => {
+  it('Earth % within 2 points is too close to call: nobody gets comms', () => {
     const v = verdicts([
       { id: 'a', m: m(90, 50, 1) },
       { id: 'b', m: m(10, 70, 9) },
-      { id: 'c', m: m(20, 70, 9) },
+      { id: 'c', m: m(20, 69, 9) },
     ])
-    expect(v).toEqual({ a: 'energy', b: 'comms', c: 'comms' })
+    expect(v).toEqual({ a: 'energy', b: null, c: 'balanced' })
+  })
+  it('a lead of exactly 2.0 points counts; 1.9 does not', () => {
+    expect(verdicts([{ id: 'a', m: m(52.1, 10) }, { id: 'b', m: m(50.1, 90) }]).a).toBe('energy')
+    expect(verdicts([{ id: 'a', m: m(52.0, 10) }, { id: 'b', m: m(50.1, 90) }]).a).toBe('balanced')
+  })
+  it('default 1-year view: Sun too close, IM-1 comms, IM-2 balanced', () => {
+    const v = verdicts([
+      { id: 'shackleton', m: m(53.0, 45.8) },
+      { id: 'im2', m: m(51.6, 73.3) },
+      { id: 'im1', m: m(51.3, 100) },
+    ])
+    expect(v).toEqual({ shackleton: null, im2: 'balanced', im1: 'comms' })
   })
   it('one site winning both gets "both"', () => {
     const v = verdicts([
@@ -199,9 +225,22 @@ describe('verdicts', () => {
     ])
     expect(v).toEqual({ a: 'both', b: 'balanced' })
   })
-  it('identical sites all share "both"', () => {
+  it('identical sites are too close on both scores and share "balanced"', () => {
     const v = verdicts([{ id: 'a', m: m(50, 50, 5) }, { id: 'b', m: m(50, 50, 5) }])
-    expect(v).toEqual({ a: 'both', b: 'both' })
+    expect(v).toEqual({ a: 'balanced', b: 'balanced' })
+  })
+})
+
+describe('closeCall', () => {
+  it('flags a lead under CLOSE_PTS', () => {
+    expect(closeCall([53.0, 51.6, 51.3])).toEqual({ close: true, top: 53.0, next: 51.6 })
+  })
+  it('a clear lead is not close, whatever the input order', () => {
+    expect(closeCall([45.8, 100, 73.3])).toEqual({ close: false, top: 100, next: 73.3 })
+  })
+  it('a single value is never close', () => {
+    expect(closeCall([40]).close).toBe(false)
+    expect(CLOSE_PTS).toBe(2)
   })
 })
 
@@ -215,14 +254,6 @@ describe('bestDarkHours', () => {
   })
   it('has no best when every night is cut off', () => {
     expect(bestDarkHours([m(50, 50, 40, true), m(50, 50, 30, true)])).toBeNull()
-  })
-})
-
-describe('energy tie-break with a cut-off night', () => {
-  it('does not award energy to a tied site only because its night was cut off', () => {
-    const v = verdicts([{ id: 'a', m: m(50, 10, 5, true) }, { id: 'b', m: m(50, 20, 100) }])
-    expect(v.b === 'energy' || v.b === 'both').toBe(true)
-    expect(v.a).not.toBe('energy')
   })
 })
 
