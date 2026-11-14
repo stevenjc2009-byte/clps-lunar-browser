@@ -21,9 +21,14 @@ export const PRESETS: readonly Preset[] = [
     params: p({}),
   },
   {
-    id: 'cautious', name: 'Cautious: 5° mask, whole Earth disc',
-    why: 'Pretends the skyline is 5° higher everywhere, a safety margin for things the map misses such as boulders, and only counts Earth once all of it is above that; near the pole the Sun never climbs more than a few degrees, so some sites then get no Sun at all.',
-    params: p({ maskOffsetDeg: 5, earthRule: 'whole_disc' }),
+    id: 'cautious', name: 'Cautious radio: whole Earth disc, DSN ≥ 15°',
+    why: 'Only counts Earth once all of it is above the skyline, and only counts radio time when a Deep Space Network dish sees the Moon at least 15° up: a careful estimate of time to talk home.',
+    params: p({ earthRule: 'whole_disc', dsnMinElDeg: 15 }),
+  },
+  {
+    id: 'skyline-3', name: 'Skyline 3° higher',
+    why: 'Pretends the skyline is 3° higher everywhere, a margin for things the map misses such as boulders. Near the pole the Sun never climbs more than a few degrees, so some sites then get no Sun at all: this shows how much the answer depends on the exact skyline.',
+    params: p({ maskOffsetDeg: 3 }),
   },
   {
     id: 'tall-mast', name: 'Tall mast: 5 m',

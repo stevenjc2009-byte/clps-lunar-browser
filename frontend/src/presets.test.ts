@@ -29,7 +29,8 @@ describe('presets', () => {
   })
   it('names match what they change', () => {
     const get = (id: string) => PRESETS.find(pr => pr.id === id)!.params
-    expect(get('cautious')).toEqual({ ...DEFAULT_PARAMS, maskOffsetDeg: 5, earthRule: 'whole_disc' })
+    expect(get('cautious')).toEqual({ ...DEFAULT_PARAMS, earthRule: 'whole_disc', dsnMinElDeg: 15 })
+    expect(get('skyline-3')).toEqual({ ...DEFAULT_PARAMS, maskOffsetDeg: 3 })
     expect(get('tall-mast')).toEqual({ ...DEFAULT_PARAMS, observerHeightM: 5 })
     expect(get('strict-radio')).toEqual({ ...DEFAULT_PARAMS, dsnMinElDeg: 15 })
   })
