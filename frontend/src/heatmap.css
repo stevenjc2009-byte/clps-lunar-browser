@@ -1,0 +1,89 @@
+/* Landing heatmap, compare-dates, presets and mission panels. Uses the app's :root colours. */
+
+.hm-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.heatmap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.heatmap .seg, .cd .seg { flex-wrap: wrap; }
+.hm-controls { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; }
+.hm-body { display: flex; align-items: flex-start; gap: 8px; }
+.hm-labels { flex: none; margin: 0; padding: 0; list-style: none; max-width: 38%; min-width: 0; }
+.hm-labels li {
+  display: flex; align-items: center; gap: 2px; padding-right: 4px; font-size: 0.8rem; color: #cfdaf0;
+  white-space: nowrap; line-height: 1;
+}
+.hm-name { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.hm-labels li.on { color: var(--text); font-weight: 700; }
+.hm-prov { flex: none; color: var(--sun); font-weight: 700; }
+.hm-scroll {
+  flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; border-radius: 6px; outline: none;
+  padding-bottom: 2px;
+}
+.hm-scroll:focus-visible { box-shadow: 0 0 0 2px var(--earth); }
+.hm-scroll canvas { display: block; cursor: pointer; touch-action: pan-x; }
+.hm-readout { margin: 0; min-height: 1.4em; font-size: 0.88rem; color: var(--text); font-variant-numeric: tabular-nums; }
+.hm-note { margin: 0; font-size: 0.8rem; color: var(--muted); }
+.hm-empty { color: var(--muted); }
+
+.hm-legend { display: grid; gap: 4px; font-size: 0.78rem; color: var(--muted); }
+.hm-legend-title { color: #cfdaf0; font-weight: 600; }
+.hm-legend-row { display: flex; align-items: flex-start; gap: 8px; }
+.hm-legend-end { flex: none; padding-top: 1px; }
+.hm-legend-bar-wrap { flex: 1; max-width: 360px; }
+.hm-legend-bar { height: 12px; border-radius: 3px; border: 1px solid var(--border); }
+.hm-legend-ticks { position: relative; height: 16px; }
+.hm-legend-ticks span { position: absolute; top: 2px; transform: translateX(-50%); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hm-legend-keys { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 2px; }
+.hm-legend-keys i { display: inline-block; vertical-align: middle; margin-right: 4px; }
+.hm-key-best { width: 16px; height: 3px; background: #fff; }
+.hm-key-hatch {
+  width: 14px; height: 12px; border: 1px solid var(--border);
+  background: repeating-linear-gradient(135deg, #21908d 0 3px, #04060d 3px 4.5px);
+}
+.hm-key-now { width: 2px; height: 12px; background: #fff; box-shadow: 0 0 0 1px #04060d; }
+
+.hm-reco { padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: #070b16; font-size: 0.88rem; color: #cfdaf0; }
+.hm-reco p { margin: 0 0 6px; line-height: 1.45; }
+.hm-reco p:last-child { margin-bottom: 0; }
+.hm-reco ul { margin: 0 0 6px; padding: 0; list-style: none; display: grid; gap: 6px; }
+.hm-reco li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-variant-numeric: tabular-nums; }
+.hm-use, .cd-btn {
+  background: #13213f; color: var(--text); border: 1px solid var(--earth); border-radius: 999px;
+  padding: 4px 12px; font: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+}
+.hm-use:hover, .cd-btn:hover { background: #1a2a4f; }
+.hm-use:focus-visible, .cd-btn:focus-visible { outline: 2px solid var(--earth); outline-offset: 2px; }
+.hm-flat { color: var(--muted); font-size: 0.82rem; }
+
+/* Compare dates */
+.cd { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.cd-pick { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; }
+.cd-pick input[type=date] {
+  background: #070b16; color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font: inherit; font-size: 0.95rem; color-scheme: dark;
+}
+.cd-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; font-variant-numeric: tabular-nums; }
+.cd-table th, .cd-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+.cd-table th:first-child, .cd-table td:first-child { text-align: left; }
+.cd-table thead th { color: var(--muted); font-weight: 600; font-size: 0.8rem; }
+.cd-table td.sun { color: var(--sun); }
+.cd-table td.earth { color: var(--earth); }
+.cd-delta.better { color: #7ee0a0; }
+.cd-delta.worse { color: #ff9b9b; }
+.cd-delta.same { color: var(--muted); }
+.cd-note { margin: 0; font-size: 0.8rem; color: var(--muted); }
+.cd-scroll { overflow-x: auto; }
+
+/* Presets */
+.preset { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; font-size: 0.85rem; color: var(--muted); }
+.preset select {
+  background: #070b16; color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font: inherit; font-size: 0.95rem; color-scheme: dark; max-width: 100%;
+}
+.preset-why { margin: 0; color: #cfdaf0; font-size: 0.84rem; line-height: 1.4; }
+
+/* Mission framing */
+.mission { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.mission section { background: #070b16; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.mission h3 { margin: 0 0 6px; font-size: 0.95rem; }
+.mission ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 0.86rem; color: #cfdaf0; line-height: 1.45; }
+.mission p { margin: 0 0 6px; font-size: 0.86rem; color: #cfdaf0; line-height: 1.45; }
