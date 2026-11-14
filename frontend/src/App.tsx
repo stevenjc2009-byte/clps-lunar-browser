@@ -1,17 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
-import Compare, { type Row } from './Compare'
+import { useMemo, useState } from 'react'
+import Compare from './Compare'
+import Controls, { CopyLink } from './Controls'
 import CustomSite from './CustomSite'
 import Explain from './Explain'
 import LandingChart from './LandingChart'
+import Sensitivity from './Sensitivity'
 import { EXPLAIN } from './explanations'
-import { engineData, siteTimeline } from './lib/engine'
 import { isoDay } from './lib/format'
-import type { HorizonsFile } from './lib/horizon'
-import { DEFAULT_PARAMS, type Params } from './lib/params'
 import { dataEndH, dataStartMs, defaultLandingDay, landingRangeH, spanOf, windowFor, type Span } from './lib/window'
-import { windowMetrics } from './lib/windowMetrics'
 import SkyChart from './SkyChart'
-import type { Site, SkyData } from './types'
+import { useShareState, useUrlSync } from './useShareState'
+import { useEngineRows, useSkyData } from './worker/useEngine'
 
 function fmtLat(lat: number) { return `${Math.abs(lat).toFixed(2)}° ${lat < 0 ? 'S' : 'N'}` }
 function fmtLon(lon: number) { return `${Math.abs(lon).toFixed(2)}° ${lon < 0 ? 'W' : 'E'}` }
@@ -29,53 +28,24 @@ function range(a: number[], span: Span): [number, number] {
   return [lo, hi]
 }
 
-// horizons.json is optional: without it every site uses the flat horizon (provisional).
-async function loadHorizons(): Promise<HorizonsFile | null> {
-  try {
-    const r = await fetch(`${import.meta.env.BASE_URL}horizons.json`)
-    if (!r.ok) return null
-    const h = await r.json() as HorizonsFile
-    return h && typeof h === 'object' && h.sites ? h : null
-  } catch { return null }
-}
-
 export default function App() {
-  const [data, setData] = useState<SkyData | null>(null)
-  const [horizons, setHorizons] = useState<HorizonsFile | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [siteId, setSiteId] = useState('')
-  const [picked, setPicked] = useState<string[]>([])
-  const [startDay, setStartDay] = useState('')
-  const [days, setDays] = useState(365)
   const [explainAll, setExplainAll] = useState(false)
-  const [custom, setCustom] = useState<Site | null>(null)
-  // Model parameters (spec 6.2). No controls yet; the defaults are the engine's.
-  const [params] = useState<Params>(DEFAULT_PARAMS)
+  // Everything a shared link carries; starts from the URL hash (url.ts), defaults otherwise.
+  const share = useShareState()
+  const { siteId, setSiteId, picked, toggle, startDay, setStartDay, days, setDays, params, setParams, custom, addCustom } = share
+  // Loads the data, starts the engine (a Web Worker when possible, see worker/) and applies the URL.
+  const { data, horizons, ed, client, error } = useSkyData(share.init)
 
-  useEffect(() => {
-    const sky = fetch(`${import.meta.env.BASE_URL}sky.json`)
-      .then(r => { if (!r.ok) throw new Error(`sky.json: HTTP ${r.status}`); return r.json() as Promise<SkyData> })
-    Promise.all([sky, loadHorizons()])
-      .then(([d, h]) => {
-        setHorizons(h)
-        setData(d)
-        setSiteId(d.sites[0]?.id ?? '')
-        setPicked(d.sites.slice(0, 3).map(s => s.id))
-        setStartDay(defaultLandingDay(d))
-      })
-      .catch(e => setError(String(e)))
-  }, [])
-
-  const ed = useMemo(() => (data ? engineData(data, horizons) : null), [data, horizons])
   const sites = useMemo(() => (data ? [...data.sites, ...(custom ? [custom] : [])] : []), [data, custom])
   const pick = useMemo(() => (data && startDay ? windowFor(data, startDay, days) : null), [data, startDay, days])
-  const rows: Row[] = useMemo(() => {
-    if (!ed || !pick) return []
-    return sites.filter(s => picked.includes(s.id)).map(site => {
-      const tl = siteTimeline(ed, site, params)
-      return { site, tl, m: windowMetrics(tl, pick.startH, pick.lenH) }
-    })
-  }, [ed, sites, pick, picked, params])
+  const compared = useMemo(() => sites.filter(s => picked.includes(s.id)), [sites, picked])
+  const win = useMemo(() => (pick ? { startH: pick.startH, lenH: pick.lenH } : null), [pick])
+  const { rows, busy, error: engineError } = useEngineRows(client, compared, params, win)
+  const t0Ms = data ? dataStartMs(data) : 0
+  useUrlSync(data && pick && siteId ? {
+    day: isoDay(t0Ms + pick.startH * HOUR_MS), days, sky: siteId, params, custom: custom && { lat: custom.lat, lon: custom.lon },
+    sites: picked.filter(id => sites.some(s => s.id === id)),
+  } : null, share.markWritten)
 
   if (error) return <main className="app"><p className="error">Could not load data: {error}</p></main>
   if (!data || !pick || !ed) return <main className="app"><p className="loading">Loading ephemeris data…</p></main>
@@ -94,14 +64,6 @@ export default function App() {
   const clampNote = pick.clamped === 'before_range' ? `That date is before the supported landing range, so the dates start on ${fmtDay(isoDay(t0 + minH * HOUR_MS))}.`
     : pick.clamped === 'after_range' ? `That date leaves too little data for the look-ahead, so the dates start on ${fmtDay(fromDay)}.`
       : pick.clamped === 'invalid' ? `That date could not be read, so the dates start on ${fmtDay(fromDay)}.` : null
-
-  const toggle = (id: string) => setPicked(p =>
-    p.includes(id) ? (p.length > 2 ? p.filter(x => x !== id) : p) : [...p, id])
-  const addCustom = (s: Site) => {
-    setCustom(s)
-    setPicked(p => (p.includes(s.id) ? p : [...p, s.id]))
-    setSiteId(s.id)
-  }
 
   return (
     <main className="app">
@@ -141,6 +103,13 @@ export default function App() {
         <p className="period">{fmtDay(fromDay)} → {fmtDay(toDay)}
           <Explain term="Dates" all={explainAll}>{EXPLAIN.dates}</Explain></p>
         {clampNote && <p className="period clamp-note" role="status">{clampNote}</p>}
+        {share.linkNote && <p className="period clamp-note" role="status">{share.linkNote}</p>}
+        <CopyLink explainAll={explainAll} />
+      </section>
+
+      <section className="panel" aria-label="Model settings">
+        <div className="section-head"><h2>Model settings</h2></div>
+        <Controls params={params} onChange={setParams} explainAll={explainAll} dsnLoaded={ed.dsnLoaded} busy={busy} />
       </section>
 
       <section className="panel" aria-label="Compare sites">
@@ -160,8 +129,17 @@ export default function App() {
           </div>
         </div>
         <CustomSite onSite={addCustom} explainAll={explainAll} meta={data.meta} />
-        <Compare rows={rows} params={params} explainAll={explainAll}
-          landing={{ startH: pick.startH, t0Ms: t0, endH: dataEndH(data) }} />
+        <div className={busy && rows.length ? 'compare-busy' : ''} aria-busy={busy} data-testid="compare">
+          {engineError && <p className="error" role="alert">Could not work out the numbers: {engineError}</p>}
+          {rows.length
+            ? <Compare rows={rows} params={params} explainAll={explainAll}
+                landing={{ startH: pick.startH, t0Ms: t0, endH: dataEndH(data) }} />
+            : !engineError && <p className="compare-wait" role="status">Working out the numbers…</p>}
+        </div>
+      </section>
+
+      <section className="panel" aria-label="How sure are these numbers">
+        <Sensitivity client={client} sites={compared} params={params} win={pick} explainAll={explainAll} />
       </section>
 
       <section className="panel" aria-label="Sunlight by landing date">
@@ -200,10 +178,13 @@ export default function App() {
 
       <footer>
         <p>Positions: NASA JPL DE440 ephemeris and NAIF lunar orientation kernels via Skyfield, checked against NASA JPL Horizons
-          to within 0.002 arcseconds. Model: {data.meta.horizon}. Hourly samples, {fmtDay(data.meta.start_utc.slice(0, 10))} to{' '}
+          to within 0.002 arcseconds. Horizon: {horizons ? 'LOLA terrain horizons' : 'flat horizon'}. Hourly samples, {fmtDay(data.meta.start_utc.slice(0, 10))} to{' '}
           {fmtDay(data.meta.end_utc.slice(0, 10))}; landing dates {fmtDay(minDay)} to {fmtDay(maxDay)}.</p>
         <p>Made by <b>The Big Four</b> ·{' '}
           <a href="https://github.com/stevenjc2009-byte/clps-lunar-browser#readme" target="_blank" rel="noreferrer">Method, sources and code</a></p>
+        <p>Not an official NASA product. Built for the NASA Space Apps Challenge 2026.</p>
+        <p className="footer-stamp">Build {__BUILD_COMMIT__} · data version {data.meta.version ?? 1}
+          {data.meta.generated_utc ? ` · data generated ${fmtDay(data.meta.generated_utc.slice(0, 10))}` : ''}</p>
       </footer>
     </main>
   )

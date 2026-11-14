@@ -1,0 +1,41 @@
+/* Model settings, Copy link and the sensitivity table. Uses the colour tokens from index.css. */
+.ctl-grid { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start; }
+.ctl-grid .seg button:disabled { color: var(--muted); cursor: not-allowed; opacity: 0.6; }
+.ctl-note { color: var(--muted); font-size: 0.78rem; max-width: 260px; }
+.ctl-defaults { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 0.82rem; min-height: 1.2em; }
+
+.copy-link { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+.copy-btn {
+  background: #13213f; color: var(--text); border: 1px solid var(--earth); border-radius: 8px;
+  padding: 7px 14px; font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+.copy-btn:hover { background: #1a2a4f; }
+.copy-manual { flex-basis: 100%; }
+.copy-manual input {
+  width: 100%; background: #070b16; color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 0.85rem;
+}
+
+.compare-busy { opacity: 0.6; transition: opacity 0.15s; }
+.compare-wait { color: var(--muted); font-size: 0.9rem; }
+
+.sens > summary { cursor: pointer; list-style: revert; }
+.sens > summary h2 { display: inline; margin: 0; font-size: 1.15rem; }
+.sens[open] > summary { margin-bottom: 10px; }
+.sens-progress, .sens-summary { margin: 6px 0; font-size: 0.88rem; color: #cfdaf0; }
+.sens-summary { padding: 8px 12px; border-radius: 8px; background: #0a1226; border: 1px solid var(--border); }
+.sens-spread { margin: 6px 0 10px; padding-left: 20px; font-size: 0.85rem; color: #cfdaf0; line-height: 1.5; }
+.sens-scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--border); border-radius: 10px; }
+.sens-table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+.sens-table th, .sens-table td { padding: 6px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+.sens-table thead th { background: #070b16; position: sticky; top: 0; }
+.sens-table td span { display: block; white-space: nowrap; }
+.sens-sun { color: var(--sun); }
+.sens-link { color: var(--earth); }
+.sens-night { color: var(--text); }
+.sens-group th { background: #0a1226; color: var(--muted); font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.sens-now { background: #111c35; }
+.sens-tag { color: var(--muted); font-weight: 500; font-size: 0.75rem; }
+.sens-flip { display: block; color: #ffd27a; font-weight: 600; font-size: 0.75rem; }
+
+.footer-stamp { color: var(--muted); font-size: 0.78rem; }
