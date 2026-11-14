@@ -167,3 +167,64 @@ footer a:hover { text-decoration: underline; }
 .why { margin: 12px 0 0; font-size: 0.86rem; color: #cfdaf0; }
 .why summary { cursor: pointer; color: var(--muted); }
 .why ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; line-height: 1.45; }
+
+/* ---- sky graph legend, map links, text alternatives ---- */
+.sky-legend { margin: 10px 4px 0; display: grid; gap: 6px; }
+.sky-key { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--muted); }
+.sky-key .ramp { display: inline-block; width: 90px; height: 12px; border-radius: 6px; border: 1px solid #667aa6; }
+.sky-note { margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+.sky-note b { color: #e8dcc0; }
+.sky-scale { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sky-scale svg { flex: none; max-width: 100%; }
+.sky-scale .sky-note { flex: 1 1 220px; }
+.sky-table { margin: 10px 4px 0; font-size: 0.85rem; color: #cfdaf0; }
+.sky-table summary { cursor: pointer; color: var(--muted); min-height: 44px; display: flex; align-items: center; }
+.table-scroll { overflow-x: auto; max-width: 100%; }
+.sky-table table { border-collapse: collapse; width: 100%; min-width: 440px; }
+.sky-table th, .sky-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); text-align: right; white-space: nowrap; }
+.sky-table th[scope=row], .sky-table thead th:first-child { text-align: left; font-weight: 600; }
+.sky-table thead th { color: var(--muted); font-weight: 600; }
+.map-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; padding: 8px 0 0; border-top: 1px solid var(--border); font-size: 0.84rem; }
+.map-links a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 8px;
+  border: 1px solid #667aa6; color: var(--earth); text-decoration: none; background: #0a1226;
+}
+.map-links a:hover { background: #12203d; text-decoration: underline; }
+.map-links .sub { flex-basis: 100%; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* ---- accessibility ---- */
+/* Control borders were #1d2840 (1.3:1). Interactive boundaries need 3:1 against their background. */
+.field input[type=date], .custom input, .seg, .custom-go, .pick, .site-tabs button, .explain-btn { border-color: #667aa6; }
+.pick.on { border-color: #8fa3cc; }
+:focus-visible { outline: 3px solid #ffffff; outline-offset: 2px; box-shadow: 0 0 0 2px #04060d; border-radius: 4px; }
+.explain-btn:focus-visible, .pick:focus-within { border-radius: 999px; }
+.pick:focus-within { outline: 3px solid #ffffff; outline-offset: 2px; }
+.pick input:focus-visible { outline: none; box-shadow: none; }
+
+/* 44 x 44 px touch targets */
+.seg button, .site-tabs button, .custom-go, .explain-all { min-height: 44px; }
+.pick { min-height: 44px; padding-top: 0; padding-bottom: 0; }
+.field input[type=date], .custom input { min-height: 44px; }
+.explain-btn { position: relative; }
+.explain-btn::after { content: ''; position: absolute; inset: -12px; }
+.why summary, .caveats a, .intro a { min-height: 44px; display: inline-flex; align-items: center; }
+footer a { text-decoration: underline; display: inline-flex; align-items: center; min-height: 44px; }
+
+@media (max-width: 420px) {
+  .app { padding-left: 12px; padding-right: 12px; }
+  .panel { padding-left: 12px; padding-right: 12px; }
+  .compare-grid, .intro, .card-key { grid-template-columns: minmax(0, 1fr); }
+  .field input[type=date], .custom input { max-width: 100%; }
+  .custom input { width: 100%; }
+  .site-tabs button, .seg button { padding-left: 12px; padding-right: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+.sky-chart .modebar-btn:focus-visible, .sky-chart .modebar-btn:focus { outline: 2px solid #ffffff !important; outline-offset: 1px; }
+.sky-chart .modebar-btn { padding: 4px 6px; }
