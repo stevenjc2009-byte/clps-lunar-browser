@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import Compare from './Compare'
+import CustomSite from './CustomSite'
 import Explain from './Explain'
 import { EXPLAIN } from './explanations'
 import { dataStartMs, isoDay, siteMetrics, spanFor } from './metrics'
 import SkyChart from './SkyChart'
-import type { SkyData } from './types'
+import type { Site, SkyData } from './types'
 
 function fmtLat(lat: number) { return `${Math.abs(lat).toFixed(2)}° ${lat < 0 ? 'S' : 'N'}` }
 function fmtLon(lon: number) { return `${Math.abs(lon).toFixed(2)}° ${lon < 0 ? 'W' : 'E'}` }
@@ -23,6 +24,7 @@ export default function App() {
   const [startDay, setStartDay] = useState('')
   const [days, setDays] = useState(365)
   const [explainAll, setExplainAll] = useState(false)
+  const [custom, setCustom] = useState<Site | null>(null)
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}sky.json`)
@@ -36,12 +38,13 @@ export default function App() {
       .catch(e => setError(String(e)))
   }, [])
 
+  const sites = useMemo(() => (data ? [...data.sites, ...(custom ? [custom] : [])] : []), [data, custom])
   const span = useMemo(() => (data && startDay ? spanFor(data, startDay, days) : null), [data, startDay, days])
   const rows = useMemo(() => {
     if (!data || !span) return []
-    return data.sites.filter(s => picked.includes(s.id))
+    return sites.filter(s => picked.includes(s.id))
       .map(site => ({ site, m: siteMetrics(site, span, data.meta.step_hours) }))
-  }, [data, span, picked])
+  }, [data, sites, span, picked])
 
   if (error) return <main className="app"><p className="error">Could not load data: {error}</p></main>
   if (!data || !span) return <main className="app"><p className="loading">Loading ephemeris data…</p></main>
@@ -52,11 +55,16 @@ export default function App() {
   const maxDay = isoDay(t0 + (data.meta.samples - (days * 24) / data.meta.step_hours) * step)
   const fromDay = isoDay(t0 + span.start * step)
   const toDay = isoDay(t0 + span.end * step)
-  const site = data.sites.find(s => s.id === siteId) ?? data.sites[0]
+  const site = sites.find(s => s.id === siteId) ?? sites[0]
   const chartM = siteMetrics(site, span, data.meta.step_hours)
 
   const toggle = (id: string) => setPicked(p =>
     p.includes(id) ? (p.length > 2 ? p.filter(x => x !== id) : p) : [...p, id])
+  const addCustom = (s: Site) => {
+    setCustom(s)
+    setPicked(p => (p.includes(s.id) ? p : [...p, s.id]))
+    setSiteId(s.id)
+  }
 
   return (
     <main className="app">
@@ -93,8 +101,8 @@ export default function App() {
       <section className="panel" aria-label="Compare sites">
         <div className="section-head">
           <h2>Compare sites</h2>
-          <div className="site-picks" role="group" aria-label="Sites to compare (pick 2 or 3)">
-            {data.sites.map(s => {
+          <div className="site-picks" role="group" aria-label="Sites to compare (pick at least 2)">
+            {sites.map(s => {
               const on = picked.includes(s.id)
               return (
                 <label key={s.id} className={`pick ${on ? 'on' : ''}`}>
@@ -106,14 +114,15 @@ export default function App() {
             })}
           </div>
         </div>
-        <Compare rows={rows} explainAll={explainAll} />
+        <CustomSite onSite={addCustom} explainAll={explainAll} />
+        <Compare rows={rows} explainAll={explainAll} landing={{ index: span.start, t0Ms: t0, stepHours: data.meta.step_hours }} />
       </section>
 
       <section className="panel" aria-label="Sky graph">
         <div className="section-head">
           <h2>Sky graph <Explain term="Sky graph" all={explainAll}>{EXPLAIN.graph}</Explain></h2>
           <nav className="site-tabs" role="tablist">
-            {data.sites.map(s => (
+            {sites.map(s => (
               <button key={s.id} role="tab" aria-selected={s.id === site.id}
                 className={s.id === site.id ? 'active' : ''} onClick={() => setSiteId(s.id)}>
                 {s.name}

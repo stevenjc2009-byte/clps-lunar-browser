@@ -1,0 +1,12 @@
+{
+ "start_utc": "2026-11-15T00:00:00Z",
+ "step_hours": 1,
+ "count": 17544,
+ "layout": "sunX,sunY,sunZ,earthX,earthY,earthZ",
+ "dtype": "float32 little-endian",
+ "units": "km",
+ "frame": "MOON_ME_DE421 (body-fixed, origin Moon centre)",
+ "moon_radius_km": 1737.4,
+ "vector": "apparent (light-time, deflection, aberration) from Moon centre",
+ "source": "JPL DE421 + NAIF moon_080317.tf, pck00008.tpc, moon_pa_de421_1900-2050.bpc"
+}

@@ -7,5 +7,7 @@ export const EXPLAIN = {
   dates: 'Pick when the mission would land and how long to look ahead: 30 days is about one lunar day-night cycle, 1 year shows the Moon\'s slow seasons.',
   graph: 'Each dot is where the Sun (yellow) or Earth (blue) was in the sky at one hour. Left to right is compass direction; up and down is height above the horizon. Dots in the brown band are below the horizon, so hidden.',
   low: 'The Moon\'s axis is tilted only 1.5°, so near the south pole the Sun never climbs high. It circles round the horizon once a month, skimming just above or below it.',
+  next: 'Is the Sun up, and can the lander see Earth, at 00:00 UTC on the landing date? And how long until that changes? A lander that touches down just before sunset has hours, not days, to charge up. Times are worked out between the hourly samples, so treat them as accurate to within about an hour.',
+  custom: 'Type any latitude and longitude on the Moon (south pole: latitude near −90) and press Add. The page works out where the Sun and Earth are from that spot for every hour, using the same NASA data as the three sites. It matches the full calculation to within 0.01°.',
   flat: 'We treat the ground around each site as perfectly flat. Real hills and crater walls can block the Sun and Earth, and a high peak can see over them. Studies that include real terrain find far more sunlight on Shackleton\'s rim: sunlit for about 240 days in a row, with the longest night about 1.5 days (Mazarico et al. 2011, NASA).',
 }
