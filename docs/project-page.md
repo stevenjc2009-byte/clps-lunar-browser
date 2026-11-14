@@ -25,7 +25,7 @@ Near the pole the Sun never rises high. It skims round the horizon once a month,
 
 ## Link to Project Demo
 
-(the team adds the public link to the 30-second video. The file is `docs/demo-video.mp4` in the repository, ready to upload.)
+(the team adds the public link to the 30-second video. The file is `docs/demo-video.mp4` in the repository, ready to upload. Backup slides, if a slide deck is used instead: `docs/slides.pdf`, 7 slides.)
 
 ## Link to Final Project
 

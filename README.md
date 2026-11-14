@@ -4,7 +4,7 @@
 
 Compare Moon south-pole landing sites. For each site, see when the Sun is up (solar power) and when Earth is in view (direct radio contact with home), then get a plain-language verdict.
 
-**Live site:** https://stevenjc2009-byte.github.io/clps-lunar-browser/ · **30-second demo video:** [`docs/demo-video.mp4`](docs/demo-video.mp4) (silent, English subtitles; how it was made: [`docs/video-script.md`](docs/video-script.md))
+**Live site:** https://stevenjc2009-byte.github.io/clps-lunar-browser/ · **30-second demo video:** [`docs/demo-video.mp4`](docs/demo-video.mp4) (silent, English subtitles; how it was made: [`docs/video-script.md`](docs/video-script.md)) · **Backup slides (7):** [`docs/slides.pdf`](docs/slides.pdf) / [`docs/slides.pptx`](docs/slides.pptx)
 
 ## The problem
 

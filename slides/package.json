@@ -1,0 +1,8 @@
+{
+  "name": "clps-slides",
+  "private": true,
+  "devDependencies": {
+    "pptxgenjs": "4.0.1",
+    "playwright": "1.65.1"
+  }
+}
