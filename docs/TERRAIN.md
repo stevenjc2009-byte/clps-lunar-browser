@@ -165,9 +165,17 @@ length given; C1 89.0 % average illumination, 92.7 % Sun visible, 141 h longest 
     Shackleton 2.0 / 2.4 / 3.0 m gives 198 / 120 / 78 h. Taking the ground as the
     highest of the 4 nearest grid cells (C1) gives 200 h.
   - Position: within 100 m of the C1 point, nights range 143-624 h (81 points).
+  - Random height error: we added a random height field (independent values on a 20 m
+    grid, 40 runs per case) to all terrain and to the site. At 0.1, 0.3 and 0.5 m standard
+    deviation the median night does not move (C1 259-260 h, Shackleton 195-197 h).
+    Glaser et al. give 0.1 m for their gridding error. Only at 0.5 m do a few runs reach
+    their values (C1 4 of 40 at or under 120 h; Shackleton 6 of 40, lowest 87 h). So
+    random height noise does not explain the gap; the difference is systematic.
   - So the longest night is set by nearby ground and by fractions of a metre of eye
     height, which the paper does not specify. Sun-visible % moves only 1-3 points
     under the same changes. No bug was found; the gap is inside this sensitivity.
+    The likely systematic causes are their own elevation grid (gridded by the authors
+    from LOLA tracks, not the LOLA team grid we use) or their eye-above-ground rule.
 
 ### 2. Independent map: LOLA team average visibility (Mazarico et al. method)
 
@@ -249,7 +257,9 @@ What was checked by eye:
   (-89.6866, 197.19: 85.5 / 89.4 % / 66 h) shares the label; we use the S row.
 - **The map's illumination period.** It is not stated in the map's label.
 - **Why our 2 m nights are longer than Glaser's.** Narrowed, not fully settled: see
-  Validation 1. Their exact eye-above-ground handling is not in the paper.
+  Validation 1. Random height error is ruled out (15 Nov 2026). What is left is a
+  systematic difference: their own elevation grid or their eye-above-ground rule, neither
+  of which the paper gives in enough detail. Settling it needs the authors' grid.
 - **Licence: now confirmed at node level.** the PDS Geosciences Node FAQ (https://pds-geosciences.wustl.edu/faq.html, read 15 Nov 2026) says "Data sets archived in the PDS are in the public domain" and asks that they be cited like published research.
   No LOLA-specific licence text was found. We cite the data as `data/README.md` shows.
 
