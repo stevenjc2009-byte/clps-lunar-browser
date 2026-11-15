@@ -73,9 +73,10 @@ export default function SkyChart({ site, span, horizon, horizonStep, flatDeg = 0
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: '#070b16',
       font: { color: TEXT, family: 'Inter, system-ui, sans-serif' },
-      margin: { l: 56, r: 16, t: 10, b: 56 },
+      // narrow screens: room above the plot for the toolbar, a shorter axis title, legend below
+      margin: { l: 56, r: 16, t: narrow ? 34 : 10, b: 56 },
       xaxis: {
-        title: { text: 'Compass direction (° clockwise from lunar north)' },
+        title: { text: narrow ? 'Compass direction (° from north)' : 'Compass direction (° clockwise from lunar north)' },
         range: [-180, 180],
         // narrow screens: only N, E, S, W so the labels do not overlap
         tickvals: narrow ? [-180, -90, 0, 90, 180] : [-180, -135, -90, -45, 0, 45, 90, 135, 180],
@@ -86,7 +87,8 @@ export default function SkyChart({ site, span, horizon, horizonStep, flatDeg = 0
         title: { text: 'Height above level (°)' },
         range, gridcolor: GRID, zeroline: false,
       },
-      legend: { orientation: 'h', x: 0, y: 1.1, itemsizing: 'constant' },
+      legend: narrow ? { orientation: 'h', x: 0, y: -0.27, yanchor: 'top', itemsizing: 'constant' }
+        : { orientation: 'h', x: 0, y: 1.1, itemsizing: 'constant' },
       dragmode: 'zoom',
     }
 
