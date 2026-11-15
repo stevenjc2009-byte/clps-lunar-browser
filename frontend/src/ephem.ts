@@ -1,7 +1,7 @@
 import type { Site, SiteStats } from './types.ts'
 
 // In-browser sky for ANY lunar lat/lon. backend/export_vectors.py stores the apparent
-// Sun and Earth vectors from the Moon's centre (km, MOON_ME_DE421 body-fixed frame) for
+// Sun and Earth vectors from the Moon's centre (km, MOON_ME = MOON_ME_DE440_ME421 body-fixed frame, DE440) for
 // every hour; the site's local horizon is derived from those here, mirroring compute.py.
 
 export interface VectorHeader {

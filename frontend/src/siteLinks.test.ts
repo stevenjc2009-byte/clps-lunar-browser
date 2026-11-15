@@ -12,10 +12,18 @@ describe('siteLinks', () => {
     const { x, y } = southPolarXY(-90, 40)
     expect(Math.abs(x) + Math.abs(y)).toBeLessThan(1e-6)
   })
-  it('the Moon Trek hash uses x=lon, y=lat and wraps 0..360 to -180..180', () => {
-    expect(moonTrekUrl(-88.51566, -61.16732)).toContain('#v=0.1&x=-61.16732&y=-88.51566&z=7')
-    expect(moonTrekUrl(-84.7906, 29.1957)).toContain('x=29.19570&y=-84.79060')
-    expect(moonTrekUrl(-89, 300)).toContain('x=-60.00000&')
+  it('north of 60 S the Moon Trek hash uses x=lon, y=lat and wraps 0..360 to -180..180', () => {
+    expect(moonTrekUrl(-45.5, -61.16732)).toContain('#v=0.1&x=-61.16732&y=-45.50000&z=7')
+    expect(moonTrekUrl(-45.5, 300)).toContain('x=-60.00000&')
+    expect(moonTrekUrl(-45.5, 0)).toContain('EPSG%3A%3A104903')
+  })
+  it('south of 60 S the Moon Trek hash uses polar stereographic metres (checked on Shackleton crater)', () => {
+    const u = moonTrekUrl(-89.67, 129.2)
+    const m = u.match(/#v=0\.1&x=(-?[\d.]+)&y=(-?[\d.]+)&/)
+    expect(Math.abs(Number(m?.[1]) - 7754)).toBeLessThan(5)
+    expect(Math.abs(Number(m?.[2]) + 6325)).toBeLessThan(5)
+    expect(u).toContain('&z=10&p=urn%3Aogc%3Adef%3Acrs%3AIAU2000%3A%3A30120')
+    expect(moonTrekUrl(-89.7849, -156.03)).toContain('x=-2649.8&y=-5960.0&')
   })
   it('falls back to the home pages for bad input or the northern hemisphere', () => {
     expect(quickMapUrl(NaN, 0)).toBe('https://quickmap.lroc.im-ldi.com/')

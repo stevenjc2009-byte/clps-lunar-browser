@@ -9,12 +9,18 @@
 // - Moon Trek (trek.nasa.gov/moon): the hash carries x = longitude (deg east), y = latitude (deg), z = zoom,
 //   p = the Moon geographic CRS. The app re-centred on the requested point (-61.16638, -88.51684 for a
 //   request of -61.16732, -88.51566) and rewrote the rest of the hash.
+//   Near the pole that geographic view smears the imagery into horizontal stripes, so south of POLAR_LAT
+//   the link uses Moon Trek's south polar stereographic CRS (IAU2000:30120) instead, where x and y are
+//   metres in the same projection as QuickMap's. Checked 2026-11-15: x=7754, y=-6325 (Shackleton crater
+//   centre, -89.67, 129.2 E) opened centred on the crater; z=10 shows a box about 8.6 km wide.
 
 const MOON_RADIUS_M = 1_737_400
 const QUICKMAP_HOME = 'https://quickmap.lroc.im-ldi.com/'
 const MOON_TREK_HOME = 'https://trek.nasa.gov/moon/'
 const HALF_WIDTH_M = 5000   // QuickMap view: a 10 km wide box round the site
 const TREK_ZOOM = 7
+const TREK_POLAR_ZOOM = 10
+const POLAR_LAT = -60
 
 export interface SiteLink { label: string; href: string; deep: boolean }
 
@@ -36,6 +42,11 @@ export function quickMapUrl(lat: number, lon: number): string {
 
 export function moonTrekUrl(lat: number, lon: number): string {
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 360) return MOON_TREK_HOME
+  if (lat <= POLAR_LAT) {
+    const { x, y } = southPolarXY(lat, lon)
+    return `${MOON_TREK_HOME}#v=0.1&x=${x.toFixed(1)}&y=${y.toFixed(1)}&z=${TREK_POLAR_ZOOM}` +
+      '&p=urn%3Aogc%3Adef%3Acrs%3AIAU2000%3A%3A30120&d=&locale=&b=moon&e=&sfz=&w='
+  }
   const lon180 = ((lon + 180) % 360 + 360) % 360 - 180
   return `${MOON_TREK_HOME}#v=0.1&x=${lon180.toFixed(5)}&y=${lat.toFixed(5)}&z=${TREK_ZOOM}` +
     '&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104903&d=&locale=&b=moon&e=&sfz=&w='
