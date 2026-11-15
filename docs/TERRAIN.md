@@ -136,8 +136,9 @@ continuous time with none of it visible.
 
 Average sunlit (mean disc fraction), Glaser vs ours (5 m): Shackleton S 81.0 vs 64.1 %,
 C1 76.0 vs 38.2 %, C2 75.6 vs 38.1 %, C1 2 m 88.0 vs 76.3 %, Shackleton 2 m 82.1 vs 78.3 %.
-Mazarico et al. 2011 (240 m DEM, different period): Shackleton 86.7 %, C1 89.0 % with a
-141 h longest night.
+Mazarico et al. 2011 (240 m DEM, twenty-year period), as reprinted in Glaser Table 1 (the paper
+itself was not read): Shackleton 86.7 % average illumination, 90.5 % Sun visible, no night
+length given; C1 89.0 % average illumination, 92.7 % Sun visible, 141 h longest night.
 
 **What this shows.**
 - **At Glaser's own resolution the engine matches them.** With a 20 m near band it
@@ -235,6 +236,6 @@ What was checked by eye:
   row is low confidence.
 - **The map's illumination period.** It is not stated in the map's label.
 - **Why our 2 m nights are longer than Glaser's.** Not found.
-- **Licence.** No licence text was found on the data pages. NASA data are generally
-  public domain, but this was not confirmed with NASA.
+- **Licence: now confirmed at node level.** the PDS Geosciences Node FAQ (https://pds-geosciences.wustl.edu/faq.html, read 15 Nov 2026) says "Data sets archived in the PDS are in the public domain" and asks that they be cited like published research.
+  No LOLA-specific licence text was found. We cite the data as `data/README.md` shows.
 

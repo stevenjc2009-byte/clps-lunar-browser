@@ -64,7 +64,7 @@ sees less Sun than a flat horizon gave (40.9 % vs 53.0 %). The true rim point no
 | Terrain Sun numbers are close to a published terrain study | Shackleton rim 86.7 % vs Gläser 85.5 %; Connecting Ridge 86.6 % vs 81.3 % (`docs/terrain-validation.json`) | checked; ours is 2 m up, theirs ground level |
 | Longest nights match the published study | ours are longer (C1 216–259 h vs 112 h) | **not matched**; stated in `docs/TERRAIN.md` |
 | Gläser Table 2 numbers | read from scrambled PDF text | **not verified** |
-| LOLA data may be redistributed | PDS data, normally public domain | **licence wording not confirmed** |
+| LOLA data may be redistributed | PDS Geosciences Node FAQ: "Data sets archived in the PDS are in the public domain" | checked (node-wide statement; no LOLA-specific text) |
 | Close calls are not ranked | 2-point rule, `docs/VERDICT.md`, unit tests | checked |
 | No NASA logo, not an official NASA product | footer text; no logo files in the repo | checked |
 | Built during the event | every file created 14–15 Nov 2026 (git history) | checked |

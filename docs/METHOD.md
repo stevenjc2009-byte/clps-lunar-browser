@@ -127,7 +127,7 @@ The heights and periods differ, so this is rough agreement, not an exact test. A
 
 - Glaser et al.'s Table 2 values were read from scrambled PDF text; the Shackleton 2 m row is low confidence.
 - Our 2 m longest nights are longer than Glaser et al.'s in every variant we tried (Connecting Ridge C1: 216 to 259 h against their 112 h). The reason was not found.
-- The data licence: no licence text was found on the LOLA pages. NASA-produced data are generally public domain, but this was not confirmed with NASA.
+- The data licence: the PDS Geosciences Node FAQ (https://pds-geosciences.wustl.edu/faq.html) says "Data sets archived in the PDS are in the public domain". No LOLA-specific licence text was found.
 - The illumination period of the independent map is not stated in its label.
 
 **Custom spots.** A spot typed in by the user has no terrain data. It uses the flat horizon (lowered by the observer-height dip, plus the mask offset), its card is flagged "Flat horizon · provisional", and the verdict says its ranking is not reliable.

@@ -26,9 +26,8 @@ Everything below was read from the PDS server on 2026-11-14 (directory listings,
 - Citation requested by the data set catalogue (`catalog/gdr_ds.cat`): Neumann, G.A., 2009,
   Lunar Orbiter Laser Altimeter Raw Data Set, LRO-L-LOLA-4-GDR-V1.0, NASA Planetary Data
   System, 2010. Instrument reference: Smith et al. 2009 (SMITHETAL2009).
-- Licence: no licence text appears in the labels or on the LOLA product pages. The PDS page
-  footer links NASA's copyright/image-use policy; NASA-produced data are generally not
-  subject to US copyright. We cite the source as above. (Not verified with NASA directly.)
+- Licence: the PDS Geosciences Node FAQ (https://pds-geosciences.wustl.edu/faq.html, read 15 Nov 2026) says "Data sets archived in the PDS are in the public domain" and asks that they be cited like published research. No LOLA-specific licence text appears in the labels or on the
+  LOLA product pages. We cite the source as above.
 
 ## Products used
 

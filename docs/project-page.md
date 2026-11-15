@@ -4,12 +4,10 @@ These are the fields of the Space Apps 2026 Project Page form, in the form's ord
 
 **Deadline: 22:59 UK time, Sunday 15 Nov 2026** (23:59 Casablanca). The page stays editable until then.
 
-**Two fields need the team** before submitting:
+**Both links are filled in below** and open without a login:
 
-- **Link to Project Demo:** the public video link, once uploaded.
+- **Link to Project Demo:** https://stevenjc2009-byte.github.io/clps-lunar-browser/demo-video.mp4 (the video served by the project site).
 - **Link to Final Project:** the GitHub link, or the deployed site.
-
-Both links must open without a login.
 
 ---
 
@@ -27,7 +25,7 @@ Not an official NASA product.
 
 ## Link to Project Demo
 
-Demo video: (link added by the team after upload)
+Demo video: https://stevenjc2009-byte.github.io/clps-lunar-browser/demo-video.mp4
 
 (The file is `docs/demo-video.mp4` in the repository. Backup slides, if a slide deck is used instead: `docs/slides.pdf`, 7 slides.)
 
@@ -70,7 +68,7 @@ Live site: https://stevenjc2009-byte.github.io/clps-lunar-browser/
 - We confirmed the check can fail: moving a site by about 60 m made one row miss its limit.
 - Terrain check: with LOLA terrain at 2 m observer height over one year, Shackleton rim gets 86.7 % Sun and Connecting Ridge 86.6 % (`docs/terrain-validation.json`). Published values are 85.5 % and 81.3 % (Glaser et al.), but those are at ground level over 20 years, so this is a rough agreement. Before terrain, our flat-horizon model gave only 60.5 % and 57.8 %, and we showed that gap rather than hide it.
 - Automated tests: 207 front-end tests pass (4 skipped), 6 browser tests pass (including an accessibility check), and 73 back-end tests pass (2 skipped).
-- Stated as not verified: one published table was read from scrambled PDF text; our 2 m longest nights are longer than the published ones and we do not know why; the LOLA licence wording was not confirmed with NASA.
+- Stated as not verified: one published table was read from scrambled PDF text; our 2 m longest nights are longer than the published ones and we do not know why.
 
 **Benefits**
 

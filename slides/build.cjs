@@ -189,7 +189,7 @@ pres.addSection({ title: 'Close' })
   ], 'impact')
   col(5.15, 'Next steps', EARTH, [
     'Terrain skyline for spots you type in',
-    'Sunlight on solar panels at a set height',
+    'A power and battery model, not just geometry',
     'Relay-satellite coverage in the communication score',
   ], 'next')
   T(s, [

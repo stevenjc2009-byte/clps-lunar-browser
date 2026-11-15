@@ -51,5 +51,5 @@ Everything the team wrote (code, text, explanations) is original and released un
 ## Open items for the team (not part of the pasted text)
 
 - Before submitting, open the live site and confirm it shows terrain (site cards without "Flat horizon" flags) and the QuickMap / Moon Trek links.
-- LOLA licence: no licence text was found on the LOLA pages; NASA data are generally public domain but this was not confirmed with NASA (`docs/TERRAIN.md`, "Not verified").
+- LOLA licence: the PDS Geosciences Node FAQ (https://pds-geosciences.wustl.edu/faq.html, read 15 Nov 2026) says "Data sets archived in the PDS are in the public domain" and asks that they be cited like published research (`docs/TERRAIN.md`, "Not verified"). Nothing to do.
 - The submission guide says the SI-use question is for data collection and is not shown to judges, but SI-generated code and data must still be acknowledged in descriptive text and metadata. The last paragraph above does that.
