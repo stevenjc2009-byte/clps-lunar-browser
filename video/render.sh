@@ -21,6 +21,9 @@ subtitles=captions.srt:force_style='FontName=Segoe UI,Fontsize=15,Bold=1,Primary
 drawtext=fontfile='C\:/Windows/Fonts/segoeuib.ttf':text='AI-made video (Claude) - screen recording + synthetic TTS voice':fontsize=22:fontcolor=white:box=1:boxcolor=0x000000@0.65:boxborderw=8:x=w-tw-24:y=h-th-14
 EOF
 
+# Space Apps rule: SI audio/video must also be acknowledged in the file's metadata.
+SI_NOTE='AI-made video (Claude): automated screen recording of the live site; the voiceover is synthetic text-to-speech (Microsoft neural voice en-GB-SoniaNeural via edge-tts), not a person. No NASA logo; not an official NASA product.'
 "$FFMPEG" -v error -y -ss "$T0" -i raw.webm -i voice.wav -t 29.5 -filter_script:v filter.txt -map 0:v -map 1:a \
+  -metadata title='CLPS Lunar Mission Browser - 30-second demo' -metadata comment="$SI_NOTE" -metadata description="$SI_NOTE" \
   -c:a aac -b:a 160k -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -movflags +faststart ../../docs/demo-video.mp4
 echo "wrote docs/demo-video.mp4"
