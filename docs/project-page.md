@@ -110,8 +110,8 @@ A clear, honest first look at a site before detailed studies. Next steps would b
   - look up published reference values and site coordinates;
   - draft the README, the plain-language explanations and this text.
 - The team reviewed the output, and every computed position was checked against NASA JPL Horizons.
-- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant.
-- The 30-second demo video and the backup slides were also made by the SI assistant. The video is an automated screen recording of the live site with subtitles and a synthetic text-to-speech voiceover (Microsoft neural voice "en-GB-SoniaNeural" via the edge-tts package; no person's voice); the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork or person anywhere, and the only SI audio is that voiceover.
+- The team logo (The Big Four) in the page header, browser tab icon, title slide and video was supplied by the team, not made by the SI assistant.
+- The 30-second demo video and the backup slides were also made by the SI assistant. The video is an automated screen recording of the live site with subtitles and a synthetic text-to-speech voiceover (Microsoft neural voice "en-GB-RyanNeural" via the edge-tts package; no person's voice); the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork or person anywhere, and the only SI audio is that voiceover.
 
 ## NASA Data
 
@@ -141,6 +141,6 @@ Software (open source; licences in `THIRD_PARTY_NOTICES.md`):
 
 - Skyfield (MIT): https://rhodesmill.org/skyfield/
 - NumPy, jplephem, sgp4, React, Vite, TypeScript, Plotly.js, Vitest, pytest, Playwright, axe-core
-- Video tools (used to make the demo video, not part of the app): Playwright (screen recording), ffmpeg (editing and subtitles), and edge-tts, https://github.com/rany2/edge-tts , which makes the synthetic voiceover with Microsoft's neural text-to-speech voice "en-GB-SoniaNeural".
+- Video tools (used to make the demo video, not part of the app): Playwright (screen recording), ffmpeg (editing and subtitles), and edge-tts, https://github.com/rany2/edge-tts , which makes the synthetic voiceover with Microsoft's neural text-to-speech voice "en-GB-RyanNeural".
 
 No Space Agency Partner data was used.

@@ -42,11 +42,11 @@ Challenge-listed resources: the NASA Horizons System (Field 1, item 2), LROC Qui
 
 Software (all open source; licences in `THIRD_PARTY_NOTICES.md`): Skyfield (Brandon Rhodes, MIT), NumPy, jplephem, sgp4, React, Vite, TypeScript, Plotly.js, Vitest, pytest.
 
-Video tools (used to make the demo video, not part of the app): Playwright (screen recording), ffmpeg (editing and subtitles), and edge-tts, https://github.com/rany2/edge-tts , which makes the synthetic voiceover with Microsoft's neural text-to-speech voice "en-GB-SoniaNeural".
+Video tools (used to make the demo video, not part of the app): Playwright (screen recording), ffmpeg (editing and subtitles), and edge-tts, https://github.com/rany2/edge-tts , which makes the synthetic voiceover with Microsoft's neural text-to-speech voice "en-GB-RyanNeural".
 
 Cross-checks and links to NASA Moon Trek, https://trek.nasa.gov/moon/ , and LROC QuickMap, https://quickmap.lroc.im-ldi.com/ , are provided inside the app so users can look at each site on the Moon.
 
-Everything the team wrote (code, text, explanations) is original and released under the MIT licence. The code, text and this submission text were written with AI coding assistants (Claude, by Anthropic) under the team's direction; see the README of https://github.com/stevenjc2009-byte/clps-lunar-browser . The demo video's voiceover is AI-generated audio: a synthetic text-to-speech voice (Microsoft neural voice "en-GB-SoniaNeural", made with the edge-tts package), not a person. There is no AI-generated photo or person in the project, and no NASA logo. This is not an official NASA product.
+Everything the team wrote (code, text, explanations) is original and released under the MIT licence. The code, text and this submission text were written with AI coding assistants (Claude, by Anthropic) under the team's direction; see the README of https://github.com/stevenjc2009-byte/clps-lunar-browser . The demo video's voiceover is AI-generated audio: a synthetic text-to-speech voice (Microsoft neural voice "en-GB-RyanNeural", made with the edge-tts package), not a person. There is no AI-generated photo or person in the project, and no NASA logo. This is not an official NASA product.
 
 ---
 

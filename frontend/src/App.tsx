@@ -82,10 +82,13 @@ export default function App() {
   return (
     <main className="app">
       <header>
-        <div>
+        <div className="brand">
+          <img className="team-logo" src="team-logo.jpg" alt="The Big Four team logo" width={1200} height={896} />
+          <div>
           <p className="eyebrow">NASA Space Apps Challenge 2026 · Lunar Landing Site Navigator</p>
           <h1>CLPS Lunar Mission Browser</h1>
           <p className="tagline">Compare Moon south-pole landing sites: when is the Sun up for power, and when can you see Earth to phone home?</p>
+          </div>
         </div>
         <button type="button" className={`explain-all ${explainAll ? 'on' : ''}`} aria-pressed={explainAll}
           onClick={() => setExplainAll(x => !x)}>

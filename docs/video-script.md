@@ -7,7 +7,7 @@
 - **30 seconds or less:** 29.5 s, checked with ffprobe.
 - **English subtitles:** burned in, from `video-subtitles.srt`.
 - **No NASA logo** or other NASA branding.
-- **No photos, video or voices of any person.** At least one team member is under 18, so the video is a screen recording of the site only. The voiceover is a computer voice: Microsoft's neural text-to-speech voice "en-GB-SoniaNeural", made through the free `edge-tts` Python package. No team member's voice is used.
+- **No photos, video or voices of any person.** At least one team member is under 18, so the video is a screen recording of the site only. The voiceover is a computer voice: Microsoft's neural text-to-speech voice "en-GB-RyanNeural", made through the free `edge-tts` Python package. No team member's voice is used.
 - **AI watermark and SI audio acknowledgement.** An AI assistant (Claude) scripted and recorded the video and the voice is synthetic, so a visible line sits in the bottom-right corner the whole time: "AI-made video (Claude) - screen recording + synthetic TTS voice". The same is stated in the README and the Project Page text, and in the file's own metadata (mp4 `title`, `comment` and `description` tags, written by `render.sh`).
 - **Still to do by the team:** upload it publicly (for example YouTube unlisted, or Google Drive with "anyone with the link"), so it opens without a login. Then paste the link into the Project Page's "Link to Project Demo" field. It cannot be uploaded to the Space Apps site itself.
 

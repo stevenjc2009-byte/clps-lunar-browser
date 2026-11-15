@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the synthetic voiceover (out/voice.wav, 29.5 s) from lines.txt.
-# Voice: Microsoft neural text-to-speech (en-GB-SoniaNeural) through the
+# Voice: Microsoft neural text-to-speech (en-GB-RyanNeural) through the
 # edge-tts Python package (pip install edge-tts). No person's voice is used.
 # Each line is trimmed of silence and placed at its start time below, which
 # record.mjs and docs/video-subtitles.srt are timed to.
@@ -12,7 +12,7 @@ mkdir -p ../out
 i=0
 while IFS= read -r line; do
   i=$((i+1))
-  py -3 -m edge_tts --voice en-GB-SoniaNeural --rate=+8% --text "$line" --write-media "raw$i.mp3"
+  py -3 -m edge_tts --voice en-GB-RyanNeural --rate=+8% --text "$line" --write-media "raw$i.mp3"
   "$FFMPEG" -v error -y -i "raw$i.mp3" -af "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse" -ar 48000 -ac 1 "t$i.wav"
 done < lines.txt
 inputs=(); filt=""; mix=""

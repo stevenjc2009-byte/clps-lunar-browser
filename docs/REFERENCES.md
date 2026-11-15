@@ -47,7 +47,7 @@ Licences are read from the lockfiles by `.github/scripts/gen_third_party_notices
 
 - Skyfield, Brandon Rhodes: https://rhodesmill.org/skyfield/ (opened). Not a NASA product.
 - NumPy: https://numpy.org/ ; React: https://react.dev/ ; Vite: https://vite.dev/ ; TypeScript: https://www.typescriptlang.org/ ; Plotly.js: https://plotly.com/javascript/ ; Vitest: https://vitest.dev/ ; pytest: https://pytest.org/ (project home pages, listed in the earlier README; licences per `THIRD_PARTY_NOTICES.md`).
-- Demo video only: Playwright https://playwright.dev/ (recording), ffmpeg https://ffmpeg.org/ (editing, subtitles), edge-tts https://github.com/rany2/edge-tts (synthetic voiceover, Microsoft neural voice "en-GB-SoniaNeural"; no person's voice).
+- Demo video only: Playwright https://playwright.dev/ (recording), ffmpeg https://ffmpeg.org/ (editing, subtitles), edge-tts https://github.com/rany2/edge-tts (synthetic voiceover, Microsoft neural voice "en-GB-RyanNeural"; no person's voice).
 
 ## Left out on purpose
 

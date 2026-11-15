@@ -155,8 +155,8 @@ py -3 .github/scripts/gen_third_party_notices.py      # regenerate THIRD_PARTY_N
   - draft this README and the plain-language explanations.
 - **For the upgrade described here, AI agents built much of the work.** Several Claude agents, working in parallel on separate branches overnight under the team's direction, wrote the DE440 backend, the LOLA terrain-horizon code and its validation, the visibility engine and verdict rules, the controls, heatmap, sensitivity and compare panels, the Playwright and accessibility tests, the validation scripts and reports, the tests, the CI workflows, the in-app method panel and these documents. Each agent recorded its choices in `docs/decisions/`; the build history is in [`docs/JOURNAL.md`](docs/JOURNAL.md).
 - The team reviews and decides what ships. Computed positions are checked against NASA JPL Horizons (see Validation), not trusted because an AI wrote the code.
-- The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant.
-- The 30-second demo video and the backup slides were made by the SI assistant. The video is an automated screen recording of the live site with subtitles and a synthetic text-to-speech voiceover (Microsoft neural voice "en-GB-SoniaNeural" via the edge-tts package; no person's voice); the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork or person anywhere, and no NASA logo; the only SI audio is that voiceover.
+- The team logo (The Big Four) in the page header, browser tab icon, title slide and video was supplied by the team, not made by the SI assistant.
+- The 30-second demo video and the backup slides were made by the SI assistant. The video is an automated screen recording of the live site with subtitles and a synthetic text-to-speech voiceover (Microsoft neural voice "en-GB-RyanNeural" via the edge-tts package; no person's voice); the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork or person anywhere, and no NASA logo; the only SI audio is that voiceover.
 
 ## Licence
 

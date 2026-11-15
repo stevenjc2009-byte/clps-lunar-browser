@@ -1,7 +1,7 @@
 // Screenshots of the live site for the slides (the slides show only our own page).
 //   node shots.mjs [url]   -> img/*.png
 import { chromium } from 'playwright'
-import { mkdirSync, readFileSync } from 'node:fs'
+import { mkdirSync } from 'node:fs'
 
 const URL_ = process.argv[2] ?? 'http://localhost:5197/#d=2026-11-15&w=365&s=shackleton-rim,connecting-ridge,peak-near-shackleton,im2,im1&g=shackleton-rim'
 const IMG = new URL('./img/', import.meta.url)
@@ -35,10 +35,5 @@ await page.locator('.hm-use').first().waitFor()
 await panel('Best landing dates').screenshot({ path: out('heatmap.png') })
 await panel('Model settings').screenshot({ path: out('settings.png') })
 
-// The favicon, large, for the title slide
-const svg = readFileSync(new URL('../frontend/public/favicon.svg', import.meta.url), 'utf8')
-const icon = await browser.newPage({ viewport: { width: 512, height: 512 } })
-await icon.setContent(`<body style="margin:0;background:transparent">${svg.replace('<svg', '<svg width="512" height="512"')}</body>`)
-await icon.locator('svg').screenshot({ path: out('icon.png'), omitBackground: true })
 await browser.close()
 console.log('shots done')
