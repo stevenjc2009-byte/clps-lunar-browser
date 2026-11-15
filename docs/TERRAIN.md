@@ -132,7 +132,7 @@ continuous time with none of it visible.
 | Connecting Ridge C1, 0 m | 81.3 % / 268 h | 40.7 % / 512 h | **74.4 % / 308 h** | 82.8 % / 185 h |
 | Connecting Ridge C2, 0 m | 80.6 % / 166 h | 43.4 % / 557 h | **78.6 % / 166 h** | 78.2 % / 166 h |
 | C1, 2 m | 92.1 % / 112 h | 79.7 % / 241 h | 89.8 % / 259 h | 88.9 % / 216 h |
-| Shackleton, 2 m (low confidence: table text scrambled in the PDF) | 89.8 % / 65 h | 85.1 % / 137 h | 83.8 % / 198 h | 90.4 % / 65 h |
+| Shackleton S, 2 m | 89.8 % / 65 h | 85.1 % / 137 h | 83.8 % / 198 h | 90.4 % / 65 h |
 
 Average sunlit (mean disc fraction), Glaser vs ours (5 m): Shackleton S 81.0 vs 64.1 %,
 C1 76.0 vs 38.2 %, C2 75.6 vs 38.1 %, C1 2 m 88.0 vs 76.3 %, Shackleton 2 m 82.1 vs 78.3 %.
@@ -155,8 +155,19 @@ length given; C1 89.0 % average illumination, 92.7 % Sun visible, 141 h longest 
 - **This is not the int16 bug coming back.** The float grids have no 0.5 m steps, and the
   20 m near band, read through the same code, agrees with Glaser.
 - **Our 2 m longest nights are longer than Glaser's in every variant** (C1 216-259 h vs
-  112 h). This is not explained. Their Table 2 point may differ (it is 1.2 km from C1),
-  or the table may be misread from the PDF. Not investigated further.
+  112 h). Checked 15 Nov 2026 (20 m near band, their 2 m point and 2017-2037 period):
+  - The point is right: their Table 2 C1 point (-89.4398, 222.83) is 0.32 km from the
+    0 m C1 point, and our validation already uses it. Table 2 is now read cleanly.
+  - In our longest C1 night (259 h) the Sun is hidden by at most 0.001-0.009 deg, behind
+    ground 0.1-0.4 km away. Ground beyond 0.5 km only: C1 104 h (Glaser 112 h),
+    Shackleton 65 h (Glaser 65 h). Ground within 0.5 km only: 259 h and 198 h.
+  - Eye height: C1 2.0 / 2.2 / 2.6 / 2.8 / 3.0 m gives 259 / 204 / 191 / 112 / 110 h.
+    Shackleton 2.0 / 2.4 / 3.0 m gives 198 / 120 / 78 h. Taking the ground as the
+    highest of the 4 nearest grid cells (C1) gives 200 h.
+  - Position: within 100 m of the C1 point, nights range 143-624 h (81 points).
+  - So the longest night is set by nearby ground and by fractions of a metre of eye
+    height, which the paper does not specify. Sun-visible % moves only 1-3 points
+    under the same changes. No bug was found; the gap is inside this sensitivity.
 
 ### 2. Independent map: LOLA team average visibility (Mazarico et al. method)
 
@@ -232,10 +243,13 @@ What was checked by eye:
 
 ### 5. Not verified
 
-- **Glaser Table 2 values.** These were read from scrambled PDF text; the Shackleton 2 m
-  row is low confidence.
+- **Glaser Table 2 values: now confirmed.** Read 15 Nov 2026 from the NTRS PDF page 12
+  by word positions (PyMuPDF), row by row: C1 (-89.4398, 222.83) 88.0 / 92.1 % / 112 h;
+  Shackleton S (-89.7815, 204.70) 82.1 / 89.8 % / 65 h. A second Shackleton point
+  (-89.6866, 197.19: 85.5 / 89.4 % / 66 h) shares the label; we use the S row.
 - **The map's illumination period.** It is not stated in the map's label.
-- **Why our 2 m nights are longer than Glaser's.** Not found.
+- **Why our 2 m nights are longer than Glaser's.** Narrowed, not fully settled: see
+  Validation 1. Their exact eye-above-ground handling is not in the paper.
 - **Licence: now confirmed at node level.** the PDS Geosciences Node FAQ (https://pds-geosciences.wustl.edu/faq.html, read 15 Nov 2026) says "Data sets archived in the PDS are in the public domain" and asks that they be cited like published research.
   No LOLA-specific licence text was found. We cite the data as `data/README.md` shows.
 

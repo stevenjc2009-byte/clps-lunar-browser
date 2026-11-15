@@ -68,7 +68,7 @@ Live site: https://stevenjc2009-byte.github.io/clps-lunar-browser/
 - We confirmed the check can fail: moving a site by about 60 m made one row miss its limit.
 - Terrain check: with LOLA terrain at 2 m observer height over one year, Shackleton rim gets 86.7 % Sun and Connecting Ridge 86.6 % (`docs/terrain-validation.json`). Published values are 85.5 % and 81.3 % (Glaser et al.), but those are at ground level over 20 years, so this is a rough agreement. Before terrain, our flat-horizon model gave only 60.5 % and 57.8 %, and we showed that gap rather than hide it.
 - Automated tests: 207 front-end tests pass (4 skipped), 6 browser tests pass (including an accessibility check), and 73 back-end tests pass (2 skipped).
-- Stated as not verified: one published table was read from scrambled PDF text; our 2 m longest nights are longer than the published ones and we do not know why.
+- Stated openly: our 2 m longest nights are longer than the published ones (Connecting Ridge 259 h vs 112 h). The longest night hangs on a few hundredths of a degree of ground within 0.5 km and on fractions of a metre of eye height; ignoring that nearby ground gives 104 h and 65 h against the published 112 h and 65 h. We found no bug.
 
 **Benefits**
 

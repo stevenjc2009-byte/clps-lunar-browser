@@ -125,8 +125,8 @@ The heights and periods differ, so this is rough agreement, not an exact test. A
 
 **Not verified.**
 
-- Glaser et al.'s Table 2 values were read from scrambled PDF text; the Shackleton 2 m row is low confidence.
-- Our 2 m longest nights are longer than Glaser et al.'s in every variant we tried (Connecting Ridge C1: 216 to 259 h against their 112 h). The reason was not found.
+- Glaser et al.'s Table 2 values are now confirmed (read by word positions from the PDF, 15 Nov 2026).
+- Our 2 m longest nights are longer than Glaser et al.'s in every variant we tried (Connecting Ridge C1: 216 to 259 h against their 112 h). Narrowed, not fully settled: Our 2 m longest nights are longer than theirs because the longest night hangs on a few hundredths of a degree of nearby ground: in our longest Connecting Ridge night the Sun is hidden by at most 0.001-0.009 degrees behind ground 0.1-0.4 km away. Ignoring ground closer than 0.5 km gives 104 h (theirs 112 h) at C1 and 65 h (theirs 65 h) at Shackleton; raising the eye from 2.0 to 2.8 m gives 112 h at C1. We found no bug; the exact way their model puts the eye above the ground is not given in the paper, and that is enough to explain the gap. Details: `docs/TERRAIN.md`, Validation 1.
 - The data licence: the PDS Geosciences Node FAQ (https://pds-geosciences.wustl.edu/faq.html) says "Data sets archived in the PDS are in the public domain". No LOLA-specific licence text was found.
 - The illumination period of the independent map is not stated in its label.
 

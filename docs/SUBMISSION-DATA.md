@@ -35,8 +35,8 @@ We used no space-agency partner data. Everything below is other data, software a
 Published studies (all opened and read for this project):
 
 - Pena-Asensio, Neira-Acosta and Sanchez-Lozano, arXiv:2406.19863, https://arxiv.org/html/2406.19863v1 : coordinates of three candidate south-pole points (Table 3).
-- Glaser, Oberst, Neumann, Mazarico, Speyerer and Robinson, "Illumination conditions at the lunar poles: Implications for future exploration", https://ntrs.nasa.gov/citations/20170007365 : published sunlight values (Sun visible %, longest night) we compare our terrain results with. We read its Table 2 from scrambled PDF text, so one row (Shackleton, 2 m) is low confidence.
-- Mazarico, Neumann, Smith, Zuber and Torrence (2011), Icarus 211, "Illumination conditions of the lunar polar regions using LOLA topography", https://ntrs.nasa.gov/citations/20120010094 (abstract read): the published method for sunlight from LOLA terrain, and a published figure for a site near the Shackleton rim. We also used its method for our cross-check map.
+- Glaser, Oberst, Neumann, Mazarico, Speyerer and Robinson, "Illumination conditions at the lunar poles: Implications for future exploration", https://ntrs.nasa.gov/citations/20170007365 : published sunlight values (Sun visible %, longest night) we compare our terrain results with (Tables 1 and 2, confirmed).
+- Mazarico, Neumann, Smith, Zuber and Torrence (2011), Icarus 211, "Illumination conditions of the lunar polar regions using LOLA topography", https://ntrs.nasa.gov/citations/20120010094 (abstract read; per-site values quoted via Glaser et al. Table 1): the published method for sunlight from LOLA terrain, and a published figure for a site near the Shackleton rim. We also used its method for our cross-check map.
 
 Challenge-listed resources: the NASA Horizons System (Field 1, item 2), LROC QuickMap and NASA Moon Trek (links only).
 
