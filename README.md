@@ -6,7 +6,7 @@ Compare Moon south-pole landing sites. For each site, see when the Sun is up (so
 
 **Not an official NASA product.** It is a student project for the NASA Space Apps Challenge. NASA has not reviewed or endorsed it, and it uses no NASA logo.
 
-**Live site:** https://stevenjc2009-byte.github.io/clps-lunar-browser/ · **30-second demo video:** [`docs/demo-video.mp4`](docs/demo-video.mp4) (silent, English subtitles; how it was made: [`docs/video-script.md`](docs/video-script.md)) · **Backup slides (7):** [`docs/slides.pdf`](docs/slides.pdf) / [`docs/slides.pptx`](docs/slides.pptx)
+**Live site:** https://stevenjc2009-byte.github.io/clps-lunar-browser/ · **30-second demo video:** [`docs/demo-video.mp4`](docs/demo-video.mp4) (synthetic text-to-speech voiceover, English subtitles; how it was made: [`docs/video-script.md`](docs/video-script.md)) · **Backup slides (7):** [`docs/slides.pdf`](docs/slides.pdf) / [`docs/slides.pptx`](docs/slides.pptx)
 
 Method in full: [`docs/METHOD.md`](docs/METHOD.md) · Verdict rules: [`docs/VERDICT.md`](docs/VERDICT.md) · Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md) · References: [`docs/REFERENCES.md`](docs/REFERENCES.md) · Build journal: [`docs/JOURNAL.md`](docs/JOURNAL.md)
 
@@ -156,7 +156,7 @@ py -3 .github/scripts/gen_third_party_notices.py      # regenerate THIRD_PARTY_N
 - **For the upgrade described here, AI agents built much of the work.** Several Claude agents, working in parallel on separate branches overnight under the team's direction, wrote the DE440 backend, the LOLA terrain-horizon code and its validation, the visibility engine and verdict rules, the controls, heatmap, sensitivity and compare panels, the Playwright and accessibility tests, the validation scripts and reports, the tests, the CI workflows, the in-app method panel and these documents. Each agent recorded its choices in `docs/decisions/`; the build history is in [`docs/JOURNAL.md`](docs/JOURNAL.md).
 - The team reviews and decides what ships. Computed positions are checked against NASA JPL Horizons (see Validation), not trusted because an AI wrote the code.
 - The favicon (a simple drawn icon: Sun, Earth and lunar ground) was written as SVG code by the SI assistant.
-- The 30-second demo video and the backup slides were made by the SI assistant. The video is an automated, silent screen recording of the live site with subtitles; the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork, voice or person anywhere, and no NASA logo.
+- The 30-second demo video and the backup slides were made by the SI assistant. The video is an automated screen recording of the live site with subtitles and a synthetic text-to-speech voiceover (Microsoft neural voice "en-GB-SoniaNeural" via the edge-tts package; no person's voice); the slides use screenshots of the site. Both carry a visible "AI-made" watermark. There is no SI-generated photo, artwork or person anywhere, and no NASA logo; the only SI audio is that voiceover.
 
 ## Licence
 

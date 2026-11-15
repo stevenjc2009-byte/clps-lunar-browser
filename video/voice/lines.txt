@@ -1,0 +1,5 @@
+Landing near the Moon's south pole? You need sunlight for power, and Earth in view for radio.
+This is one site's sky for a year. Grey is the real NASA terrain skyline. When the Sun sinks behind it, the lander goes dark.
+Each card scores a site: time in sunlight, time Earth is in view, and the longest dark spell.
+The heatmap shows the best days to land. Click one, and every number updates.
+Too close to call? It tells you, honestly.

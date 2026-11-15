@@ -1,40 +1,47 @@
 1
-00:00:00,000 --> 00:00:03,000
-The Big Four:
-Lunar Landing Site Navigator
+00:00:00,000 --> 00:00:02,420
+Landing near the Moon's south pole?
 
 2
-00:00:03,000 --> 00:00:06,000
-Real NASA LOLA terrain skyline
+00:00:02,420 --> 00:00:06,100
+You need sunlight for power,
+and Earth in view for radio.
 
 3
-00:00:06,000 --> 00:00:09,000
-Sun dots behind hills are hidden
+00:00:06,100 --> 00:00:08,480
+This is one site's sky for a year.
 
 4
-00:00:09,000 --> 00:00:12,500
-Seven sites, one date, compared
+00:00:08,480 --> 00:00:11,240
+Grey is the real NASA terrain skyline.
 
 5
-00:00:12,500 --> 00:00:15,500
-Rim and ridge: about 86% Sun
+00:00:11,240 --> 00:00:14,700
+When the Sun sinks behind it,
+the lander goes dark.
 
 6
-00:00:15,500 --> 00:00:19,500
-Too close to call? We say so
+00:00:14,700 --> 00:00:17,100
+Each card scores a site:
+time in sunlight,
 
 7
-00:00:19,500 --> 00:00:22,000
-Best landing dates, day by day
+00:00:17,100 --> 00:00:20,600
+time Earth is in view,
+and the longest dark spell.
 
 8
-00:00:22,000 --> 00:00:25,000
-Click a day to set the date
+00:00:20,600 --> 00:00:23,240
+The heatmap shows the best days to land.
 
 9
-00:00:25,000 --> 00:00:27,500
-Model presets and DSN link check
+00:00:23,240 --> 00:00:26,000
+Click one, and every number updates.
 
 10
-00:00:27,500 --> 00:00:29,500
-Share this exact view with one link
+00:00:26,000 --> 00:00:27,490
+Too close to call?
+
+11
+00:00:27,490 --> 00:00:29,500
+It tells you, honestly.
